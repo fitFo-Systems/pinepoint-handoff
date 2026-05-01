@@ -366,6 +366,12 @@
       color: var(--medium-gray);
       cursor: not-allowed;
     }
+    .card-reply__submit.is-sending,
+    .ask-form button.is-sending { background: var(--medium-gray); cursor: wait; }
+    .card-reply__submit.is-sent,
+    .ask-form button.is-sent { background: var(--green-hover); }
+    .card-reply__submit.is-failed,
+    .ask-form button.is-failed { background: var(--rust); }
     .card-reply__hint {
       color: var(--medium-gray);
       font-size: 0.78rem;
@@ -2766,17 +2772,73 @@ function installTrigger() {
   });
   updateProgress();
 
-  // === Catchall question form (mailto) ===
+  // === Behind-the-scenes form delivery via Formsubmit ===
+  // POSTs JSON to Formsubmit's AJAX endpoint, which emails the contents to
+  // SUBMIT_DEST. First-time submissions trigger a one-click email-confirmation
+  // step on Keith's side; after that, every submission is delivered silently.
+  const SUBMIT_DEST = 'keith@fitfosystems.com';
+  const SUBMIT_URL = 'https://formsubmit.co/ajax/' + encodeURIComponent(SUBMIT_DEST);
+
+  async function sendBehindTheScenes(payload) {
+    try {
+      const res = await fetch(SUBMIT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(Object.assign({
+          _subject: payload.subject || '[Pine Point handoff] Note',
+          _captcha: 'false',
+          _template: 'box'
+        }, payload))
+      });
+      if (!res.ok) return { ok: false, reason: 'http_' + res.status };
+      const data = await res.json().catch(() => ({}));
+      // Formsubmit returns { success: 'true' } on accepted submissions.
+      const ok = String(data.success).toLowerCase() === 'true';
+      return ok ? { ok: true } : { ok: false, reason: data.message || 'unknown' };
+    } catch (e) {
+      return { ok: false, reason: 'network_error' };
+    }
+  }
+
+  function setSubmitState(btn, state, label) {
+    btn.classList.remove('is-sending', 'is-sent', 'is-failed');
+    if (state) btn.classList.add('is-' + state);
+    if (label !== undefined) btn.textContent = label;
+  }
+
+  // === Catchall "Anything we missed?" form ===
   const askForm = document.getElementById('ask-form');
-  askForm.addEventListener('submit', e => {
+  const askMsg = document.getElementById('ask-message');
+  const askEmail = document.getElementById('ask-email');
+  const askSubmitBtn = askForm.querySelector('button[type="submit"]');
+  askForm.addEventListener('submit', async e => {
     e.preventDefault();
-    const message = document.getElementById('ask-message').value;
-    const email = document.getElementById('ask-email').value;
-    const subject = '[Pine Point handoff] Anything we missed';
-    const body = (email ? 'From: ' + email + '\n\n' : '') + message + '\n\n---\nSent from the handoff page.';
-    window.location.href = 'mailto:keith@fitfosystems.com'
-      + '?subject=' + encodeURIComponent(subject)
-      + '&body=' + encodeURIComponent(body);
+    const message = (askMsg.value || '').trim();
+    if (!message) return;
+    setSubmitState(askSubmitBtn, 'sending', 'Sending…');
+    askSubmitBtn.disabled = true;
+    const result = await sendBehindTheScenes({
+      subject: '[Pine Point handoff] Anything we missed',
+      kind: 'catchall',
+      message: message,
+      replyEmail: askEmail.value || '(not provided)',
+      page: location.href
+    });
+    if (result.ok) {
+      setSubmitState(askSubmitBtn, 'sent', 'Sent ✓ thanks');
+      askMsg.value = '';
+    } else {
+      setSubmitState(askSubmitBtn, 'failed', 'Failed — try email');
+      askSubmitBtn.disabled = false;
+      // Last-ditch fallback so they can still get the message to Keith.
+      const subject = '[Pine Point handoff] Anything we missed';
+      const body = message + (askEmail.value ? '\n\nReply to: ' + askEmail.value : '');
+      setTimeout(() => {
+        window.location.href = 'mailto:' + SUBMIT_DEST
+          + '?subject=' + encodeURIComponent(subject)
+          + '&body=' + encodeURIComponent(body);
+      }, 600);
+    }
   });
 
   // === Inline replies on each "What we need" card ===
@@ -2791,6 +2853,14 @@ function installTrigger() {
     try { localStorage.setItem(STORAGE_KEY_REPLIES, JSON.stringify(replyDrafts)); } catch (e) {}
   }
 
+  function refreshSubmitButton(ta) {
+    const card = ta.closest('.card--checkable');
+    if (!card) return;
+    const btn = card.querySelector('.card-reply__submit');
+    if (!btn || btn.classList.contains('is-sent') || btn.classList.contains('is-sending')) return;
+    btn.disabled = !ta.value.trim();
+  }
+
   document.querySelectorAll('.card-reply__textarea').forEach(ta => {
     const id = ta.dataset.replyId;
     if (replyDrafts[id]) ta.value = replyDrafts[id];
@@ -2798,41 +2868,56 @@ function installTrigger() {
     ta.addEventListener('input', () => {
       replyDrafts[id] = ta.value;
       saveDrafts();
+      const card = ta.closest('.card--checkable');
+      const btn = card.querySelector('.card-reply__submit');
+      // If user keeps typing after sending, allow sending again.
+      if (btn && btn.classList.contains('is-sent')) {
+        setSubmitState(btn, null, 'Send reply');
+      }
       refreshSubmitButton(ta);
     });
   });
 
-  function refreshSubmitButton(ta) {
-    const card = ta.closest('.card--checkable');
-    if (!card) return;
-    const btn = card.querySelector('.card-reply__submit');
-    if (btn) btn.disabled = !ta.value.trim();
-  }
-
   document.querySelectorAll('.card-reply__submit').forEach(btn => {
-    btn.addEventListener('click', e => {
+    btn.addEventListener('click', async e => {
       e.preventDefault();
       const card = btn.closest('.card--checkable');
       const ta = card.querySelector('.card-reply__textarea');
       const text = (ta?.value || '').trim();
       if (!text) return;
       const topic = btn.dataset.replyTopic || 'Reply';
-      const subject = '[Pine Point handoff] ' + topic;
-      const body = text + '\n\n---\nSent from the handoff page (' + topic + ').';
-      // Also auto-mark this card as addressed since they actually replied.
-      if (!card.classList.contains('is-done')) {
-        card.classList.add('is-done');
-        const checkBtn = card.querySelector('.card-check');
-        if (checkBtn) checkBtn.textContent = 'Addressed';
-        if (card.dataset.needId) {
-          needDoneSet.add(card.dataset.needId);
-          try { localStorage.setItem(STORAGE_KEY_NEED, JSON.stringify(Array.from(needDoneSet))); } catch (e) {}
-          refreshNeedProgress();
+      setSubmitState(btn, 'sending', 'Sending…');
+      btn.disabled = true;
+      const result = await sendBehindTheScenes({
+        subject: '[Pine Point handoff] ' + topic,
+        kind: 'inline_reply',
+        topic: topic,
+        message: text,
+        page: location.href
+      });
+      if (result.ok) {
+        setSubmitState(btn, 'sent', 'Sent ✓');
+        // Auto-mark the card addressed since they actually replied.
+        if (!card.classList.contains('is-done')) {
+          card.classList.add('is-done');
+          const checkBtn = card.querySelector('.card-check');
+          if (checkBtn) checkBtn.textContent = 'Addressed';
+          if (card.dataset.needId) {
+            needDoneSet.add(card.dataset.needId);
+            try { localStorage.setItem(STORAGE_KEY_NEED, JSON.stringify(Array.from(needDoneSet))); } catch (e) {}
+            refreshNeedProgress();
+          }
         }
+      } else {
+        setSubmitState(btn, 'failed', 'Failed — try email');
+        btn.disabled = false;
+        const subject = '[Pine Point handoff] ' + topic;
+        setTimeout(() => {
+          window.location.href = 'mailto:' + SUBMIT_DEST
+            + '?subject=' + encodeURIComponent(subject)
+            + '&body=' + encodeURIComponent(text);
+        }, 600);
       }
-      window.location.href = 'mailto:keith@fitfosystems.com'
-        + '?subject=' + encodeURIComponent(subject)
-        + '&body=' + encodeURIComponent(body);
     });
   });
 

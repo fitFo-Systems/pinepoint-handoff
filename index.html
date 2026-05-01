@@ -3219,10 +3219,10 @@ function installTrigger() {
   // === Behind-the-scenes form delivery via Keith's Apps Script ===
   // POSTs JSON to the same Pine Point Apps Script that captures live leads —
   // it routes the submission to a sendHandoffEmail() handler that mails
-  // keith@fitfosystems.com. No third-party dependency, no activation flow.
+  // fitfo@fitfosystems.com. No third-party dependency, no activation flow.
   // Apps Script Web Apps don't echo CORS headers, so we use mode: 'no-cors'
   // and trust the POST is delivered if fetch resolves without throwing.
-  const SUBMIT_DEST = 'keith@fitfosystems.com';
+  const SUBMIT_DEST = 'fitfo@fitfosystems.com';
   const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbz68dVyIGyruTPSofHei6UqcbkBuDZKhGybFLFjcowc2uCSIkDol4NWOJ0FOZdqlxOXpQ/exec';
 
   async function sendBehindTheScenes(payload) {

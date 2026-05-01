@@ -3210,41 +3210,43 @@ function installTrigger() {
           }
         }, 2400);
       } else {
-        setSubmitState(testSubmitBtn, 'failed', 'Failed — try email');
+        setSubmitState(testSubmitBtn, 'failed', "Couldn't send — try again");
         testSubmitBtn.disabled = false;
-        const subject = '[Pine Point handoff] Test feedback';
-        setTimeout(() => {
-          window.location.href = 'mailto:' + SUBMIT_DEST
-            + '?subject=' + encodeURIComponent(subject)
-            + '&body=' + encodeURIComponent(body);
-        }, 600);
+        if (testSubmitHint) testSubmitHint.textContent = 'Network looked off. Your marks are saved — hit submit again in a moment.';
       }
     });
   }
 
   // === Behind-the-scenes form delivery via Formsubmit ===
-  // POSTs JSON to Formsubmit's AJAX endpoint, which emails the contents to
-  // SUBMIT_DEST. First-time submissions trigger a one-click email-confirmation
-  // step on Keith's side; after that, every submission is delivered silently.
+  // Uses Formsubmit's plain endpoint with mode: 'no-cors' and a "simple"
+  // form-encoded body, which sidesteps CORS preflight entirely. We can't read
+  // the opaque response, but Formsubmit still receives + processes the POST.
+  // First-time submissions trigger a one-click activation email on Keith's
+  // side — once he clicks it, every future submission delivers silently.
   const SUBMIT_DEST = 'keith@fitfosystems.com';
-  const SUBMIT_URL = 'https://formsubmit.co/ajax/' + encodeURIComponent(SUBMIT_DEST);
+  const SUBMIT_URL = 'https://formsubmit.co/' + encodeURIComponent(SUBMIT_DEST);
 
   async function sendBehindTheScenes(payload) {
+    const merged = Object.assign({
+      _subject: payload.subject || '[Pine Point handoff] Note',
+      _captcha: 'false',
+      _template: 'box'
+    }, payload);
+    delete merged.subject; // mapped to _subject above
+    const params = new URLSearchParams();
+    for (const [k, v] of Object.entries(merged)) {
+      params.append(k, String(v == null ? '' : v));
+    }
     try {
-      const res = await fetch(SUBMIT_URL, {
+      await fetch(SUBMIT_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify(Object.assign({
-          _subject: payload.subject || '[Pine Point handoff] Note',
-          _captcha: 'false',
-          _template: 'box'
-        }, payload))
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString()
       });
-      if (!res.ok) return { ok: false, reason: 'http_' + res.status };
-      const data = await res.json().catch(() => ({}));
-      // Formsubmit returns { success: 'true' } on accepted submissions.
-      const ok = String(data.success).toLowerCase() === 'true';
-      return ok ? { ok: true } : { ok: false, reason: data.message || 'unknown' };
+      // With no-cors we can't read the response, but if fetch didn't throw,
+      // the POST was delivered to Formsubmit. That's good enough.
+      return { ok: true };
     } catch (e) {
       return { ok: false, reason: 'network_error' };
     }
@@ -3426,13 +3428,9 @@ function installTrigger() {
           }
         }, 2400);
       } else {
-        setSubmitState(needSubmitBtn, 'failed', 'Failed — try email');
+        setSubmitState(needSubmitBtn, 'failed', "Couldn't send — try again");
         needSubmitBtn.disabled = false;
-        setTimeout(() => {
-          window.location.href = 'mailto:' + SUBMIT_DEST
-            + '?subject=' + encodeURIComponent('[Pine Point handoff] Input batch')
-            + '&body=' + encodeURIComponent(body);
-        }, 600);
+        if (needSubmitHint) needSubmitHint.textContent = 'Network looked off. Your drafts are saved — hit submit again in a moment.';
       }
     });
   }

@@ -183,23 +183,31 @@
       border-left-color: var(--green-hover);
       background: var(--charcoal);
     }
-    .progress-strip {
-      margin-top: 18px;
-      padding: 10px 12px;
+    /* Inline section-level progress strip (Setup, Test, What-We-Need) */
+    .section-progress {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 14px;
       background: var(--charcoal);
-      border-radius: 6px;
       border: 1px solid var(--dark-gray);
-      font-size: 0.78rem;
-      color: var(--light-gray);
+      border-radius: 6px;
+      margin: 0 0 22px;
     }
-    .progress-strip__label { display: block; margin-bottom: 6px; }
-    .progress-strip__bar {
+    .section-progress__label {
+      font-size: 0.85rem;
+      color: var(--off-white);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .section-progress__bar {
+      flex: 1;
       height: 6px;
       background: var(--dark-gray);
       border-radius: 3px;
       overflow: hidden;
     }
-    .progress-strip__fill {
+    .section-progress__fill {
       height: 100%;
       background: var(--green);
       width: 0%;
@@ -294,6 +302,30 @@
     .card h3 { margin: 0 0 8px; font-size: 1.05rem; font-weight: 700; }
     .card p { margin: 0 0 10px; }
     .card p:last-child { margin-bottom: 0; }
+    .card--checkable.is-done {
+      border-color: var(--green);
+      background: rgba(45, 90, 39, 0.12);
+    }
+    .card--checkable.is-done h3::before {
+      content: '\2713 ';
+      color: var(--green-hover);
+      font-weight: 800;
+    }
+    .card-check {
+      margin-top: 14px;
+      background: var(--dark-gray);
+      color: var(--off-white);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .card-check:hover { background: var(--medium-gray); }
+    .card--checkable.is-done .card-check { background: var(--green); color: var(--white); }
+    .card--checkable.is-done .card-check::before { content: '\2713 '; }
 
     .grid-2 {
       display: grid;
@@ -358,6 +390,33 @@
     }
     .flow__step h4 { margin: 0 0 4px; font-size: 1rem; }
     .flow__step p { margin: 0; color: var(--light-gray); font-size: 0.95rem; }
+
+    /* === Email-flow scenarios === */
+    .email-flow {
+      display: grid;
+      gap: 10px;
+      margin: 18px 0 28px;
+    }
+    .email-flow__item {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 18px;
+      padding: 14px 18px;
+      background: var(--charcoal);
+      border-left: 3px solid var(--green);
+      border-radius: 0 4px 4px 0;
+    }
+    .email-flow__when {
+      color: var(--light-gray);
+      font-size: 0.92rem;
+    }
+    .email-flow__then {
+      color: var(--off-white);
+      font-size: 0.95rem;
+    }
+    @media (max-width: 700px) {
+      .email-flow__item { grid-template-columns: 1fr; gap: 4px; padding: 12px 14px; }
+    }
 
     /* === Mockup: email === */
     .mockup-email {
@@ -611,6 +670,54 @@
       gap: 10px;
       word-break: break-all;
     }
+
+    .script-copy {
+      background: var(--black);
+      border: 1px solid var(--dark-gray);
+      border-radius: 6px;
+      overflow: hidden;
+      margin: 6px 0 10px;
+    }
+    .script-copy__bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      background: #161616;
+      border-bottom: 1px solid var(--dark-gray);
+    }
+    .script-copy__label {
+      color: var(--light-gray);
+      font-size: 0.78rem;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .copy-all-btn {
+      background: var(--green);
+      color: var(--white);
+      border: none;
+      padding: 7px 14px;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .copy-all-btn:hover { background: var(--green-hover); }
+    .copy-all-btn.copied { background: var(--green-hover); }
+    .script-source {
+      max-height: 360px;
+      overflow: auto;
+      margin: 0;
+      padding: 14px 16px;
+      background: var(--black);
+      border: none;
+      border-radius: 0;
+      font-size: 0.78rem;
+      line-height: 1.5;
+    }
+    .script-source code { background: none; padding: 0; color: #e5d5b8; }
     .copy-block .copy-btn {
       background: var(--green);
       color: var(--white);
@@ -814,10 +921,6 @@
       <li><a href="#need" data-section="need">What we need from you</a></li>
       <li><a href="#ask" data-section="ask">Ask a question</a></li>
     </ul>
-    <div class="progress-strip">
-      <span class="progress-strip__label">Test progress: <span id="progress-text">0 / 0</span></span>
-      <div class="progress-strip__bar"><div class="progress-strip__fill" id="progress-fill"></div></div>
-    </div>
   </aside>
 
   <main>
@@ -885,10 +988,25 @@
     </section>
 
     <!-- WHAT YOU RECEIVE -->
-    <section id="receive" data-keywords="email sheet drive folder photos notifications subject body inbox sheet tabs columns">
+    <section id="receive" data-keywords="email sheet drive folder photos notifications subject body inbox sheet tabs columns when fires lead callback delayed duplicate">
       <div class="section-eyebrow">Every lead, three places</div>
       <h2>What lands in your hands</h2>
-      <p class="lead">Every estimate creates an email, three sheet rows, and a Drive folder — all stamped with the same Estimate # so they thread together.</p>
+      <p class="lead">Every submission writes to your sheet and your Drive folder — all stamped with the same Estimate # (format <code>2026_00001</code> by default; <em>say if you'd prefer something else</em>) so a customer's email, row, and photos thread together. The <strong>email</strong> you actually receive depends on what the customer does next:</p>
+
+      <div class="email-flow">
+        <div class="email-flow__item">
+          <div class="email-flow__when">If they request a callback</div>
+          <div class="email-flow__then"><strong>Callback Requested</strong> email arrives immediately.</div>
+        </div>
+        <div class="email-flow__item">
+          <div class="email-flow__when">If they don't schedule anything for 5 minutes</div>
+          <div class="email-flow__then"><strong>New Lead</strong> email arrives once that window passes.</div>
+        </div>
+        <div class="email-flow__item">
+          <div class="email-flow__when">If they were busy and circle back to schedule a callback <em>after</em> the lead email already fired</div>
+          <div class="email-flow__then"><strong>Callback Requested</strong> arrives now, with a yellow ℹ "Update on existing lead #2026_00001" banner so you know it's the same person, not a duplicate.</div>
+        </div>
+      </div>
 
       <h3 style="font-size:1.1rem;color:var(--off-white);margin:28px 0 10px">1. The email (HTML, attachments included)</h3>
       <p style="color:var(--light-gray);margin:0 0 14px">This is what hits your inbox. Phone is one-tap to dial. Photos are both linked AND attached when total size is under 15 MB.</p>
@@ -1053,7 +1171,7 @@
     <section id="analytics" data-keywords="google analytics ga4 traffic conversions metrics dashboard pageviews source attribution conversion tracking phone tracking">
       <div class="section-eyebrow">Already plugged in</div>
       <h2>Google Analytics</h2>
-      <p class="lead">Traffic and visitor data is being captured in my GA4 property. I'm adding <code>pinepointtreeservice@gmail.com</code> as a Viewer so you can log in any time and see the dashboard — no setup on your side.</p>
+      <p class="lead">Traffic and visitor data is being captured. The wiring is in place — I'll let you know when the dashboard is ready for you to log in and review.</p>
 
       <h3 style="font-size:1rem;color:var(--off-white);margin:22px 0 8px">Captured today (out of the box)</h3>
       <ul style="color:var(--off-white);padding-left:20px">
@@ -1079,11 +1197,13 @@
       <h2>Setting up the lead pipeline</h2>
       <p class="lead">Right now, lead notifications are wired to my account for testing. To flip that to <strong>your</strong> Gmail (so you own the data), you'll need to set up a small Google Apps Script. It's a one-time thing, no coding required — follow the 10 numbered steps below or hop on a screenshare with me.</p>
 
+      <div class="section-progress">
+        <span class="section-progress__label">Setup progress: <span id="setup-progress-text">0 / 10</span></span>
+        <div class="section-progress__bar"><div class="section-progress__fill" id="setup-progress-fill"></div></div>
+      </div>
+
       <div class="wizard__intro">
-        <h3>Two ways to do this</h3>
-        <p><strong>Path A:</strong> Hop on a 10-min screenshare with Keith (Zoom / FaceTime / Google Meet — your pick). You log in, share screen, Keith walks you through every click. Easiest if you're not into Google products.</p>
-        <p style="margin-top:6px"><strong>Path B:</strong> Self-serve, ~5 minutes. Steps below.</p>
-        <div class="badges"><span>No coding</span><span>One-time setup</span><span>You own the data</span></div>
+        <p>Steps are below — should take about 5 minutes. Easy task; if you'd rather we hop on a quick screenshare and walk through it together, just say so.</p>
       </div>
 
       <div class="wizard" id="wizard">
@@ -1130,13 +1250,936 @@
             <div class="wizard__caret">&#9662;</div>
           </div>
           <div class="wizard__body">
-            <p>The script lives at this URL. Click the button to open it in a new tab, then select all (⌘A / Ctrl-A) and copy (⌘C / Ctrl-C).</p>
-            <div class="copy-block">
-              <span id="script-url">https://pinepointtrees.com/docs/google-apps-script-leads.js</span>
-              <button class="copy-btn" data-copy="https://pinepointtrees.com/docs/google-apps-script-leads.js">Copy URL</button>
+            <p>Click <strong>Copy all script</strong>, then paste into the empty <code>Code.gs</code> tab in the Apps Script editor. Save with the floppy-disk icon (or ⌘S / Ctrl-S).</p>
+            <div class="script-copy">
+              <div class="script-copy__bar">
+                <span class="script-copy__label">Code.gs — paste this</span>
+                <button class="copy-all-btn" data-copy-target="#script-source">Copy all script</button>
+              </div>
+              <pre id="script-source" class="script-source"><code>/**
+ * Pine Point — Lead Capture Endpoint
+ *
+ * Receives JSON POSTs from pinepointtrees.com (estimate.html):
+ *   - formType: "estimate_contact" — user submitted contact form on the estimate page
+ *   - formType: "schedule"         — user clicked "Schedule a Follow-Up" after seeing price
+ *
+ * Email behavior — exactly ONE email per user journey:
+ *   - Estimate filled, no schedule within EMAIL_DELAY_MINUTES → "New Lead" email
+ *   - Estimate filled + schedule from same phone/email      → "Callback Requested" email only
+ * Both submissions still write rows to their respective sheet tabs regardless.
+ *
+ * The trigger that sends "New Lead" emails also defends against a race where
+ * the schedule POST lands at the server before the estimate_contact POST: it
+ * checks the Schedule Requests sheet for a recent matching row and skips the
+ * lead email if one exists.
+ *
+ * Setup once per deployment — see docs/LEAD-CAPTURE-SETUP.md for the full walk-through.
+ * Short version:
+ *   1. Paste this code into Code.gs in the Apps Script editor
+ *   2. Run → installTrigger (creates the 1-min time trigger)
+ *   3. Deploy → New deployment → Web app → "Anyone" access
+ */
+
+const NOTIFY_EMAIL = Session.getEffectiveUser().getEmail();
+const EMAIL_DELAY_MINUTES = 5;
+const ATTACHMENT_TOTAL_LIMIT_BYTES = 15 * 1024 * 1024;  // skip attaching once the total exceeds this
+
+const SHEETS = {
+  // Clean, deduplicated view that combines Estimate Leads + Schedule Requests
+  // into one row per Estimate # with just the columns Jason cares about for
+  // follow-up. Each customer = exactly one row, Lead Type updates from
+  // "Lead" → "Callback" when they schedule.
+  summary: {
+    name: 'All Leads',
+    headers: [
+      'Estimate #', 'Name', 'Phone', 'Email', 'ZIP',
+      'Lead Type', 'Job Type', 'Estimate Range'
+    ]
+  },
+  estimate_contact: {
+    name: 'Estimate Leads',
+    headers: [
+      'Estimate #', 'Timestamp', 'Name', 'Phone', 'Email',
+      'ZIP', 'City', 'State', 'Distance (mi)', 'Outside Area',
+      'Service', 'Tree Count', 'Tree Height', 'Hazards', 'Access',
+      'Prune Type', 'Lot Size', 'Lot Density', 'End Goal',
+      'Price Low', 'Price Typical', 'Price High',
+      'Notes', 'Photos', 'Page'
+    ]
+  },
+  schedule: {
+    name: 'Schedule Requests',
+    headers: [
+      'Estimate #', 'Timestamp', 'Name', 'Phone', 'Email',
+      'ZIP', 'City', 'State', 'Distance (mi)', 'Outside Area',
+      'Best Time',
+      'Service', 'Details', 'Price Typical', 'Notes', 'Photos', 'Page'
+    ]
+  },
+  pending: {
+    name: '_Pending Lead Emails',
+    headers: ['Queued At', 'Phone Key', 'Email Key', 'Payload JSON'],
+    hidden: true  // internal queue used by the script — not for Jason to look at
+  }
+};
+
+// Pine Point's service center (Leicester, MA) and operating radius.
+const SERVICE_CENTER_LAT = 42.2459;
+const SERVICE_CENTER_LNG = -71.9087;
+const SERVICE_RADIUS_MILES = 15;
+
+const PHOTO_FOLDER_NAME = 'Pine Point Lead Photos';
+
+const SERVICE_NAMES = {
+  removal: 'Tree Removal',
+  trimming: 'Trimming &amp; Pruning',
+  lot_clearing: 'Lot Clearing'
+};
+
+// Short PascalCase name used in folder + filename patterns.
+const SERVICE_SHORT = {
+  removal: 'Removal',
+  trimming: 'Trimming',
+  lot_clearing: 'LotClearing'
+};
+
+const LABELS = {
+  removal: {
+    treeCount:  { '1': '1 tree', '2-3': '2-3 trees', '4-6': '4-6 trees', '7+': '7 or more trees' },
+    treeHeight: { small: 'small (under 25 ft)', medium: 'medium (25-50 ft)', large: 'large (50-75 ft)', xlarge: 'very large (75+ ft)' },
+    hazards:    { none: 'open area', house: 'near house/structure', powerlines: 'near power lines', both: 'near house &amp; power lines' },
+    access:     { easy: 'easy truck access', limited: 'tight but possible', none: 'difficult / backyard' }
+  },
+  trimming: {
+    treeCount:  { '1': '1 tree', '2-3': '2-3 trees', '4-6': '4-6 trees', '7+': '7 or more trees' },
+    pruneType:  { overhang: 'overhang clearing', shaping: 'shaping/thinning', deadwood: 'deadwood removal', clearance: 'clearance from structure/lines' },
+    treeHeight: { small: 'small (under 25 ft)', medium: 'medium (25-50 ft)', large: 'large (50-75 ft)', xlarge: 'very large (75+ ft)' },
+    access:     { easy: 'easy truck access', limited: 'tight but possible', none: 'difficult / backyard' }
+  },
+  lot_clearing: {
+    lotSize:    { small: 'small area (&lt;1/4 acre)', medium: '1/4-1/2 acre', large: '1/2-1 acre', xlarge: '1+ acres' },
+    lotDensity: { brush: 'brush/small trees', mixed: 'mix of brush and large trees', heavy: 'dense woods/hardwoods' },
+    access:     { easy: 'easy access for heavy equipment', limited: 'limited / tight', none: 'difficult — no clear route' },
+    endGoal:    { build: 'construction prep', yard: 'yard/lawn', thin: 'selective thinning' }
+  }
+};
+
+const KEY_LABELS = {
+  treeCount: 'Tree count',
+  treeHeight: 'Tree height',
+  hazards: 'Hazards',
+  access: 'Access',
+  pruneType: 'Prune type',
+  lotSize: 'Lot size',
+  lotDensity: 'Lot density',
+  endGoal: 'End goal'
+};
+
+// ============================================================
+// HTTP entrypoints
+// ============================================================
+
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+    if (data.formType === 'estimate_contact') {
+      if (!isValidContact(data.contact, data.formType)) {
+        return jsonResponse({ error: 'invalid contact' });
+      }
+      if (data.contact) data.contact.phone = normalizePhone(data.contact.phone);
+      data.estimateNumber = nextEstimateNumber();
+      data.areaCheck = checkServiceArea((data.contact || {}).zip);
+      data.photoLinks = savePhotosToDrive(data.photos, data.estimateNumber, data.service, (data.contact || {}).name);
+      delete data.photos;
+      writeEstimate(ss, data);
+      upsertSummary(ss, data, 'Lead');
+      queueLeadEmail(ss, data);
+    } else if (data.formType === 'schedule') {
+      if (!isValidContact(data.contact, data.formType)) {
+        return jsonResponse({ error: 'invalid contact' });
+      }
+      if (data.contact) data.contact.phone = normalizePhone(data.contact.phone);
+      data.areaCheck = checkServiceArea((data.contact || {}).zip);
+      const cancelled = cancelPendingFor(ss, data);
+      if (cancelled &amp;&amp; cancelled.estimateNumber) {
+        // Schedule arrived inside the EMAIL_DELAY_MINUTES window — the
+        // pending lead email was cancelled in time, so this is the only
+        // notification Jason will see for this customer.
+        data.estimateNumber = cancelled.estimateNumber;
+        if (cancelled.photoLinks &amp;&amp; cancelled.photoLinks.length) {
+          data.photoLinks = cancelled.photoLinks;
+        }
+      } else {
+        // Schedule arrived AFTER the lead email already went out (or the
+        // pending row was already drained). Customer linkage still holds
+        // via the matching Estimate # — flag the email so Jason knows
+        // it's the same lead, not a fresh one.
+        const prior = lookupRecentEstimate(ss, data.contact);
+        if (prior) {
+          data.estimateNumber = prior.estimateNumber;
+          data.priorEstimateAt = prior.timestamp;
+          // Lead email goes out EMAIL_DELAY_MINUTES after estimate timestamp.
+          const leadSentBy = new Date(prior.timestamp.getTime() + EMAIL_DELAY_MINUTES * 60 * 1000);
+          data.leadEmailAlreadySent = (new Date() &gt;= leadSentBy);
+        }
+      }
+      writeSchedule(ss, data);
+      // Once they've scheduled a callback they're no longer a "lead awaiting
+      // follow-up" — remove them from the Estimate Leads tab so that tab
+      // really means "open leads to call." Full detail lives in Schedule
+      // Requests + the All Leads summary.
+      removeEstimateRow(ss, data.estimateNumber);
+      upsertSummary(ss, data, 'Callback');
+      sendCallbackEmail(data);
+    } else {
+      writeUnknown(ss, data);
+    }
+
+    return jsonResponse({ ok: true });
+  } catch (err) {
+    return jsonResponse({ error: String(err) });
+  }
+}
+
+/**
+ * Returns a fresh, monotonic-per-year estimate number like "26_00001".
+ * Counter is stored in ScriptProperties and incremented under a script-level
+ * lock so concurrent submissions can't collide on the same number.
+ */
+function nextEstimateNumber() {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    const props = PropertiesService.getScriptProperties();
+    const yyyy = String(new Date().getFullYear());
+    const key = 'estimate_counter_' + yyyy;
+    const next = parseInt(props.getProperty(key) || '0', 10) + 1;
+    props.setProperty(key, String(next));
+    return yyyy + '_' + String(next).padStart(5, '0');
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/**
+ * Removes any Estimate Leads rows matching the given Estimate #. Called
+ * after a schedule submission so a customer doesn't appear in both the
+ * Estimate Leads and Schedule Requests tabs simultaneously — they've
+ * upgraded from "lead" to "callback" and only belong in one place.
+ */
+function removeEstimateRow(ss, estimateNumber) {
+  if (!estimateNumber) return;
+  const sheet = ss.getSheetByName(SHEETS.estimate_contact.name);
+  if (!sheet) return;
+  const lastRow = sheet.getLastRow();
+  if (lastRow &lt; 2) return;
+  const ids = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+  for (let i = ids.length - 1; i &gt;= 0; i--) {
+    if (ids[i][0] === estimateNumber) {
+      sheet.deleteRow(i + 2);
+    }
+  }
+}
+
+function lookupRecentEstimate(ss, contact) {
+  const sheet = ss.getSheetByName(SHEETS.estimate_contact.name);
+  if (!sheet) return null;
+  const lastRow = sheet.getLastRow();
+  if (lastRow &lt; 2) return null;
+  const phoneKey = normalizeKey(contact &amp;&amp; contact.phone);
+  const emailKey = normalizeKey(contact &amp;&amp; contact.email);
+  if (!phoneKey &amp;&amp; !emailKey) return null;
+  // Estimate Leads columns (1-indexed): 1=Estimate #, 2=Timestamp, 3=Name, 4=Phone, 5=Email
+  const rows = sheet.getRange(2, 1, lastRow - 1, 5).getValues();
+  for (let i = rows.length - 1; i &gt;= 0; i--) {
+    if ((phoneKey &amp;&amp; normalizeKey(rows[i][3]) === phoneKey) ||
+        (emailKey &amp;&amp; normalizeKey(rows[i][4]) === emailKey)) {
+      return {
+        estimateNumber: rows[i][0],
+        timestamp: rows[i][1] instanceof Date ? rows[i][1] : new Date(rows[i][1])
+      };
+    }
+  }
+  return null;
+}
+
+/**
+ * Defense-in-depth: same checks the client runs, applied server-side.
+ * Keeps automated garbage out of the sheet/email even if the client JS
+ * is bypassed.
+ */
+/**
+ * Defense-in-depth validation. ZIP is mandatory on the initial estimate
+ * contact form, but the schedule modal doesn't collect ZIP — the client
+ * carries it forward from state.contact, but we still want schedule
+ * submissions to succeed if it's missing for any reason.
+ */
+function isValidContact(c, formType) {
+  if (!c) return false;
+  const phoneDigits = String(c.phone || '').replace(/[^0-9]/g, '');
+  if (phoneDigits.length &lt; 10 || phoneDigits.length &gt; 15) return false;
+  if (/^(\d)\1+$/.test(phoneDigits)) return false; // all same digit
+  if (c.email &amp;&amp; !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.email)) return false;
+
+  const zip = String(c.zip || '').trim();
+  if (formType === 'estimate_contact') {
+    if (!/^\d{5}(-\d{4})?$/.test(zip)) return false;
+  } else if (zip) {
+    // Schedule etc.: zip is optional, but if provided must be valid.
+    if (!/^\d{5}(-\d{4})?$/.test(zip)) return false;
+  }
+  return true;
+}
+
+/**
+ * Normalize an inbound phone string to a consistent display format so
+ * the sheet and email always show "(508) 555-1234" or "+1 (508) 555-1234"
+ * regardless of what the user typed.
+ */
+function normalizePhone(s) {
+  const digits = String(s || '').replace(/[^0-9]/g, '');
+  if (digits.length === 10) {
+    return '(' + digits.slice(0, 3) + ') ' + digits.slice(3, 6) + '-' + digits.slice(6);
+  }
+  if (digits.length === 11 &amp;&amp; digits[0] === '1') {
+    return '+1 (' + digits.slice(1, 4) + ') ' + digits.slice(4, 7) + '-' + digits.slice(7);
+  }
+  if (digits.length &gt; 0) return digits;
+  return '';
+}
+
+/**
+ * Looks up a US ZIP via the free zippopotam.us API to confirm it's a real
+ * USPS ZIP and to compute distance from our service center. Returns:
+ *   { ok: true,  city, state, lat, lng, miles, withinServiceArea }
+ *   { ok: false, reason: 'not_found' | 'http_error' | 'fetch_failed' }
+ *
+ * Failure modes never block the submission — they just leave the
+ * area-check empty in the email/sheet.
+ */
+function checkServiceArea(zip) {
+  if (!zip) return { ok: false, reason: 'no_zip' };
+  const zip5 = String(zip).split('-')[0];
+  if (!/^\d{5}$/.test(zip5)) return { ok: false, reason: 'bad_format' };
+  try {
+    const resp = UrlFetchApp.fetch('https://api.zippopotam.us/us/' + zip5, { muteHttpExceptions: true });
+    if (resp.getResponseCode() !== 200) {
+      return { ok: false, reason: 'not_found', status: resp.getResponseCode() };
+    }
+    const data = JSON.parse(resp.getContentText());
+    const place = data &amp;&amp; data.places &amp;&amp; data.places[0];
+    if (!place) return { ok: false, reason: 'no_place' };
+    const lat = parseFloat(place.latitude);
+    const lng = parseFloat(place.longitude);
+    const miles = haversineMiles(SERVICE_CENTER_LAT, SERVICE_CENTER_LNG, lat, lng);
+    return {
+      ok: true,
+      city: place['place name'] || '',
+      state: place['state abbreviation'] || '',
+      lat: lat,
+      lng: lng,
+      miles: miles,
+      withinServiceArea: miles &lt;= SERVICE_RADIUS_MILES
+    };
+  } catch (err) {
+    return { ok: false, reason: 'fetch_failed', error: String(err) };
+  }
+}
+
+function haversineMiles(lat1, lng1, lat2, lng2) {
+  const R = 3958.8;
+  const toRad = function (d) { return d * Math.PI / 180; };
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+            Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+function doGet() {
+  return jsonResponse({ status: 'ready' });
+}
+
+// ============================================================
+// Sheet writes
+// ============================================================
+
+function writeEstimate(ss, d) {
+  const sheet = getOrCreate(ss, SHEETS.estimate_contact);
+  const a = d.answers || {};
+  const c = d.contact || {};
+  const p = d.price || {};
+  const ac = d.areaCheck || {};
+  const distance = (ac.ok &amp;&amp; typeof ac.miles === 'number') ? Number(ac.miles.toFixed(1)) : '';
+  const outside = ac.ok ? (ac.withinServiceArea ? '' : 'YES') : '';
+  sheet.appendRow([
+    d.estimateNumber || '',
+    new Date(),
+    c.name || '', c.phone || '', c.email || '',
+    c.zip || '', ac.city || '', ac.state || '', distance, outside,
+    d.service || '',
+    a.treeCount || '', a.treeHeight || '', a.hazards || '', a.access || '',
+    a.pruneType || '', a.lotSize || '', a.lotDensity || '', a.endGoal || '',
+    p.low || '', p.typical || '', p.high || '',
+    c.notes || '', formatPhotoUrls(d.photoLinks), d.page || ''
+  ]);
+}
+
+function writeSchedule(ss, d) {
+  const sheet = getOrCreate(ss, SHEETS.schedule);
+  const c = d.contact || {};
+  const p = d.price || {};
+  const ac = d.areaCheck || {};
+  const distance = (ac.ok &amp;&amp; typeof ac.miles === 'number') ? Number(ac.miles.toFixed(1)) : '';
+  const outside = ac.ok ? (ac.withinServiceArea ? '' : 'YES') : '';
+  sheet.appendRow([
+    d.estimateNumber || '',
+    new Date(),
+    c.name || '', c.phone || '', c.email || '',
+    c.zip || '', ac.city || '', ac.state || '', distance, outside,
+    d.scheduledTime || '',
+    d.service || '', JSON.stringify(d.answers || {}),
+    p.typical || '',
+    d.scheduleNotes || '',
+    formatPhotoUrls(d.photoLinks),
+    d.page || ''
+  ]);
+}
+
+function writeUnknown(ss, d) {
+  const sheet = getOrCreate(ss, { name: 'Other', headers: ['Timestamp', 'Raw'] });
+  sheet.appendRow([new Date(), JSON.stringify(d)]);
+}
+
+/**
+ * Maintains the "All Leads" summary tab — one row per Estimate #.
+ * Called with leadType "Lead" on estimate_contact and "Callback" on
+ * schedule. If a row for this Estimate # already exists, updates it in
+ * place (so a Lead row becomes a Callback row when the customer
+ * schedules). Otherwise appends a new row.
+ */
+function upsertSummary(ss, d, leadType) {
+  if (!d.estimateNumber) return;
+  const sheet = getOrCreate(ss, SHEETS.summary);
+  const c = d.contact || {};
+  const p = d.price || {};
+  const range = (p.low &amp;&amp; p.high) ? '$' + p.low + '–$' + p.high : '';
+  const jobType = SERVICE_NAMES[d.service] || d.service || '';
+  const row = [
+    d.estimateNumber,
+    c.name || '',
+    c.phone || '',
+    c.email || '',
+    c.zip || '',
+    leadType,
+    jobType,
+    range
+  ];
+
+  const lastRow = sheet.getLastRow();
+  if (lastRow &gt;= 2) {
+    const ids = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+    for (let i = 0; i &lt; ids.length; i++) {
+      if (ids[i][0] === d.estimateNumber) {
+        sheet.getRange(i + 2, 1, 1, row.length).setValues([row]);
+        return;
+      }
+    }
+  }
+  sheet.appendRow(row);
+}
+
+// ============================================================
+// Pending-email queue (deduplicates lead vs callback emails)
+// ============================================================
+
+function queueLeadEmail(ss, d) {
+  const sheet = getOrCreate(ss, SHEETS.pending);
+  const c = d.contact || {};
+  sheet.appendRow([
+    new Date(),
+    normalizeKey(c.phone),
+    normalizeKey(c.email),
+    JSON.stringify(d)
+  ]);
+}
+
+/**
+ * Removes pending lead-email rows that match the schedule submission
+ * (by normalized phone or email). Returns the most recently matched
+ * pending payload (parsed) so the caller can carry over any photoLinks
+ * etc. into the callback email; returns null if nothing matched.
+ */
+function cancelPendingFor(ss, d) {
+  const sheet = ss.getSheetByName(SHEETS.pending.name);
+  if (!sheet) return null;
+  const lastRow = sheet.getLastRow();
+  if (lastRow &lt; 2) return null;
+
+  const c = d.contact || {};
+  const phoneKey = normalizeKey(c.phone);
+  const emailKey = normalizeKey(c.email);
+  if (!phoneKey &amp;&amp; !emailKey) return null;
+
+  const rows = sheet.getRange(2, 1, lastRow - 1, 4).getValues();
+  let matchedPayload = null;
+  for (let i = rows.length - 1; i &gt;= 0; i--) {
+    const pendingPhone = rows[i][1];
+    const pendingEmail = rows[i][2];
+    const matchPhone = phoneKey &amp;&amp; pendingPhone &amp;&amp; phoneKey === pendingPhone;
+    const matchEmail = emailKey &amp;&amp; pendingEmail &amp;&amp; emailKey === pendingEmail;
+    if (matchPhone || matchEmail) {
+      if (!matchedPayload) {
+        try { matchedPayload = JSON.parse(rows[i][3]); } catch (e) {}
+      }
+      sheet.deleteRow(i + 2);
+    }
+  }
+  return matchedPayload;
+}
+
+/**
+ * Called by the 1-minute time trigger installed by installTrigger().
+ * Walks the pending queue and sends a "New Lead" email for any entry older
+ * than EMAIL_DELAY_MINUTES *unless* a matching schedule row already exists
+ * (which would mean the user did schedule — they just raced the network).
+ */
+function processPendingLeads() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(SHEETS.pending.name);
+  if (!sheet) return;
+  const lastRow = sheet.getLastRow();
+  if (lastRow &lt; 2) return;
+
+  // Build the set of phone/email keys that scheduled a callback recently.
+  // A schedule POST landing on the server BEFORE its matching estimate_contact
+  // POST (race triggered by client-side photo encoding latency) leaves nothing
+  // for cancelPendingFor() to delete; this safety net catches that case.
+  const scheduledKeys = collectRecentScheduleKeys(ss, EMAIL_DELAY_MINUTES + 5);
+
+  const cutoff = new Date(Date.now() - EMAIL_DELAY_MINUTES * 60 * 1000);
+  const rows = sheet.getRange(2, 1, lastRow - 1, 4).getValues();
+
+  for (let i = rows.length - 1; i &gt;= 0; i--) {
+    const queuedAt = new Date(rows[i][0]);
+    if (queuedAt &gt; cutoff) continue;
+
+    const phoneKey = rows[i][1];
+    const emailKey = rows[i][2];
+    const alreadyScheduled =
+      (phoneKey &amp;&amp; scheduledKeys.has(phoneKey)) ||
+      (emailKey &amp;&amp; scheduledKeys.has(emailKey));
+
+    if (!alreadyScheduled) {
+      try {
+        const data = JSON.parse(rows[i][3]);
+        sendLeadEmail(data);
+      } catch (e) {
+        // Skip malformed rows but still remove from the queue.
+      }
+    }
+    sheet.deleteRow(i + 2);
+  }
+}
+
+function collectRecentScheduleKeys(ss, minutesBack) {
+  const sheet = ss.getSheetByName(SHEETS.schedule.name);
+  const keys = new Set();
+  if (!sheet) return keys;
+  const lastRow = sheet.getLastRow();
+  if (lastRow &lt; 2) return keys;
+
+  const cutoff = new Date(Date.now() - minutesBack * 60 * 1000);
+  // Schedule Requests columns: 1=Estimate#, 2=Timestamp, 3=Name, 4=Phone, 5=Email
+  // (Was 4-col read at 1=Timestamp, 3=Phone, 4=Email before Estimate # was
+  //  added as col 1 — that staleness caused a stray Bobo lead email to fire
+  //  even after the callback was confirmed.)
+  const rows = sheet.getRange(2, 1, lastRow - 1, 5).getValues();
+  for (const r of rows) {
+    const ts = r[1] instanceof Date ? r[1] : new Date(r[1]);
+    if (!isNaN(ts.getTime()) &amp;&amp; ts &lt; cutoff) continue;
+    const pk = normalizeKey(r[3]);
+    const ek = normalizeKey(r[4]);
+    if (pk) keys.add(pk);
+    if (ek) keys.add(ek);
+  }
+  return keys;
+}
+
+// ============================================================
+// Email composition (HTML + plain-text fallback, with photo attachments)
+// ============================================================
+
+function sendLeadEmail(d) {
+  const c = d.contact || {};
+  const p = d.price || {};
+  const num = d.estimateNumber || '';
+  const service = SERVICE_NAMES[d.service] || d.service || '';
+  const subject = 'New Lead - ' + (service ? service + ' ' : '') + (c.name || 'Pine Point');
+
+  const html = [
+    '&lt;div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;color:#222"&gt;',
+    '&lt;h2 style="margin:0 0 4px;color:#2D5A27"&gt;New Lead&lt;/h2&gt;',
+    num ? '&lt;p style="margin:0 0 4px;font-size:13px;color:#444"&gt;Estimate #: &lt;strong&gt;' + escapeHtml(num) + '&lt;/strong&gt;&lt;/p&gt;' : '',
+    '&lt;p style="margin:0 0 12px;color:#666;font-size:13px"&gt;' +
+      'Estimate submitted ' + EMAIL_DELAY_MINUTES + '+ minutes ago, no callback scheduled yet. ' +
+      'If they schedule one later, you\'ll get a follow-up email referencing this same Estimate #.&lt;/p&gt;',
+    outsideAreaBanner(d.areaCheck),
+    htmlSection('Contact', contactRows(c, d.areaCheck)),
+    htmlSection('Job', [
+      ['Service', '&lt;strong&gt;' + escapeHtml(SERVICE_NAMES[d.service] || d.service || '') + '&lt;/strong&gt;']
+    ].concat(answerRows(d.service, d.answers))),
+    htmlSection('Estimated price', [
+      ['Low',     '$' + escapeHtml(p.low || '?')],
+      ['Typical', '&lt;strong&gt;$' + escapeHtml(p.typical || '?') + '&lt;/strong&gt;'],
+      ['High',    '$' + escapeHtml(p.high || '?')]
+    ]),
+    c.notes ? htmlSection('Their notes', [['', escapeHtml(c.notes)]]) : '',
+    formatPhotosHtml(d.photoLinks),
+    '&lt;p style="color:#888;font-size:12px;margin-top:24px"&gt;Source: ' + escapeHtml(d.page || '') + '&lt;/p&gt;',
+    '&lt;/div&gt;'
+  ].join('');
+
+  sendHtmlEmail(subject, html, buildAttachments(d.photoLinks));
+}
+
+function sendCallbackEmail(d) {
+  const c = d.contact || {};
+  const p = d.price || {};
+  const num = d.estimateNumber || '';
+  const service = SERVICE_NAMES[d.service] || d.service || '';
+  const subject = 'Callback Requested - ' + (service ? service + ' ' : '') + (c.name || 'Pine Point');
+
+  const html = [
+    '&lt;div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;color:#222"&gt;',
+    '&lt;h2 style="margin:0 0 4px;color:#2D5A27"&gt;Callback Requested&lt;/h2&gt;',
+    num ? '&lt;p style="margin:0 0 12px;font-size:13px;color:#444"&gt;Estimate #: &lt;strong&gt;' + escapeHtml(num) + '&lt;/strong&gt;&lt;/p&gt;' : '&lt;div style="height:12px"&gt;&lt;/div&gt;',
+    leadFollowupBanner(d),
+    outsideAreaBanner(d.areaCheck),
+    htmlSection('Caller', contactRows(c, d.areaCheck).concat([
+      ['Best time', '&lt;strong&gt;' + escapeHtml(d.scheduledTime || '(any)') + '&lt;/strong&gt;']
+    ])),
+    htmlSection('Job', [
+      ['Service', '&lt;strong&gt;' + escapeHtml(SERVICE_NAMES[d.service] || d.service || '') + '&lt;/strong&gt;']
+    ].concat(answerRows(d.service, d.answers))),
+    htmlSection('Estimate', [
+      ['Typical price', '&lt;strong&gt;$' + escapeHtml(p.typical || '?') + '&lt;/strong&gt;']
+    ]),
+    d.scheduleNotes ? htmlSection('Their note', [['', escapeHtml(d.scheduleNotes)]]) : '',
+    formatPhotosHtml(d.photoLinks),
+    '&lt;/div&gt;'
+  ].join('');
+
+  sendHtmlEmail(subject, html, buildAttachments(d.photoLinks));
+}
+
+/**
+ * Builds the standard contact rows used in both lead and callback emails.
+ * Pulls USPS city/state from areaCheck when available so the customer's
+ * actual location is visible at a glance, with the typed town as a fallback.
+ */
+function contactRows(c, areaCheck) {
+  c = c || {};
+  const usps = areaCheck &amp;&amp; areaCheck.ok ? areaCheck : null;
+  const cityState = usps ? (usps.city + ', ' + usps.state) : '';
+  const zip = c.zip || '';
+  const zipLine = zip + (cityState ? ' (' + cityState + ')' : '');
+  const rows = [
+    ['Name', escapeHtml(c.name || '(none)')],
+    ['Phone', phoneLink(c.phone)],
+    ['Email', emailLink(c.email)],
+    ['ZIP', escapeHtml(zipLine || '(none)')]
+  ];
+  if (usps &amp;&amp; typeof usps.miles === 'number') {
+    rows.push(['Distance', escapeHtml(usps.miles.toFixed(1) + ' mi from Leicester')]);
+  }
+  return rows;
+}
+
+/**
+ * Yellow info banner shown on callback emails when the lead email
+ * already went out earlier — tells Jason this is the SAME customer
+ * he's already been notified about, not a brand-new lead.
+ */
+function leadFollowupBanner(d) {
+  if (!d.leadEmailAlreadySent) return '';
+  const when = d.priorEstimateAt
+    ? Utilities.formatDate(new Date(d.priorEstimateAt), Session.getScriptTimeZone(), "MMM d, h:mm a")
+    : '';
+  const num = d.estimateNumber || '';
+  return [
+    '&lt;div style="margin:0 0 16px;padding:10px 14px;background:#fff8d4;border:1px solid #d4ad1a;border-radius:4px;color:#5a4a00;font-size:14px"&gt;',
+    '&lt;strong&gt;ℹ Update on existing lead' + (num ? ' #' + escapeHtml(num) : '') + '.&lt;/strong&gt; ',
+    'A "New Lead" email was already sent for this customer',
+    when ? ' (estimate submitted ' + escapeHtml(when) + ')' : '',
+    '. They are now scheduling the callback.',
+    '&lt;/div&gt;'
+  ].join('');
+}
+
+/**
+ * Returns an HTML banner if the submission's ZIP geocoded outside our
+ * service radius. Empty string if the area check passed or never ran.
+ * The customer never sees this — it's an internal flag to be discussed
+ * with Jason before deciding policy.
+ */
+function outsideAreaBanner(areaCheck) {
+  if (!areaCheck || !areaCheck.ok) return '';
+  if (areaCheck.withinServiceArea) return '';
+  const miles = (areaCheck.miles || 0).toFixed(1);
+  return [
+    '&lt;div style="margin:0 0 16px;padding:10px 14px;background:#fff5e6;border:1px solid #c85a28;border-radius:4px;color:#5a2c0d;font-size:14px"&gt;',
+    '&lt;strong&gt;⚠ Outside service area:&lt;/strong&gt; ',
+    escapeHtml(miles), ' mi from Leicester ',
+    '(service radius is ', String(SERVICE_RADIUS_MILES), ' mi).',
+    '&lt;/div&gt;'
+  ].join('');
+}
+
+function htmlSection(title, rows) {
+  const inner = rows.map(function (r) {
+    const label = r[0]
+      ? '&lt;td style="padding:4px 12px 4px 0;color:#666;font-size:13px;vertical-align:top;white-space:nowrap"&gt;' + escapeHtml(r[0]) + ':&lt;/td&gt;'
+      : '&lt;td&gt;&lt;/td&gt;';
+    return '&lt;tr&gt;' + label + '&lt;td style="padding:4px 0;font-size:14px"&gt;' + r[1] + '&lt;/td&gt;&lt;/tr&gt;';
+  }).join('');
+  return [
+    '&lt;h3 style="margin:18px 0 6px;font-size:14px;letter-spacing:0.5px;text-transform:uppercase;color:#444"&gt;' + escapeHtml(title) + '&lt;/h3&gt;',
+    '&lt;table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse"&gt;',
+    inner,
+    '&lt;/table&gt;'
+  ].join('');
+}
+
+function answerRows(service, answers) {
+  if (!service || !answers) return [];
+  const labelMap = LABELS[service] || {};
+  const rows = [];
+  for (const key of Object.keys(answers)) {
+    const labelName = KEY_LABELS[key] || humanizeKey(key);
+    const valueLabels = labelMap[key];
+    const display = (valueLabels &amp;&amp; valueLabels[answers[key]]) || answers[key];
+    rows.push([labelName, escapeHtml(display)]);
+  }
+  return rows;
+}
+
+function formatPhotosHtml(links) {
+  if (!links || !links.length) return '';
+  const items = links.map(function (l) {
+    return '&lt;li style="margin:4px 0"&gt;&lt;a href="' + escapeHtml(l.url) + '" style="color:#2D5A27"&gt;' + escapeHtml(l.name) + '&lt;/a&gt;&lt;/li&gt;';
+  }).join('');
+  return [
+    '&lt;h3 style="margin:18px 0 6px;font-size:14px;letter-spacing:0.5px;text-transform:uppercase;color:#444"&gt;Photos (' + links.length + ')&lt;/h3&gt;',
+    '&lt;p style="margin:4px 0;color:#666;font-size:12px"&gt;Attached below + Drive links:&lt;/p&gt;',
+    '&lt;ul style="margin:4px 0 0 18px;padding:0;font-size:14px"&gt;' + items + '&lt;/ul&gt;'
+  ].join('');
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&amp;&lt;&gt;"']/g, function (c) {
+    return { '&amp;': '&amp;amp;', '&lt;': '&amp;lt;', '&gt;': '&amp;gt;', '"': '&amp;quot;', "'": '&amp;#39;' }[c];
+  });
+}
+
+function phoneLink(p) {
+  if (!p) return '&lt;em style="color:#888"&gt;(none)&lt;/em&gt;';
+  const digits = String(p).replace(/[^0-9]/g, '');
+  if (!digits) return escapeHtml(p);
+  const tel = digits.length === 10 ? '+1' + digits : '+' + digits;
+  return '&lt;a href="tel:' + escapeHtml(tel) + '" style="color:#2D5A27;font-weight:600"&gt;' + escapeHtml(p) + '&lt;/a&gt;';
+}
+
+function emailLink(e) {
+  if (!e) return '&lt;em style="color:#888"&gt;(none)&lt;/em&gt;';
+  return '&lt;a href="mailto:' + escapeHtml(e) + '" style="color:#2D5A27"&gt;' + escapeHtml(e) + '&lt;/a&gt;';
+}
+
+function htmlToText(html) {
+  return String(html)
+    .replace(/&lt;\/(p|h[1-6]|li|tr|div)&gt;/gi, '\n')
+    .replace(/&lt;br\s*\/?&gt;(?!\n)/gi, '\n')
+    .replace(/&lt;[^&gt;]+&gt;/g, '')
+    .replace(/&amp;nbsp;/g, ' ')
+    .replace(/&amp;amp;/g, '&amp;')
+    .replace(/&amp;lt;/g, '&lt;')
+    .replace(/&amp;gt;/g, '&gt;')
+    .replace(/&amp;quot;/g, '"')
+    .replace(/&amp;#39;/g, "'")
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+function sendHtmlEmail(subject, html, attachments) {
+  const opts = { htmlBody: html };
+  if (attachments &amp;&amp; attachments.length) opts.attachments = attachments;
+  try {
+    MailApp.sendEmail(NOTIFY_EMAIL, subject, htmlToText(html), opts);
+  } catch (e) {
+    // Sheet writes are the source of truth — never fail the whole submission.
+  }
+}
+
+function buildAttachments(links) {
+  if (!links || !links.length) return [];
+  const blobs = [];
+  let total = 0;
+  for (const l of links) {
+    if (!l.fileId) continue;
+    try {
+      const file = DriveApp.getFileById(l.fileId);
+      const size = file.getSize();
+      if (total + size &gt; ATTACHMENT_TOTAL_LIMIT_BYTES) break;
+      blobs.push(file.getBlob());
+      total += size;
+    } catch (e) {
+      // File may have been deleted/moved — skip; the email still has the link.
+    }
+  }
+  return blobs;
+}
+
+function humanizeKey(key) {
+  return key.replace(/([A-Z])/g, ' $1').replace(/^./, function (c) { return c.toUpperCase(); }).trim();
+}
+
+function normalizeKey(s) {
+  return (s || '').toString().toLowerCase().replace(/[^0-9a-z@.]/g, '');
+}
+
+// ============================================================
+// Photo upload to Drive (organized: &lt;root&gt;/&lt;MMM_YY&gt;/&lt;MMM_YY_Service_Name&gt;/files)
+// ============================================================
+
+/**
+ * Decodes each base64 data-URL photo from the payload, saves it to the
+ * appropriate subfolder, and returns an array of { name, url, fileId }.
+ *
+ * Folder structure:
+ *   Pine Point Lead Photos/
+ *     May_26/
+ *       MAY26_Removal_JohnSmith_2026_00001/
+ *         originalfilename.jpg
+ *
+ * The estimate-number suffix on the per-estimate folder keeps the name
+ * unique even if the same customer submits twice in the same month.
+ */
+function savePhotosToDrive(photos, estimateNumber, service, customerName) {
+  if (!photos || !photos.length) return [];
+  const now = new Date();
+  const monthYear = formatMonthYear(now);             // "May_26"   — parent folder
+  const monthYearUpper = formatMonthYearUpper(now);   // "MAY26"    — folder name prefix
+  const safeService = SERVICE_SHORT[service] || 'Other';
+  const safeName = sanitizeName(customerName) || 'Anonymous';
+  const folderName = monthYearUpper + '_' + safeService + '_' + safeName +
+                     (estimateNumber ? '_' + estimateNumber : '');
+
+  const root = getOrCreatePhotoFolder();
+  const monthFolder = getOrCreateChildFolder(root, monthYear);
+  const estimateFolder = getOrCreateChildFolder(monthFolder, folderName);
+
+  const links = [];
+  for (let i = 0; i &lt; photos.length; i++) {
+    const photo = photos[i];
+    try {
+      const match = (photo.dataUrl || '').match(/^data:(.+?);base64,(.*)$/);
+      if (!match) continue;
+      const mimeType = match[1];
+      const base64 = match[2];
+      const filename = (photo.name || ('photo-' + (i + 1) + '.jpg')).replace(/[\\/]/g, '_');
+      const blob = Utilities.newBlob(Utilities.base64Decode(base64), mimeType, filename);
+      const file = estimateFolder.createFile(blob);
+      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+      links.push({ name: filename, url: file.getUrl(), fileId: file.getId() });
+    } catch (e) {
+      // Skip individual photo failures rather than losing the whole submission.
+    }
+  }
+  return links;
+}
+
+function formatMonthYear(d) {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return months[d.getMonth()] + '_' + String(d.getFullYear()).slice(2);
+}
+
+function formatMonthYearUpper(d) {
+  const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+  return months[d.getMonth()] + String(d.getFullYear()).slice(2);
+}
+
+function sanitizeName(s) {
+  return (s || '').toString().replace(/[^a-zA-Z0-9]/g, '');
+}
+
+function getOrCreatePhotoFolder() {
+  const folders = DriveApp.getFoldersByName(PHOTO_FOLDER_NAME);
+  if (folders.hasNext()) return folders.next();
+  return DriveApp.createFolder(PHOTO_FOLDER_NAME);
+}
+
+function getOrCreateChildFolder(parent, name) {
+  const folders = parent.getFoldersByName(name);
+  if (folders.hasNext()) return folders.next();
+  return parent.createFolder(name);
+}
+
+function formatPhotoUrls(links) {
+  if (!links || !links.length) return '';
+  return links.map(function (l) { return l.url; }).join('\n');
+}
+
+// ============================================================
+// Helpers
+// ============================================================
+
+function getOrCreate(ss, def) {
+  let s = ss.getSheetByName(def.name);
+  if (!s) {
+    s = ss.insertSheet(def.name);
+    s.appendRow(def.headers);
+    s.setFrozenRows(1);
+    s.getRange(1, 1, 1, def.headers.length).setFontWeight('bold');
+    if (def.hidden) s.hideSheet();
+  } else if (def.hidden &amp;&amp; !s.isSheetHidden()) {
+    s.hideSheet();
+  }
+  return s;
+}
+
+function jsonResponse(obj) {
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+// ============================================================
+// One-time setup — run this from the Apps Script editor (Run → installTrigger)
+// ============================================================
+
+/**
+ * Installs the 1-minute time trigger that drains the pending lead-email queue.
+ * Re-runs are safe — any existing trigger for processPendingLeads is removed first.
+ */
+function installTrigger() {
+  const triggers = ScriptApp.getProjectTriggers();
+  for (const t of triggers) {
+    if (t.getHandlerFunction() === 'processPendingLeads') {
+      ScriptApp.deleteTrigger(t);
+    }
+  }
+  ScriptApp.newTrigger('processPendingLeads')
+    .timeBased()
+    .everyMinutes(1)
+    .create();
+  console.log('Trigger installed — pending lead emails are sent ' +
+    EMAIL_DELAY_MINUTES + ' minutes after submission unless cancelled by a schedule.');
+}
+</code></pre>
             </div>
-            <p style="margin-top:10px"><a class="btn btn--ghost" href="https://pinepointtrees.com/docs/google-apps-script-leads.js" target="_blank" rel="noopener">Open script in new tab</a></p>
-            <p>Paste it into the empty <code>Code.gs</code> file. Save with the floppy-disk icon (or ⌘S / Ctrl-S).</p>
             <button class="wizard__step-toggle">Mark step done</button>
           </div>
         </div>
@@ -1249,6 +2292,11 @@
       <h2>Test everything</h2>
       <p class="lead">Once your end is set up, run through this list. Submitting fake leads is fine — we'll clean the sheet afterward. Check items off as you go; your progress saves automatically (in your browser, just for you).</p>
 
+      <div class="section-progress">
+        <span class="section-progress__label">Test progress: <span id="progress-text">0 / 0</span></span>
+        <div class="section-progress__bar"><div class="section-progress__fill" id="progress-fill"></div></div>
+      </div>
+
       <div id="checklist">
         <div class="checklist__group" data-group="estimate">
           <h3>Estimate flow</h3>
@@ -1308,7 +2356,12 @@
       <div class="section-eyebrow">Where I need your input</div>
       <h2>What we need from you</h2>
 
-      <div class="card">
+      <div class="section-progress">
+        <span class="section-progress__label">Items addressed: <span id="need-progress-text">0 / 5</span></span>
+        <div class="section-progress__bar"><div class="section-progress__fill" id="need-progress-fill"></div></div>
+      </div>
+
+      <div class="card card--checkable" data-need-id="need-pricing">
         <h3>1. Pricing reality check</h3>
         <p>The math is fully tunable — I can change base rates, multipliers (access, hazards, volume), and the Low/High spread in minutes. Specific things worth flagging:</p>
         <ul>
@@ -1317,9 +2370,10 @@
           <li>For lot clearing, are the size buckets (under 1/4 acre, 1/4–1/2, 1/2–1, 1+) the right cut points?</li>
         </ul>
         <p style="color:var(--light-gray);font-size:0.9rem;margin-top:10px"><strong>Bonus that'll save us a round-trip:</strong> if you can send 5–10 of your recent invoices, I can reverse-engineer your real rates and tune the tool to match before you even test it. Less guesswork on both sides.</p>
+        <button class="card-check">Mark addressed</button>
       </div>
 
-      <div class="card">
+      <div class="card card--checkable" data-need-id="need-invoicing">
         <h3>2. Invoicing — what do you use today?</h3>
         <p>If I understood right, you've been doing invoices in Excel — confirm? The Estimate # (e.g. <code>2026_00001</code>) is designed to bridge the online lead to the real invoice so every customer keeps one number from first click through to paid.</p>
         <p>A few things to think about:</p>
@@ -1328,24 +2382,28 @@
           <li><strong>The cleanest path is probably Google Sheets</strong> — same Drive as your leads, you can copy-paste from the All Leads tab into a "2026 Invoices" tab, totals roll up automatically, no more files lost on a laptop. I can set up an invoice template tab if you want to try it.</li>
           <li><strong>Sticking with Excel is also fine</strong> — zero migration. Tradeoff is the data lives in two places and you'd manually copy estimate #s across.</li>
         </ul>
+        <button class="card-check">Mark addressed</button>
       </div>
 
-      <div class="card">
+      <div class="card card--checkable" data-need-id="need-scheduling">
         <h3>3. Callback scheduling style</h3>
         <p>Right now customers pick a time window (Morning / Afternoon / Evening / Weekend). Cleanest alternative: a free Calendly link where they pick a specific 15-min slot with calendar invites + reminders. Less phone tag, but another tool to maintain.</p>
         <p>Either is fine — say which you prefer.</p>
+        <button class="card-check">Mark addressed</button>
       </div>
 
-      <div class="card">
+      <div class="card card--checkable" data-need-id="need-out-of-area">
         <h3>4. Out-of-area policy</h3>
         <p>Today the email gets a yellow ⚠ banner so you can decide per-lead. What do you actually want to happen?</p>
         <ul>
           <li><strong>(a)</strong> Keep flagging, you decide per lead</li>
-          <li><strong>(b)</strong> Disqualify upfront — polite message at the start of the form (“we serve within 15 mi of Leicester, here's where to call for outside that area”) and don't take the lead</li>
-          <li><strong>(c)</strong> Take the lead but auto-reply with a polite decline + referral list</li>
-          <li><strong>(d)</strong> Take it but auto-add a travel surcharge</li>
-          <li><strong>(e)</strong> No different from any other lead</li>
+          <li><strong>(b)</strong> <strong>Distance-tiered</strong> — triage anything close to the boundary (you tell us the cutoff, e.g. 15–25 mi from Leicester, still gets to your inbox flagged), but auto-decline anything well outside (e.g. 25+ mi). Customer gets a polite "thanks, we don't currently serve your area" message instead of the price.</li>
+          <li><strong>(c)</strong> Disqualify upfront for everything beyond 15 mi — polite message at the start of the form, no lead at all</li>
+          <li><strong>(d)</strong> Take the lead but auto-reply with a polite decline + referral list</li>
+          <li><strong>(e)</strong> Take it but auto-add a travel surcharge</li>
+          <li><strong>(f)</strong> No different from any other lead</li>
         </ul>
+        <button class="card-check">Mark addressed</button>
       </div>
 
       <div class="card">
@@ -1358,13 +2416,14 @@
         </table>
       </div>
 
-      <div class="card">
+      <div class="card card--checkable" data-need-id="need-small-items">
         <h3>6. Open small items</h3>
         <ul>
           <li><strong>Better photos?</strong> Got any sharper before/afters or specific job shots you'd want swapped in?</li>
           <li><strong>Add your personal cell</strong> alongside the main 774-262-2145?</li>
           <li><strong>Anyone else who should see the leads?</strong> Employees, partners — send their Google email and I'll give them sheet access.</li>
         </ul>
+        <button class="card-check">Mark addressed</button>
       </div>
     </section>
 
@@ -1460,14 +2519,23 @@
   }, { rootMargin: '-30% 0px -55% 0px', threshold: 0 });
   sections.forEach(s => { if (s.id) observer.observe(s); });
 
-  // === Wizard collapsibles ===
+  // === Wizard collapsibles + setup-progress strip ===
   const STORAGE_KEY_WIZ = 'pinepoint.handoff.wizardDone.v1';
   const wizardSteps = Array.from(document.querySelectorAll('.wizard__step'));
+  const setupProgressFill = document.getElementById('setup-progress-fill');
+  const setupProgressText = document.getElementById('setup-progress-text');
   let doneSet = new Set();
   try {
     const raw = localStorage.getItem(STORAGE_KEY_WIZ);
     if (raw) doneSet = new Set(JSON.parse(raw));
   } catch (e) {}
+
+  function refreshSetupProgress() {
+    const total = wizardSteps.length;
+    const done = wizardSteps.filter(s => s.classList.contains('is-done')).length;
+    if (setupProgressText) setupProgressText.textContent = done + ' / ' + total;
+    if (setupProgressFill) setupProgressFill.style.width = total ? (done / total * 100) + '%' : '0%';
+  }
 
   wizardSteps.forEach((step, idx) => {
     if (doneSet.has(idx)) step.classList.add('is-done');
@@ -1483,13 +2551,53 @@
         if (wasDone) doneSet.add(idx);
         else doneSet.delete(idx);
         try { localStorage.setItem(STORAGE_KEY_WIZ, JSON.stringify(Array.from(doneSet))); } catch (e) {}
+        refreshSetupProgress();
       });
     }
   });
+  refreshSetupProgress();
 
   // Auto-open the first incomplete wizard step
   const firstIncomplete = wizardSteps.find(s => !s.classList.contains('is-done'));
   if (firstIncomplete) firstIncomplete.classList.add('is-open');
+
+  // === Need-cards (What we need from you) — checkable + section progress ===
+  const STORAGE_KEY_NEED = 'pinepoint.handoff.needDone.v1';
+  const needCards = Array.from(document.querySelectorAll('.card--checkable'));
+  const needProgressFill = document.getElementById('need-progress-fill');
+  const needProgressText = document.getElementById('need-progress-text');
+  let needDoneSet = new Set();
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_NEED);
+    if (raw) needDoneSet = new Set(JSON.parse(raw));
+  } catch (e) {}
+
+  function refreshNeedProgress() {
+    const total = needCards.length;
+    const done = needCards.filter(c => c.classList.contains('is-done')).length;
+    if (needProgressText) needProgressText.textContent = done + ' / ' + total;
+    if (needProgressFill) needProgressFill.style.width = total ? (done / total * 100) + '%' : '0%';
+  }
+
+  needCards.forEach(card => {
+    const id = card.dataset.needId;
+    if (needDoneSet.has(id)) {
+      card.classList.add('is-done');
+      const btn = card.querySelector('.card-check');
+      if (btn) btn.textContent = 'Addressed';
+    }
+    const btn = card.querySelector('.card-check');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const wasDone = card.classList.toggle('is-done');
+      btn.textContent = wasDone ? 'Addressed' : 'Mark addressed';
+      if (wasDone) needDoneSet.add(id);
+      else needDoneSet.delete(id);
+      try { localStorage.setItem(STORAGE_KEY_NEED, JSON.stringify(Array.from(needDoneSet))); } catch (e) {}
+      refreshNeedProgress();
+    });
+  });
+  refreshNeedProgress();
 
   // === Copy buttons ===
   document.querySelectorAll('[data-copy]').forEach(btn => {
@@ -1502,6 +2610,29 @@
         setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1600);
       } catch (e) {
         alert('Copy failed — select the URL manually.');
+      }
+    });
+  });
+
+  // === Copy-all (script body) ===
+  document.querySelectorAll('.copy-all-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const target = document.querySelector(btn.dataset.copyTarget);
+      if (!target) return;
+      try {
+        await navigator.clipboard.writeText(target.textContent);
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1800);
+      } catch (e) {
+        // Fallback: select the text in the pre so user can ⌘C themselves
+        const range = document.createRange();
+        range.selectNodeContents(target);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        alert('Auto-copy blocked by browser — text is selected, press ⌘C / Ctrl-C.');
       }
     });
   });

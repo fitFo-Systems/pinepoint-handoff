@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pine Point — Site Walkthrough &amp; Setup</title>
+  <meta name="description" content="Internal walkthrough of pinepointtrees.com — what's live, how to wire lead notifications into your Gmail, what to test, and what we need from you.">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --black: #1C1C1C;
+      --charcoal: #2C2C2C;
+      --dark-gray: #3A3A3A;
+      --medium-gray: #6B6B6B;
+      --light-gray: #A0A0A0;
+      --white: #FFFFFF;
+      --off-white: #F5F0EB;
+      --green: #2D5A27;
+      --green-hover: #3A7432;
+      --rust: #c85a28;
+      --warn: #d4ad1a;
+      --warn-bg: #fff8d4;
+      --shadow: 0 2px 12px rgba(0,0,0,0.4);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      background: var(--black);
+      color: var(--off-white);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--green-hover); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code, pre { font-family: ui-monospace, "SF Mono", Menlo, Monaco, monospace; }
+    code { background: var(--charcoal); padding: 2px 6px; border-radius: 3px; font-size: 0.9em; color: #e5d5b8; }
+    pre { background: var(--charcoal); padding: 14px 16px; border-radius: 6px; overflow-x: auto; border: 1px solid var(--dark-gray); font-size: 0.85rem; line-height: 1.5; color: #e5d5b8; }
+    pre code { background: none; padding: 0; }
+
+    h1, h2, h3, h4 { color: var(--white); margin-top: 0; line-height: 1.2; }
+
+    /* === Header === */
+    .site-header {
+      background: linear-gradient(180deg, #131313 0%, var(--black) 100%);
+      border-bottom: 1px solid var(--dark-gray);
+      padding: 28px 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(8px);
+      background-color: rgba(19,19,19,0.95);
+    }
+    .site-header__inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 20px;
+      align-items: center;
+    }
+    .site-header__brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .site-header__logo {
+      width: 44px;
+      height: 44px;
+      background: url('/images/logo-white-clean.png') center/contain no-repeat;
+      flex-shrink: 0;
+    }
+    .site-header__titles { line-height: 1.2; }
+    .site-header__eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--green-hover);
+      font-weight: 700;
+    }
+    .site-header__title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--white);
+      margin: 0;
+    }
+    .search {
+      width: 100%;
+      max-width: 360px;
+      justify-self: center;
+      position: relative;
+    }
+    .search__input {
+      width: 100%;
+      padding: 10px 14px 10px 38px;
+      background: var(--charcoal);
+      border: 1px solid var(--dark-gray);
+      border-radius: 22px;
+      color: var(--white);
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+    }
+    .search__input:focus {
+      border-color: var(--green-hover);
+      background: var(--black);
+    }
+    .search__icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--light-gray);
+      font-size: 1rem;
+      pointer-events: none;
+    }
+    .header-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 18px;
+      background: var(--green);
+      color: var(--white);
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .header-cta:hover { background: var(--green-hover); text-decoration: none; }
+
+    /* === Layout === */
+    .layout {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 36px;
+      align-items: start;
+    }
+    .toc {
+      position: sticky;
+      top: 124px;
+      max-height: calc(100vh - 140px);
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .toc__title {
+      font-size: 0.7rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--medium-gray);
+      margin: 0 0 12px;
+      font-weight: 700;
+    }
+    .toc__list { list-style: none; padding: 0; margin: 0; }
+    .toc__list li { margin-bottom: 4px; }
+    .toc__list a {
+      display: block;
+      padding: 8px 12px;
+      color: var(--light-gray);
+      border-radius: 4px;
+      font-size: 0.9rem;
+      border-left: 2px solid transparent;
+      transition: all 0.12s;
+    }
+    .toc__list a:hover {
+      color: var(--white);
+      background: var(--charcoal);
+      text-decoration: none;
+    }
+    .toc__list a.is-active {
+      color: var(--white);
+      border-left-color: var(--green-hover);
+      background: var(--charcoal);
+    }
+    .progress-strip {
+      margin-top: 18px;
+      padding: 10px 12px;
+      background: var(--charcoal);
+      border-radius: 6px;
+      border: 1px solid var(--dark-gray);
+      font-size: 0.78rem;
+      color: var(--light-gray);
+    }
+    .progress-strip__label { display: block; margin-bottom: 6px; }
+    .progress-strip__bar {
+      height: 6px;
+      background: var(--dark-gray);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .progress-strip__fill {
+      height: 100%;
+      background: var(--green);
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    /* === Sections === */
+    section {
+      scroll-margin-top: 110px;
+      margin-bottom: 56px;
+    }
+    section.hidden-by-search { display: none; }
+
+    .hero {
+      padding: 32px 32px 36px;
+      background: linear-gradient(135deg, #1f1f1f 0%, #161616 100%);
+      border: 1px solid var(--dark-gray);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      margin-bottom: 48px;
+    }
+    .hero__eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--green-hover);
+      font-weight: 700;
+    }
+    .hero h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      margin: 8px 0 12px;
+      letter-spacing: -0.5px;
+    }
+    .hero p { color: var(--light-gray); font-size: 1.05rem; margin: 0 0 16px; max-width: 70ch; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+    .hero__live {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(45, 90, 39, 0.15);
+      border: 1px solid var(--green);
+      color: var(--green-hover);
+      padding: 5px 12px;
+      border-radius: 18px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+    }
+    .hero__live::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      background: var(--green-hover);
+      border-radius: 50%;
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    .section-eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--green-hover);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    section h2 {
+      font-size: 1.65rem;
+      font-weight: 800;
+      margin: 0 0 10px;
+      letter-spacing: -0.3px;
+    }
+    section .lead {
+      color: var(--light-gray);
+      font-size: 1.02rem;
+      margin: 0 0 24px;
+      max-width: 70ch;
+    }
+
+    /* === Cards === */
+    .card {
+      background: var(--charcoal);
+      border: 1px solid var(--dark-gray);
+      border-radius: 6px;
+      padding: 20px 22px;
+      margin-bottom: 14px;
+    }
+    .card h3 { margin: 0 0 8px; font-size: 1.05rem; font-weight: 700; }
+    .card p { margin: 0 0 10px; }
+    .card p:last-child { margin-bottom: 0; }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      background: var(--green);
+      color: var(--white);
+      border: none;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .btn:hover { background: var(--green-hover); text-decoration: none; }
+    .btn--ghost {
+      background: transparent;
+      border: 1px solid var(--dark-gray);
+      color: var(--off-white);
+    }
+    .btn--ghost:hover { background: var(--charcoal); border-color: var(--medium-gray); }
+
+    /* === Customer flow === */
+    .flow {
+      counter-reset: flow;
+      display: grid;
+      gap: 12px;
+    }
+    .flow__step {
+      counter-increment: flow;
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 16px;
+      padding: 18px 20px;
+      background: var(--charcoal);
+      border: 1px solid var(--dark-gray);
+      border-radius: 6px;
+      align-items: start;
+    }
+    .flow__step::before {
+      content: counter(flow);
+      grid-row: span 2;
+      width: 48px;
+      height: 48px;
+      background: var(--green);
+      color: var(--white);
+      font-weight: 800;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    .flow__step h4 { margin: 0 0 4px; font-size: 1rem; }
+    .flow__step p { margin: 0; color: var(--light-gray); font-size: 0.95rem; }
+
+    /* === Mockup: email === */
+    .mockup-email {
+      background: #f9f7f3;
+      color: #222;
+      border-radius: 6px;
+      padding: 22px 24px;
+      font-family: Arial, Helvetica, sans-serif;
+      max-width: 580px;
+      box-shadow: var(--shadow);
+    }
+    .mockup-email h3 { margin: 0 0 4px; color: var(--green); font-size: 1.4rem; }
+    .mockup-email .est-num { font-size: 0.85rem; color: #444; margin: 0 0 14px; }
+    .mockup-email .est-num strong { color: #111; }
+    .mockup-email .banner-warn {
+      background: #fff5e6;
+      border: 1px solid var(--rust);
+      color: #5a2c0d;
+      padding: 10px 14px;
+      border-radius: 4px;
+      font-size: 0.92rem;
+      margin: 0 0 14px;
+    }
+    .mockup-email .banner-info {
+      background: var(--warn-bg);
+      border: 1px solid var(--warn);
+      color: #5a4a00;
+      padding: 10px 14px;
+      border-radius: 4px;
+      font-size: 0.92rem;
+      margin: 0 0 14px;
+    }
+    .mockup-email .section-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #444;
+      margin: 18px 0 6px;
+      font-weight: 600;
+    }
+    .mockup-email table { border-collapse: collapse; width: 100%; }
+    .mockup-email td { padding: 4px 12px 4px 0; font-size: 0.92rem; vertical-align: top; }
+    .mockup-email td:first-child { color: #666; font-size: 0.82rem; white-space: nowrap; }
+    .mockup-email a { color: var(--green); }
+    .mockup-email .photo-list { margin: 4px 0 0 18px; padding: 0; font-size: 0.92rem; }
+    .mockup-email .photo-list li { margin: 4px 0; }
+    .mockup-email .meta { color: #888; font-size: 0.75rem; margin-top: 18px; }
+
+    /* === Mockup: sheet tabs === */
+    .mockup-sheet {
+      background: #fff;
+      color: #222;
+      border-radius: 6px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      font-family: Roboto, Arial, sans-serif;
+      font-size: 0.85rem;
+    }
+    .mockup-sheet__tabs {
+      display: flex;
+      background: #f1f1f1;
+      border-bottom: 1px solid #d4d4d4;
+      padding: 8px 12px 0;
+      gap: 2px;
+    }
+    .mockup-sheet__tab {
+      padding: 8px 16px;
+      background: #e0e0e0;
+      color: #555;
+      font-weight: 500;
+      border-radius: 6px 6px 0 0;
+      cursor: pointer;
+      font-size: 0.85rem;
+      border: none;
+      border-bottom: 2px solid transparent;
+    }
+    .mockup-sheet__tab.is-active {
+      background: #fff;
+      color: var(--green);
+      border-bottom-color: var(--green);
+      font-weight: 700;
+    }
+    .mockup-sheet__body { padding: 0; overflow-x: auto; }
+    .mockup-sheet table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .mockup-sheet th, .mockup-sheet td {
+      padding: 8px 10px;
+      text-align: left;
+      border-right: 1px solid #eee;
+      border-bottom: 1px solid #eee;
+      white-space: nowrap;
+      font-size: 0.82rem;
+    }
+    .mockup-sheet th {
+      background: #f7f7f7;
+      font-weight: 600;
+      color: #444;
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .mockup-sheet td.lead-type-callback {
+      background: #e8f5e9;
+      color: #2D5A27;
+      font-weight: 600;
+    }
+    .mockup-sheet td.lead-type-lead {
+      color: #666;
+    }
+    .mockup-sheet__hint {
+      padding: 8px 12px;
+      background: #fffbe6;
+      color: #5a4a00;
+      font-size: 0.78rem;
+      border-top: 1px solid #f0e0a0;
+    }
+
+    /* === Mockup: drive folder tree === */
+    .mockup-tree {
+      background: var(--charcoal);
+      border: 1px solid var(--dark-gray);
+      border-radius: 6px;
+      padding: 18px 20px;
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 0.9rem;
+      color: #e5d5b8;
+      line-height: 1.65;
+    }
+    .mockup-tree .folder { color: var(--green-hover); }
+    .mockup-tree .file { color: var(--off-white); }
+    .mockup-tree .annot { color: var(--medium-gray); margin-left: 6px; font-size: 0.85em; }
+
+    /* === Setup wizard === */
+    .wizard__intro {
+      background: linear-gradient(135deg, #25351f 0%, #1a2716 100%);
+      border: 1px solid var(--green);
+      border-radius: 6px;
+      padding: 18px 22px;
+      margin-bottom: 18px;
+    }
+    .wizard__intro h3 { margin: 0 0 6px; color: var(--white); }
+    .wizard__intro p { margin: 0; color: var(--off-white); font-size: 0.96rem; }
+    .wizard__intro .badges { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .wizard__intro .badges span {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.15);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.78rem;
+      color: var(--off-white);
+    }
+
+    .wizard {
+      counter-reset: wizard;
+    }
+    .wizard__step {
+      counter-increment: wizard;
+      background: var(--charcoal);
+      border: 1px solid var(--dark-gray);
+      border-radius: 6px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .wizard__head {
+      display: grid;
+      grid-template-columns: 44px 1fr auto;
+      gap: 14px;
+      align-items: center;
+      padding: 14px 18px;
+      cursor: pointer;
+      user-select: none;
+      background: var(--charcoal);
+      transition: background 0.12s;
+    }
+    .wizard__head:hover { background: #333; }
+    .wizard__head::before {
+      content: counter(wizard);
+      width: 32px;
+      height: 32px;
+      background: var(--green);
+      color: var(--white);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+    .wizard__step.is-done .wizard__head::before {
+      content: '\2713';
+      background: var(--green-hover);
+    }
+    .wizard__title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--white);
+    }
+    .wizard__caret {
+      color: var(--light-gray);
+      font-size: 1.2rem;
+      transition: transform 0.2s;
+    }
+    .wizard__step.is-open .wizard__caret { transform: rotate(180deg); }
+    .wizard__body {
+      padding: 0 22px 22px 76px;
+      display: none;
+      color: var(--off-white);
+    }
+    .wizard__step.is-open .wizard__body { display: block; }
+    .wizard__body p, .wizard__body ol, .wizard__body ul { margin: 0 0 12px; }
+    .wizard__body p:last-child { margin-bottom: 0; }
+    .wizard__body ol, .wizard__body ul { padding-left: 22px; }
+    .wizard__body li { margin-bottom: 6px; }
+    .wizard__body code { color: #f0d8a8; }
+
+    .wizard__action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--dark-gray);
+    }
+    .wizard__step-toggle {
+      background: var(--dark-gray);
+      color: var(--off-white);
+      border: none;
+      padding: 8px 14px;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .wizard__step-toggle:hover { background: var(--medium-gray); }
+    .wizard__step.is-done .wizard__step-toggle { background: var(--green); color: var(--white); }
+    .wizard__step.is-done .wizard__step-toggle::before { content: '\2713 '; }
+
+    .copy-block {
+      background: var(--black);
+      border: 1px solid var(--dark-gray);
+      border-radius: 6px;
+      padding: 12px 14px;
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 0.85rem;
+      color: #e5d5b8;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      word-break: break-all;
+    }
+    .copy-block .copy-btn {
+      background: var(--green);
+      color: var(--white);
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .copy-block .copy-btn:hover { background: var(--green-hover); }
+    .copy-block .copy-btn.copied { background: var(--green-hover); }
+
+    .callout {
+      background: #1f2c25;
+      border-left: 3px solid var(--green);
+      padding: 12px 16px;
+      border-radius: 0 4px 4px 0;
+      margin: 14px 0;
+      font-size: 0.94rem;
+    }
+    .callout--warn {
+      background: #2d2716;
+      border-left-color: var(--warn);
+    }
+    .callout strong { color: var(--white); }
+
+    /* === Test checklist === */
+    .checklist__group h3 {
+      margin: 22px 0 10px;
+      font-size: 1rem;
+      color: var(--off-white);
+    }
+    .checklist__group h3:first-of-type { margin-top: 0; }
+    .checklist__item {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      padding: 10px 14px;
+      background: var(--charcoal);
+      border: 1px solid var(--dark-gray);
+      border-radius: 4px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      align-items: start;
+      transition: all 0.12s;
+    }
+    .checklist__item:hover { border-color: var(--medium-gray); }
+    .checklist__item input { margin-top: 4px; cursor: pointer; }
+    .checklist__item.is-checked {
+      background: rgba(45, 90, 39, 0.15);
+      border-color: var(--green);
+    }
+    .checklist__item.is-checked .checklist__label { text-decoration: line-through; color: var(--light-gray); }
+    .checklist__label { font-size: 0.95rem; line-height: 1.5; }
+    .checklist__hint { color: var(--light-gray); font-size: 0.85rem; margin-top: 2px; display: block; }
+
+    /* === Question form === */
+    .ask-form {
+      background: var(--charcoal);
+      border: 1px solid var(--dark-gray);
+      border-radius: 6px;
+      padding: 22px 24px;
+    }
+    .ask-form .field { margin-bottom: 14px; }
+    .ask-form label {
+      display: block;
+      font-size: 0.78rem;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--light-gray);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .ask-form select, .ask-form input, .ask-form textarea {
+      width: 100%;
+      padding: 12px 14px;
+      background: var(--black);
+      border: 1px solid var(--dark-gray);
+      border-radius: 4px;
+      color: var(--white);
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+    }
+    .ask-form textarea { min-height: 110px; resize: vertical; }
+    .ask-form select:focus, .ask-form input:focus, .ask-form textarea:focus {
+      border-color: var(--green);
+    }
+    .ask-form .ask-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 6px;
+    }
+    .ask-form .hint { color: var(--medium-gray); font-size: 0.82rem; }
+
+    /* === Tables === */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      background: var(--charcoal);
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--dark-gray);
+    }
+    .data-table th, .data-table td {
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--dark-gray);
+    }
+    .data-table th {
+      background: #2a2a2a;
+      color: var(--white);
+      font-size: 0.78rem;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+
+    /* === Footer === */
+    .site-footer {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 24px 48px;
+      text-align: center;
+      color: var(--medium-gray);
+      font-size: 0.85rem;
+      border-top: 1px solid var(--dark-gray);
+    }
+    .site-footer a { color: var(--light-gray); }
+
+    /* === No-results === */
+    .no-results {
+      display: none;
+      padding: 24px 30px;
+      background: var(--charcoal);
+      border: 1px dashed var(--dark-gray);
+      border-radius: 6px;
+      color: var(--light-gray);
+      text-align: center;
+    }
+    .no-results.is-visible { display: block; }
+
+    /* === Mobile === */
+    @media (max-width: 880px) {
+      .site-header__inner {
+        grid-template-columns: 1fr auto;
+        grid-template-rows: auto auto;
+      }
+      .search { grid-column: 1 / -1; max-width: none; }
+      .header-cta { padding: 8px 14px; font-size: 0.85rem; }
+      .layout { grid-template-columns: 1fr; padding: 24px 16px 60px; gap: 24px; }
+      .toc { position: static; max-height: none; overflow: visible; padding: 0; border: 1px solid var(--dark-gray); border-radius: 6px; padding: 14px 16px; }
+      .hero { padding: 26px 22px; }
+      .hero h1 { font-size: 1.6rem; }
+      section h2 { font-size: 1.4rem; }
+      .wizard__head { grid-template-columns: 36px 1fr auto; padding: 12px 14px; }
+      .wizard__body { padding: 0 18px 18px 64px; }
+      .flow__step { grid-template-columns: 40px 1fr; padding: 14px 16px; }
+      .flow__step::before { width: 40px; height: 40px; font-size: 1.2rem; }
+      .mockup-email { padding: 18px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <div class="site-header__brand">
+      <div class="site-header__logo" aria-hidden="true"></div>
+      <div class="site-header__titles">
+        <div class="site-header__eyebrow">Pine Point Tree Service</div>
+        <h1 class="site-header__title">Site walkthrough &amp; setup</h1>
+      </div>
+    </div>
+    <div class="search">
+      <span class="search__icon">&#128269;</span>
+      <input type="search" id="search" class="search__input" placeholder="Search… e.g. “photos”, “script”, “invoice”">
+    </div>
+    <a class="header-cta" href="https://pinepointtrees.com" target="_blank" rel="noopener">Open the site &#8599;</a>
+  </div>
+</header>
+
+<div class="layout">
+
+  <aside class="toc">
+    <div class="toc__title">On this page</div>
+    <ul class="toc__list" id="toc-list">
+      <li><a href="#welcome" data-section="welcome">Site is live</a></li>
+      <li><a href="#customer" data-section="customer">Customer experience</a></li>
+      <li><a href="#receive" data-section="receive">What you receive</a></li>
+      <li><a href="#scenarios" data-section="scenarios">Two scenarios</a></li>
+      <li><a href="#analytics" data-section="analytics">Google Analytics</a></li>
+      <li><a href="#setup" data-section="setup">Setting up notifications</a></li>
+      <li><a href="#test" data-section="test">Test everything</a></li>
+      <li><a href="#need" data-section="need">What we need from you</a></li>
+      <li><a href="#ask" data-section="ask">Ask a question</a></li>
+    </ul>
+    <div class="progress-strip">
+      <span class="progress-strip__label">Test progress: <span id="progress-text">0 / 0</span></span>
+      <div class="progress-strip__bar"><div class="progress-strip__fill" id="progress-fill"></div></div>
+    </div>
+  </aside>
+
+  <main>
+
+    <div class="no-results" id="no-results">
+      No sections match your search. <a href="#" id="clear-search">Clear search</a> to see everything.
+    </div>
+
+    <!-- HERO / WELCOME -->
+    <section id="welcome" data-keywords="live launch hello introduction overview tldr summary">
+      <div class="hero">
+        <div class="hero__live">Live in production</div>
+        <div class="hero__eyebrow" style="margin-top:14px">Hey Jason —</div>
+        <h1>Your site is live and capturing leads.</h1>
+        <p>This page walks you through what's running, how to wire lead notifications into your Gmail, what to test, and the handful of things I need from you to lock everything in. It's interactive — search at the top, check off items as you go, and use the form at the bottom for any questions.</p>
+        <div class="hero-actions">
+          <a class="btn" href="https://pinepointtrees.com" target="_blank" rel="noopener">Open pinepointtrees.com</a>
+          <a class="btn btn--ghost" href="https://pinepointtrees.com/estimate.html" target="_blank" rel="noopener">Try the estimate tool</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- CUSTOMER EXPERIENCE -->
+    <section id="customer" data-keywords="customer experience flow estimate tool steps service removal trimming lot clearing photos contact form price range">
+      <div class="section-eyebrow">How it feels to a customer</div>
+      <h2>The estimate tool, end to end</h2>
+      <p class="lead">Five steps, under two minutes for most customers, no calling required to see a price. The page is mobile-first — most folks will hit it from a phone.</p>
+
+      <div class="flow">
+        <div class="flow__step">
+          <div>
+            <h4>Pick a service</h4>
+            <p>Three big buttons: Tree Removal, Trimming &amp; Pruning, Lot Clearing.</p>
+          </div>
+        </div>
+        <div class="flow__step">
+          <div>
+            <h4>Answer 4 quick questions</h4>
+            <p>Tailored to the service. Removal: tree count, height, hazards, truck access. Trimming: count, concern type (overhang, shaping, deadwood, clearance), height, access. Lot clearing: lot size, density, equipment access, end goal.</p>
+          </div>
+        </div>
+        <div class="flow__step">
+          <div>
+            <h4>Fill the contact form (required)</h4>
+            <p>Name, phone, email, ZIP, optional notes, optional photos (up to 6, 25 MB total). The price is gated behind this — they can't see the number without giving you contact info. Phone auto-formats as they type. ZIP is USPS-validated.</p>
+          </div>
+        </div>
+        <div class="flow__step">
+          <div>
+            <h4>See the price range</h4>
+            <p>Low / Typical / High with a one-line breakdown like “Based on: tree removal · 1 tree · large · near house · easy access.” Page is clear that this is an online estimate, not a quote.</p>
+          </div>
+        </div>
+        <div class="flow__step">
+          <div>
+            <h4>Pick a next step</h4>
+            <p><strong>Schedule a Follow-Up</strong> (we collect best time to call) or <strong>Call Now</strong> (one-tap dial on mobile).</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>Try it.</strong> Easiest way to feel this is to <a href="https://pinepointtrees.com/estimate.html" target="_blank" rel="noopener">run through the tool yourself</a> on your phone with a fake name. We'll clean the test rows from the sheet later.
+      </div>
+    </section>
+
+    <!-- WHAT YOU RECEIVE -->
+    <section id="receive" data-keywords="email sheet drive folder photos notifications subject body inbox sheet tabs columns">
+      <div class="section-eyebrow">Every lead, three places</div>
+      <h2>What lands in your hands</h2>
+      <p class="lead">Every estimate creates an email, three sheet rows, and a Drive folder — all stamped with the same Estimate # so they thread together.</p>
+
+      <h3 style="font-size:1.1rem;color:var(--off-white);margin:28px 0 10px">1. The email (HTML, attachments included)</h3>
+      <p style="color:var(--light-gray);margin:0 0 14px">This is what hits your inbox. Phone is one-tap to dial. Photos are both linked AND attached when total size is under 15 MB.</p>
+
+      <div class="mockup-email">
+        <h3>New Lead</h3>
+        <p class="est-num">Estimate #: <strong>2026_00001</strong></p>
+        <p style="color:#666;margin:0 0 14px;font-size:0.92rem">Estimate submitted 5+ minutes ago, no callback scheduled yet. If they schedule one later, you'll get a follow-up email referencing this same Estimate #.</p>
+
+        <div class="section-label">Contact</div>
+        <table>
+          <tr><td>Name:</td><td>John Smith</td></tr>
+          <tr><td>Phone:</td><td><a href="#">(508) 555-1234</a></td></tr>
+          <tr><td>Email:</td><td><a href="#">john@example.com</a></td></tr>
+          <tr><td>ZIP:</td><td>01524 (Leicester, MA)</td></tr>
+          <tr><td>Distance:</td><td>0.4 mi from Leicester</td></tr>
+        </table>
+
+        <div class="section-label">Job</div>
+        <table>
+          <tr><td>Service:</td><td><strong>Tree Removal</strong></td></tr>
+          <tr><td>Tree count:</td><td>2-3 trees</td></tr>
+          <tr><td>Tree height:</td><td>large (50-75 ft)</td></tr>
+          <tr><td>Hazards:</td><td>near house/structure</td></tr>
+          <tr><td>Access:</td><td>easy truck access</td></tr>
+        </table>
+
+        <div class="section-label">Estimated price</div>
+        <table>
+          <tr><td>Low:</td><td>$1,610</td></tr>
+          <tr><td>Typical:</td><td><strong>$2,012</strong></td></tr>
+          <tr><td>High:</td><td>$2,516</td></tr>
+        </table>
+
+        <div class="section-label">Their notes</div>
+        <p style="margin:0;color:#222;font-size:0.92rem">One tree leans toward the deck. Looking to do this in next 2 weeks if possible.</p>
+
+        <div class="section-label">Photos (3)</div>
+        <ul class="photo-list">
+          <li><a href="#">tree-front.jpg</a></li>
+          <li><a href="#">tree-back.jpg</a></li>
+          <li><a href="#">deck-view.jpg</a></li>
+        </ul>
+
+        <p class="meta">Source: pinepointtrees.com/estimate.html</p>
+      </div>
+
+      <h3 style="font-size:1.1rem;color:var(--off-white);margin:32px 0 10px">2. The Google Sheet — three tabs in your Drive</h3>
+      <p style="color:var(--light-gray);margin:0 0 14px">The <strong>All Leads</strong> tab is the one you'll live in day-to-day. Two detail tabs back it up.</p>
+
+      <div class="mockup-sheet">
+        <div class="mockup-sheet__tabs">
+          <button class="mockup-sheet__tab is-active" data-mock-tab="summary">All Leads</button>
+          <button class="mockup-sheet__tab" data-mock-tab="estimates">Estimate Leads</button>
+          <button class="mockup-sheet__tab" data-mock-tab="schedule">Schedule Requests</button>
+        </div>
+        <div class="mockup-sheet__body">
+          <div data-mock-panel="summary">
+            <table>
+              <thead>
+                <tr>
+                  <th>Estimate #</th><th>Name</th><th>Phone</th><th>Email</th><th>ZIP</th>
+                  <th>Lead Type</th><th>Job Type</th><th>Estimate Range</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>2026_00003</td><td>Jane Doe</td><td>(774) 555-9012</td><td>jane@…</td><td>01608</td>
+                  <td class="lead-type-callback">Callback</td><td>Trimming &amp; Pruning</td><td>$280–$450</td>
+                </tr>
+                <tr>
+                  <td>2026_00002</td><td>Bob Reed</td><td>(508) 555-3456</td><td>bob@…</td><td>01562</td>
+                  <td class="lead-type-lead">Lead</td><td>Lot Clearing</td><td>$3,500–$6,000</td>
+                </tr>
+                <tr>
+                  <td>2026_00001</td><td>John Smith</td><td>(508) 555-1234</td><td>john@…</td><td>01524</td>
+                  <td class="lead-type-callback">Callback</td><td>Tree Removal</td><td>$1,610–$2,516</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="mockup-sheet__hint">One row per customer. “Lead” = got an estimate; “Callback” = scheduled a follow-up call.</div>
+          </div>
+          <div data-mock-panel="estimates" hidden>
+            <table>
+              <thead>
+                <tr>
+                  <th>Est #</th><th>Time</th><th>Name</th><th>Phone</th><th>Email</th><th>ZIP</th><th>City</th><th>Distance</th><th>Service</th><th>Tree Count</th><th>…</th><th>Price Typ.</th><th>Notes</th><th>Photos</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>2026_00001</td><td>5/01 09:14</td><td>John Smith</td><td>(508) 555-1234</td><td>john@…</td><td>01524</td><td>Leicester</td><td>0.4</td><td>removal</td><td>2-3</td><td>…</td><td>$2,012</td><td>One tree leans toward the deck…</td><td>3 photo URLs</td></tr>
+              </tbody>
+            </table>
+            <div class="mockup-sheet__hint">Full detail of every estimate — every answer, full price range, notes, photo URLs, source page.</div>
+          </div>
+          <div data-mock-panel="schedule" hidden>
+            <table>
+              <thead>
+                <tr>
+                  <th>Est #</th><th>Time</th><th>Name</th><th>Phone</th><th>Best Time</th><th>Service</th><th>Price Typ.</th><th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>2026_00001</td><td>5/01 09:18</td><td>John Smith</td><td>(508) 555-1234</td><td>morning</td><td>removal</td><td>$2,012</td><td>Best to call after 9am</td></tr>
+              </tbody>
+            </table>
+            <div class="mockup-sheet__hint">Every callback request, with the original estimate context attached.</div>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="font-size:1.1rem;color:var(--off-white);margin:32px 0 10px">3. The Drive folder for photos</h3>
+      <p style="color:var(--light-gray);margin:0 0 14px">Auto-organized by month and estimate — every customer's photos live in their own folder.</p>
+
+      <div class="mockup-tree">
+<span class="folder">📁 Pine Point Lead Photos/</span>
+   <span class="folder">📁 May_26/</span>
+      <span class="folder">📁 MAY26_Removal_JohnSmith_2026_00001/</span><span class="annot"># one folder per estimate</span>
+         <span class="file">🖼 tree-front.jpg</span>
+         <span class="file">🖼 tree-back.jpg</span>
+         <span class="file">🖼 deck-view.jpg</span>
+      <span class="folder">📁 MAY26_Trimming_JaneDoe_2026_00003/</span>
+         <span class="file">🖼 oak1.jpg</span>
+   <span class="folder">📁 Jun_26/</span><span class="annot"># auto-created next month</span>
+      </div>
+    </section>
+
+    <!-- TWO SCENARIOS + OUT OF AREA -->
+    <section id="scenarios" data-keywords="scenarios outside area service area zip area distance leicester immediate delayed callback flag">
+      <div class="section-eyebrow">Two ways the timing plays out</div>
+      <h2>Lead vs callback timing</h2>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Schedules right away (within 5 min)</h3>
+          <p>You get <strong>one</strong> email: "Callback Requested." The lead email is suppressed because they already raised their hand.</p>
+        </div>
+        <div class="card">
+          <h3>Schedules later (after the 5-min mark)</h3>
+          <p>You'll have already gotten the "New Lead" email. The "Callback Requested" arrives with a yellow <strong>ℹ Update on existing lead</strong> banner so you know it's the same person, not a fresh one. Same Estimate #.</p>
+        </div>
+      </div>
+
+      <h3 style="font-size:1.1rem;color:var(--off-white);margin:28px 0 10px">Out-of-service-area leads</h3>
+      <p style="color:var(--light-gray);margin:0 0 16px">If a customer's ZIP is more than 15 miles from Leicester, the email gets a yellow ⚠ banner. <strong>Customer doesn't see it</strong> — just you.</p>
+
+      <div class="mockup-email" style="max-width:560px">
+        <div class="banner-warn"><strong>⚠ Outside service area:</strong> 36.3 mi from Leicester (service radius is 15 mi).</div>
+        <div class="section-label">Contact</div>
+        <table>
+          <tr><td>Name:</td><td>Tom Nguyen</td></tr>
+          <tr><td>Phone:</td><td><a href="#">(617) 555-2233</a></td></tr>
+          <tr><td>ZIP:</td><td>02134 (Allston, MA)</td></tr>
+          <tr><td>Distance:</td><td>36.3 mi from Leicester</td></tr>
+        </table>
+      </div>
+
+      <p style="color:var(--light-gray);margin-top:16px">There's an option in <a href="#need">What we need from you</a> below — do you want them blocked at the form, auto-declined, or do you want to triage them yourself?</p>
+    </section>
+
+    <!-- GA -->
+    <section id="analytics" data-keywords="google analytics ga4 traffic conversions metrics dashboard pageviews source attribution conversion tracking phone tracking">
+      <div class="section-eyebrow">Already plugged in</div>
+      <h2>Google Analytics</h2>
+      <p class="lead">Traffic and visitor data is being captured in my GA4 property. I'm adding <code>pinepointtreeservice@gmail.com</code> as a Viewer so you can log in any time and see the dashboard — no setup on your side.</p>
+
+      <h3 style="font-size:1rem;color:var(--off-white);margin:22px 0 8px">Captured today (out of the box)</h3>
+      <ul style="color:var(--off-white);padding-left:20px">
+        <li>Pageviews and time on each page</li>
+        <li>Traffic sources — Google search, Facebook, direct, referral</li>
+        <li>Device and browser breakdown</li>
+        <li>Geographic region (where visitors are coming from)</li>
+      </ul>
+
+      <h3 style="font-size:1rem;color:var(--off-white);margin:22px 0 8px">Worth adding once you've used it for a couple weeks</h3>
+      <ul style="color:var(--off-white);padding-left:20px">
+        <li><strong>Conversion tracking</strong> — flag "submitted estimate" and "scheduled callback" as goals so you can see what % of visitors become leads.</li>
+        <li><strong>Source attribution</strong> — know which Facebook ad / Google search / business card / referral source produced which lead.</li>
+        <li><strong>Phone-call tracking</strong> — when someone taps the "Call Now" button on the site, that becomes a conversion event.</li>
+      </ul>
+
+      <div class="callout">Each of those is ~30 minutes of work whenever you're ready. Best to do once you have a few weeks of baseline so we know what's normal.</div>
+    </section>
+
+    <!-- SETUP WIZARD -->
+    <section id="setup" data-keywords="setup script google apps gmail deploy install trigger web app url notification leads code editor authorize">
+      <div class="section-eyebrow">Wire lead notifications into your Gmail</div>
+      <h2>Setting up the lead pipeline</h2>
+      <p class="lead">Right now, lead notifications are wired to my account for testing. To flip that to <strong>your</strong> Gmail (so you own the data), you'll need to set up a small Google Apps Script. It's a one-time thing, no coding required — follow the 10 numbered steps below or hop on a screenshare with me.</p>
+
+      <div class="wizard__intro">
+        <h3>Two ways to do this</h3>
+        <p><strong>Path A:</strong> Hop on a 10-min screenshare with Keith (Zoom / FaceTime / Google Meet — your pick). You log in, share screen, Keith walks you through every click. Easiest if you're not into Google products.</p>
+        <p style="margin-top:6px"><strong>Path B:</strong> Self-serve, ~5 minutes. Steps below.</p>
+        <div class="badges"><span>No coding</span><span>One-time setup</span><span>You own the data</span></div>
+      </div>
+
+      <div class="wizard" id="wizard">
+
+        <div class="wizard__step">
+          <div class="wizard__head">
+            <div><div class="wizard__title">Sign in to Google as the right account</div></div>
+            <div class="wizard__caret">&#9662;</div>
+          </div>
+          <div class="wizard__body">
+            <p>Open <a href="https://drive.google.com" target="_blank" rel="noopener">drive.google.com</a> in a browser logged in as <code>pinepointtreeservice@gmail.com</code>. <strong>Verify the avatar in the top-right is the right account</strong> — if multiple Google accounts are signed in, the wrong one is the most common reason this whole flow ends up where you don't expect.</p>
+            <button class="wizard__step-toggle">Mark step done</button>
+          </div>
+        </div>
+
+        <div class="wizard__step">
+          <div class="wizard__head">
+            <div><div class="wizard__title">Create the spreadsheet that will hold your leads</div></div>
+            <div class="wizard__caret">&#9662;</div>
+          </div>
+          <div class="wizard__body">
+            <p>In Drive, click <strong>+ New → Google Sheets → Blank spreadsheet</strong>.</p>
+            <p>Rename it to <strong>Pine Point Leads</strong> (top left, where it says “Untitled spreadsheet”).</p>
+            <p>Leave the empty sheet as-is — the script will create the proper tabs (All Leads, Estimate Leads, Schedule Requests) automatically on the first submission.</p>
+            <button class="wizard__step-toggle">Mark step done</button>
+          </div>
+        </div>
+
+        <div class="wizard__step">
+          <div class="wizard__head">
+            <div><div class="wizard__title">Open the Apps Script editor</div></div>
+            <div class="wizard__caret">&#9662;</div>
+          </div>
+          <div class="wizard__body">
+            <p>In the open spreadsheet, click <strong>Extensions → Apps Script</strong>. A new tab opens with a code editor.</p>
+            <p>The default <code>Code.gs</code> file shows a stub <code>function myFunction() {}</code>. <strong>Delete everything in that file</strong> — we're replacing it.</p>
+            <button class="wizard__step-toggle">Mark step done</button>
+          </div>
+        </div>
+
+        <div class="wizard__step">
+          <div class="wizard__head">
+            <div><div class="wizard__title">Copy the lead-capture script</div></div>
+            <div class="wizard__caret">&#9662;</div>
+          </div>
+          <div class="wizard__body">
+            <p>The script lives at this URL. Click the button to open it in a new tab, then select all (⌘A / Ctrl-A) and copy (⌘C / Ctrl-C).</p>
+            <div class="copy-block">
+              <span id="script-url">https://pinepointtrees.com/docs/google-apps-script-leads.js</span>
+              <button class="copy-btn" data-copy="https://pinepointtrees.com/docs/google-apps-script-leads.js">Copy URL</button>
+            </div>
+            <p style="margin-top:10px"><a class="btn btn--ghost" href="https://pinepointtrees.com/docs/google-apps-script-leads.js" target="_blank" rel="noopener">Open script in new tab</a></p>
+            <p>Paste it into the empty <code>Code.gs</code> file. Save with the floppy-disk icon (or ⌘S / Ctrl-S).</p>
+            <button class="wizard__step-toggle">Mark step done</button>
+          </div>
+        </div>
+
+        <div class="wizard__step">
+          <div class="wizard__head">
+            <div><div class="wizard__title">Install the time trigger</div></div>
+            <div class="wizard__caret">&#9662;</div>
+          </div>
+          <div class="wizard__body">
+            <p>The script delays the "lead" email by 5 minutes so it can cancel itself if the customer goes on to schedule a callback (you get one email instead of two). That delay is driven by a 1-minute time trigger — set it up once:</p>
+            <ol>
+              <li>In the toolbar, find the function dropdown (says “Choose function”)</li>
+              <li>Pick <strong><code>installTrigger</code></strong></li>
+              <li>Click <strong>Run</strong></li>
+              <li>Authorize when prompted (see step 6 below)</li>
+              <li>Verify in the <strong>Triggers</strong> tab (clock icon, left sidebar): you should see a row for <code>processPendingLeads</code> running every 1 minute</li>
+            </ol>
+            <p style="color:var(--light-gray);font-size:0.9rem">If you re-paste the script later and re-run <code>installTrigger</code>, it's safe — it removes the old trigger before creating a new one.</p>
+            <button class="wizard__step-toggle">Mark step done</button>
+          </div>
+        </div>
+
+        <div class="wizard__step">
+          <div class="wizard__head">
+            <div><div class="wizard__title">Authorize Google access</div></div>
+            <div class="wizard__caret">&#9662;</div>
+          </div>
+          <div class="wizard__body">
+            <p>The first time you run anything, Google asks for permission. The flow:</p>
+            <ol>
+              <li>Click <strong>Authorize access</strong></li>
+              <li>Pick <code>pinepointtreeservice@gmail.com</code></li>
+              <li>You'll see a scary-looking <strong>"Google hasn't verified this app"</strong> screen — that's normal because <em>you</em> are the developer of this private script. Click <strong>Advanced</strong> → <strong>Go to (your project name) (unsafe)</strong> → <strong>Allow</strong>.</li>
+            </ol>
+            <p>Permissions you're granting: send email (for notifications), edit your Drive (for the photo folder), edit this spreadsheet. All scoped to your own account, only this script can use them.</p>
+            <button class="wizard__step-toggle">Mark step done</button>
+          </div>
+        </div>
+
+        <div class="wizard__step">
+          <div class="wizard__head">
+            <div><div class="wizard__title">Deploy as a Web App</div></div>
+            <div class="wizard__caret">&#9662;</div>
+          </div>
+          <div class="wizard__body">
+            <p>Click <strong>Deploy → New deployment</strong> (top right of the Apps Script editor).</p>
+            <p>Click the gear icon next to "Select type" → choose <strong>Web app</strong>.</p>
+            <p>Configure:</p>
+            <ul>
+              <li><strong>Description:</strong> <code>Pine Point Lead Capture v1</code></li>
+              <li><strong>Execute as:</strong> Me (<code>pinepointtreeservice@gmail.com</code>)</li>
+              <li><strong>Who has access:</strong> <strong>Anyone</strong> ← critical, must be “Anyone”</li>
+            </ul>
+            <p>Click <strong>Deploy</strong>. Authorize again if prompted (same flow as step 6).</p>
+            <div class="callout callout--warn">If you accidentally pick <strong>Only myself</strong> instead of Anyone, the website won't be able to POST to your script and leads will silently disappear. If you've already deployed, fix via <strong>Deploy → Manage deployments → pencil → Who has access → Anyone</strong>.</div>
+            <button class="wizard__step-toggle">Mark step done</button>
+          </div>
+        </div>
+
+        <div class="wizard__step">
+          <div class="wizard__head">
+            <div><div class="wizard__title">Copy the Web App URL</div></div>
+            <div class="wizard__caret">&#9662;</div>
+          </div>
+          <div class="wizard__body">
+            <p>After deploy, Google shows you a <strong>Web app URL</strong>. It looks like this:</p>
+            <pre>https://script.google.com/macros/s/AKfyc<em>...long string...</em>/exec</pre>
+            <p>Copy that whole URL. <strong>This is the only thing I need from you to finish wiring the website to your account.</strong></p>
+            <button class="wizard__step-toggle">Mark step done</button>
+          </div>
+        </div>
+
+        <div class="wizard__step">
+          <div class="wizard__head">
+            <div><div class="wizard__title">Send Keith the URL</div></div>
+            <div class="wizard__caret">&#9662;</div>
+          </div>
+          <div class="wizard__body">
+            <p>Email or text it to me. Once I have it, I paste it into the website's code (5 minutes), and from that moment on every estimate goes to <em>your</em> Gmail, not mine.</p>
+            <p>You can either reply to my email or use the <a href="#ask">Ask a question</a> form at the bottom of this page — I'll see it either way.</p>
+            <button class="wizard__step-toggle">Mark step done</button>
+          </div>
+        </div>
+
+        <div class="wizard__step">
+          <div class="wizard__head">
+            <div><div class="wizard__title">Send a test estimate to confirm it's working</div></div>
+            <div class="wizard__caret">&#9662;</div>
+          </div>
+          <div class="wizard__body">
+            <p>After I update the URL, send a test estimate from your phone:</p>
+            <ol>
+              <li>Open <a href="https://pinepointtrees.com/estimate.html" target="_blank" rel="noopener">pinepointtrees.com/estimate.html</a></li>
+              <li>Run through the flow with a fake name + your real phone</li>
+              <li>Submit — within seconds, the row should appear in your <strong>All Leads</strong> tab</li>
+              <li>Wait 5+ min for the lead email, OR click Schedule a Follow-Up to trigger the callback email</li>
+            </ol>
+            <p>If both arrive cleanly, you're done. If anything's missing, send me a screenshot of what you see in the Apps Script <strong>Executions</strong> tab (left sidebar in the editor) and I'll diagnose.</p>
+            <button class="wizard__step-toggle">Mark step done</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TEST CHECKLIST -->
+    <section id="test" data-keywords="test checklist verify estimate flow photos schedule callback edge cases pricing review mobile">
+      <div class="section-eyebrow">15–20 minutes total</div>
+      <h2>Test everything</h2>
+      <p class="lead">Once your end is set up, run through this list. Submitting fake leads is fine — we'll clean the sheet afterward. Check items off as you go; your progress saves automatically (in your browser, just for you).</p>
+
+      <div id="checklist">
+        <div class="checklist__group" data-group="estimate">
+          <h3>Estimate flow</h3>
+          <label class="checklist__item"><input type="checkbox" data-id="t-removal-small"><span class="checklist__label">Tree Removal: small job (1 tree, easy access)</span></label>
+          <label class="checklist__item"><input type="checkbox" data-id="t-removal-big"><span class="checklist__label">Tree Removal: big job (5+ trees, near house, no access)</span></label>
+          <label class="checklist__item"><input type="checkbox" data-id="t-trim-overhang"><span class="checklist__label">Trimming: overhang clearing</span></label>
+          <label class="checklist__item"><input type="checkbox" data-id="t-trim-shaping"><span class="checklist__label">Trimming: shaping / thinning</span></label>
+          <label class="checklist__item"><input type="checkbox" data-id="t-trim-deadwood"><span class="checklist__label">Trimming: deadwood removal</span></label>
+          <label class="checklist__item"><input type="checkbox" data-id="t-trim-clearance"><span class="checklist__label">Trimming: structure / line clearance</span></label>
+          <label class="checklist__item"><input type="checkbox" data-id="t-lot-small"><span class="checklist__label">Lot Clearing: small lot, brush-only</span></label>
+          <label class="checklist__item"><input type="checkbox" data-id="t-lot-big"><span class="checklist__label">Lot Clearing: 1+ acres, dense woods</span></label>
+        </div>
+
+        <div class="checklist__group">
+          <h3>Photos &amp; emails</h3>
+          <label class="checklist__item"><input type="checkbox" data-id="t-photos-attach"><span class="checklist__label">Attach 2–3 photos to a submission — confirm they show in the email AND the Drive folder<span class="checklist__hint">Drive: Pine Point Lead Photos / [month_year] / [estimate folder]</span></span></label>
+          <label class="checklist__item"><input type="checkbox" data-id="t-lead-only"><span class="checklist__label">Submit and wait 5+ min without scheduling — confirm the "New Lead" email arrives</span></label>
+          <label class="checklist__item"><input type="checkbox" data-id="t-callback-fast"><span class="checklist__label">Submit, then immediately Schedule a Follow-Up — only the "Callback Requested" email should arrive (no separate lead email)</span></label>
+          <label class="checklist__item"><input type="checkbox" data-id="t-callback-slow"><span class="checklist__label">Submit, wait 6+ min for the lead email, THEN come back and schedule — callback email should show the yellow ℹ "Update on existing lead" banner</span></label>
+        </div>
+
+        <div class="checklist__group">
+          <h3>Edge cases</h3>
+          <label class="checklist__item"><input type="checkbox" data-id="t-out-area"><span class="checklist__label">Try ZIP <code>02134</code> (Boston) — should still submit, but the email gets a yellow ⚠ "Outside service area" banner</span></label>
+          <label class="checklist__item"><input type="checkbox" data-id="t-bad-phone"><span class="checklist__label">Try entering a 7-digit phone — should show a clear orange "Enter a 10-digit phone number" message</span></label>
+          <label class="checklist__item"><input type="checkbox" data-id="t-photo-cap"><span class="checklist__label">Try selecting 7 photos — only first 6 accepted; warning if total exceeds 25 MB</span></label>
+        </div>
+
+        <div class="checklist__group">
+          <h3>The site itself (best from your phone)</h3>
+          <label class="checklist__item"><input type="checkbox" data-id="t-mobile"><span class="checklist__label">Open pinepointtrees.com on your phone — does everything look right?</span></label>
+          <label class="checklist__item"><input type="checkbox" data-id="t-tap-call"><span class="checklist__label">Tap the phone number in the header — does it open your dialer?</span></label>
+          <label class="checklist__item"><input type="checkbox" data-id="t-scroll"><span class="checklist__label">Scroll the homepage: services, video, before/after slider, gallery, reviews, map</span></label>
+          <label class="checklist__item"><input type="checkbox" data-id="t-review-links"><span class="checklist__label">Click any review's source link (Google / Facebook / BBB) — does it open the right page?</span></label>
+        </div>
+
+        <div class="checklist__group">
+          <h3>Sheets &amp; Drive</h3>
+          <label class="checklist__item"><input type="checkbox" data-id="t-all-leads"><span class="checklist__label">Each submission shows up as one row in the All Leads tab with the right Lead Type</span></label>
+          <label class="checklist__item"><input type="checkbox" data-id="t-detail-tabs"><span class="checklist__label">Estimate Leads + Schedule Requests tabs have full details for every event</span></label>
+          <label class="checklist__item"><input type="checkbox" data-id="t-clickable"><span class="checklist__label">Phone numbers in email bodies are clickable on your phone</span></label>
+        </div>
+
+        <div class="checklist__group">
+          <h3>Pricing review (most important)</h3>
+          <label class="checklist__item"><input type="checkbox" data-id="t-price-feel"><span class="checklist__label">For each service path you tested, does the price feel right vs. what you'd actually quote?</span></label>
+          <label class="checklist__item"><input type="checkbox" data-id="t-price-spread"><span class="checklist__label">Does the Low / Typical / High spread feel reasonable?</span></label>
+          <label class="checklist__item"><input type="checkbox" data-id="t-price-breakdown"><span class="checklist__label">Is the one-line breakdown ("Based on: ...") accurate?</span></label>
+        </div>
+      </div>
+
+      <div class="callout">If anything is off — even rough notes like “removal feels 20% low” or “the overhang option should ask about height differently” — use the form at the bottom of this page or just text me. That's gold for me.</div>
+    </section>
+
+    <!-- WHAT WE NEED -->
+    <section id="need" data-keywords="need feedback pricing invoices invoicing quickbooks excel calendly callback scheduling outside area policy">
+      <div class="section-eyebrow">Where I need your input</div>
+      <h2>What we need from you</h2>
+
+      <div class="card">
+        <h3>1. Pricing reality check</h3>
+        <p>The math is fully tunable — I can change base rates, multipliers (access, hazards, volume), and the Low/High spread in minutes. Specific things worth flagging:</p>
+        <ul>
+          <li>Are the price ranges appropriately wide?</li>
+          <li>Should there always be a $500 minimum on jobs? (It's there now.)</li>
+          <li>For lot clearing, are the size buckets (under 1/4 acre, 1/4–1/2, 1/2–1, 1+) the right cut points?</li>
+        </ul>
+        <p style="color:var(--light-gray);font-size:0.9rem;margin-top:10px"><strong>Bonus that'll save us a round-trip:</strong> if you can send 5–10 of your recent invoices, I can reverse-engineer your real rates and tune the tool to match before you even test it. Less guesswork on both sides.</p>
+      </div>
+
+      <div class="card">
+        <h3>2. Invoicing — what do you use today?</h3>
+        <p>If I understood right, you've been doing invoices in Excel — confirm? The Estimate # (e.g. <code>2026_00001</code>) is designed to bridge the online lead to the real invoice so every customer keeps one number from first click through to paid.</p>
+        <p>A few things to think about:</p>
+        <ul>
+          <li><strong>Not every job comes through the website</strong> — totally fine. We can still tag every customer with an estimate # (you'd manually issue one for walk-ups using the same format) so the data feels uniform regardless of source.</li>
+          <li><strong>The cleanest path is probably Google Sheets</strong> — same Drive as your leads, you can copy-paste from the All Leads tab into a "2026 Invoices" tab, totals roll up automatically, no more files lost on a laptop. I can set up an invoice template tab if you want to try it.</li>
+          <li><strong>Sticking with Excel is also fine</strong> — zero migration. Tradeoff is the data lives in two places and you'd manually copy estimate #s across.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>3. Callback scheduling style</h3>
+        <p>Right now customers pick a time window (Morning / Afternoon / Evening / Weekend). Cleanest alternative: a free Calendly link where they pick a specific 15-min slot with calendar invites + reminders. Less phone tag, but another tool to maintain.</p>
+        <p>Either is fine — say which you prefer.</p>
+      </div>
+
+      <div class="card">
+        <h3>4. Out-of-area policy</h3>
+        <p>Today the email gets a yellow ⚠ banner so you can decide per-lead. What do you actually want to happen?</p>
+        <ul>
+          <li><strong>(a)</strong> Keep flagging, you decide per lead</li>
+          <li><strong>(b)</strong> Disqualify upfront — polite message at the start of the form (“we serve within 15 mi of Leicester, here's where to call for outside that area”) and don't take the lead</li>
+          <li><strong>(c)</strong> Take the lead but auto-reply with a polite decline + referral list</li>
+          <li><strong>(d)</strong> Take it but auto-add a travel surcharge</li>
+          <li><strong>(e)</strong> No different from any other lead</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>5. Already confirmed (just acknowledging)</h3>
+        <table class="data-table" style="margin-top:8px">
+          <tr><td><strong>Service area towns</strong></td><td>Leaving as is: Leicester, Spencer, Paxton, Auburn, Charlton, Oxford, Worcester, Rutland, Holden, Sterling</td></tr>
+          <tr><td><strong>Years in business</strong></td><td>"over 3 years"</td></tr>
+          <tr><td><strong>Storm / emergency calls</strong></td><td>Yes — already on the site</td></tr>
+          <tr><td><strong>Custom stump carving</strong></td><td>Out — removed from site materials</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>6. Open small items</h3>
+        <ul>
+          <li><strong>Better photos?</strong> Got any sharper before/afters or specific job shots you'd want swapped in?</li>
+          <li><strong>Add your personal cell</strong> alongside the main 774-262-2145?</li>
+          <li><strong>Anyone else who should see the leads?</strong> Employees, partners — send their Google email and I'll give them sheet access.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ASK FORM -->
+    <section id="ask" data-keywords="question ask feedback contact form submit message">
+      <div class="section-eyebrow">Best way to get a fast answer</div>
+      <h2>Ask a question</h2>
+      <p class="lead">Reply to my email if you'd rather, or submit here — either way it lands in my inbox. Most things I can push live in under an hour.</p>
+
+      <form class="ask-form" id="ask-form">
+        <div class="field">
+          <label for="ask-topic">Topic</label>
+          <select id="ask-topic" name="topic" required>
+            <option value="">Pick what this is about…</option>
+            <option>Pricing feedback</option>
+            <option>Apps Script setup help</option>
+            <option>Sheet / email looks wrong</option>
+            <option>Customer experience / wording</option>
+            <option>Invoicing question</option>
+            <option>Out-of-area / scheduling</option>
+            <option>Photo / image swap</option>
+            <option>Something else</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="ask-message">Your question or note</label>
+          <textarea id="ask-message" name="message" placeholder="Detail — a sentence is fine, paragraphs are great. Specific Estimate #s help if relevant." required></textarea>
+        </div>
+        <div class="field">
+          <label for="ask-email">Your email <span style="color:var(--medium-gray);font-weight:400">(so Keith can reply)</span></label>
+          <input type="email" id="ask-email" name="email" placeholder="pinepointtreeservice@gmail.com">
+        </div>
+        <div class="ask-actions">
+          <button type="submit" class="btn">Send to Keith</button>
+          <span class="hint">Opens your email app with the message pre-filled.</span>
+        </div>
+      </form>
+    </section>
+
+  </main>
+</div>
+
+<footer class="site-footer">
+  Built by <a href="https://fitfosystems.com" target="_blank" rel="noopener">FITFO Systems</a> for Pine Point Tree Service ·
+  <a href="https://pinepointtrees.com" target="_blank" rel="noopener">pinepointtrees.com</a>
+</footer>
+
+<script>
+(function () {
+  // === Search filter ===
+  const searchInput = document.getElementById('search');
+  const sections = Array.from(document.querySelectorAll('main > section'));
+  const noResults = document.getElementById('no-results');
+  const tocLinks = Array.from(document.querySelectorAll('#toc-list a'));
+  const clearSearch = document.getElementById('clear-search');
+
+  function applySearch(term) {
+    term = term.trim().toLowerCase();
+    if (!term) {
+      sections.forEach(s => s.classList.remove('hidden-by-search'));
+      tocLinks.forEach(l => l.style.display = '');
+      noResults.classList.remove('is-visible');
+      return;
+    }
+    let visibleCount = 0;
+    sections.forEach(s => {
+      const haystack = (s.textContent + ' ' + (s.dataset.keywords || '')).toLowerCase();
+      const matches = haystack.includes(term);
+      s.classList.toggle('hidden-by-search', !matches);
+      if (matches) visibleCount++;
+    });
+    tocLinks.forEach(l => {
+      const target = document.getElementById(l.dataset.section);
+      l.style.display = target && !target.classList.contains('hidden-by-search') ? '' : 'none';
+    });
+    noResults.classList.toggle('is-visible', visibleCount === 0);
+  }
+  searchInput.addEventListener('input', e => applySearch(e.target.value));
+  clearSearch.addEventListener('click', e => { e.preventDefault(); searchInput.value = ''; applySearch(''); searchInput.focus(); });
+
+  // === TOC scroll-spy ===
+  const sectionMap = new Map();
+  tocLinks.forEach(l => sectionMap.set(l.dataset.section, l));
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      const link = sectionMap.get(entry.target.id);
+      if (!link) return;
+      if (entry.isIntersecting) {
+        tocLinks.forEach(l => l.classList.remove('is-active'));
+        link.classList.add('is-active');
+      }
+    });
+  }, { rootMargin: '-30% 0px -55% 0px', threshold: 0 });
+  sections.forEach(s => { if (s.id) observer.observe(s); });
+
+  // === Wizard collapsibles ===
+  const STORAGE_KEY_WIZ = 'pinepoint.handoff.wizardDone.v1';
+  const wizardSteps = Array.from(document.querySelectorAll('.wizard__step'));
+  let doneSet = new Set();
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_WIZ);
+    if (raw) doneSet = new Set(JSON.parse(raw));
+  } catch (e) {}
+
+  wizardSteps.forEach((step, idx) => {
+    if (doneSet.has(idx)) step.classList.add('is-done');
+    const head = step.querySelector('.wizard__head');
+    head.addEventListener('click', () => {
+      step.classList.toggle('is-open');
+    });
+    const toggle = step.querySelector('.wizard__step-toggle');
+    if (toggle) {
+      toggle.addEventListener('click', e => {
+        e.stopPropagation();
+        const wasDone = step.classList.toggle('is-done');
+        if (wasDone) doneSet.add(idx);
+        else doneSet.delete(idx);
+        try { localStorage.setItem(STORAGE_KEY_WIZ, JSON.stringify(Array.from(doneSet))); } catch (e) {}
+      });
+    }
+  });
+
+  // Auto-open the first incomplete wizard step
+  const firstIncomplete = wizardSteps.find(s => !s.classList.contains('is-done'));
+  if (firstIncomplete) firstIncomplete.classList.add('is-open');
+
+  // === Copy buttons ===
+  document.querySelectorAll('[data-copy]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(btn.dataset.copy);
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1600);
+      } catch (e) {
+        alert('Copy failed — select the URL manually.');
+      }
+    });
+  });
+
+  // === Sheet mockup tabs ===
+  const sheetTabs = Array.from(document.querySelectorAll('.mockup-sheet__tab'));
+  const sheetPanels = Array.from(document.querySelectorAll('[data-mock-panel]'));
+  sheetTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      sheetTabs.forEach(t => t.classList.remove('is-active'));
+      tab.classList.add('is-active');
+      const which = tab.dataset.mockTab;
+      sheetPanels.forEach(p => p.hidden = p.dataset.mockPanel !== which);
+    });
+  });
+
+  // === Test checklist with localStorage ===
+  const STORAGE_KEY_CHECK = 'pinepoint.handoff.checklist.v1';
+  const checkboxes = Array.from(document.querySelectorAll('#checklist input[type="checkbox"]'));
+  const progressFill = document.getElementById('progress-fill');
+  const progressText = document.getElementById('progress-text');
+  let checkedSet = new Set();
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_CHECK);
+    if (raw) checkedSet = new Set(JSON.parse(raw));
+  } catch (e) {}
+
+  function updateProgress() {
+    const total = checkboxes.length;
+    const done = checkboxes.filter(c => c.checked).length;
+    progressText.textContent = done + ' / ' + total;
+    progressFill.style.width = total ? (done / total * 100) + '%' : '0%';
+  }
+  checkboxes.forEach(cb => {
+    if (checkedSet.has(cb.dataset.id)) {
+      cb.checked = true;
+      cb.closest('.checklist__item').classList.add('is-checked');
+    }
+    cb.addEventListener('change', () => {
+      const item = cb.closest('.checklist__item');
+      item.classList.toggle('is-checked', cb.checked);
+      if (cb.checked) checkedSet.add(cb.dataset.id);
+      else checkedSet.delete(cb.dataset.id);
+      try { localStorage.setItem(STORAGE_KEY_CHECK, JSON.stringify(Array.from(checkedSet))); } catch (e) {}
+      updateProgress();
+    });
+  });
+  updateProgress();
+
+  // === Question form (mailto) ===
+  const askForm = document.getElementById('ask-form');
+  askForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const topic = document.getElementById('ask-topic').value;
+    const message = document.getElementById('ask-message').value;
+    const email = document.getElementById('ask-email').value;
+    const subject = '[Pine Point handoff] ' + (topic || 'Question');
+    const body = (email ? 'From: ' + email + '\n\n' : '') + message + '\n\n---\nSent from pinepointtrees.com/handoff';
+    const mailto = 'mailto:keith@fitfosystems.com'
+      + '?subject=' + encodeURIComponent(subject)
+      + '&body=' + encodeURIComponent(body);
+    window.location.href = mailto;
+  });
+
+})();
+</script>
+</body>
+</html>

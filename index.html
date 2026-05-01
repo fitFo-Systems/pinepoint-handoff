@@ -2852,10 +2852,9 @@ function installTrigger() {
 
       <div class="test-summary" id="need-summary">
         <div class="test-summary__counts">
-          <span class="ok-count"><strong id="need-filled-count">0</strong> filled in</span>
-          <span class="untested-count"><strong id="need-empty-count">6</strong> untouched</span>
+          <span class="ok-count"><strong id="need-filled-count">0</strong> of 6 cards have notes</span>
         </div>
-        <p style="color:var(--off-white);font-size:0.95rem;margin:0 0 14px">Hit submit anytime — partial replies are fine. Each submission is timestamped and shown under the cards you replied to, so you can pick up where you left off and Keith can see the thread.</p>
+        <p style="color:var(--off-white);font-size:0.95rem;margin:0 0 14px">Hit submit anytime — partial replies are fine. (The "Already confirmed" card is acknowledgments only and doesn't count toward this.) Each submission is timestamped and shown under the cards you replied to.</p>
         <div class="test-summary__actions">
           <button type="button" class="test-submit" id="need-submit" disabled>Submit input</button>
           <span class="test-summary__hint" id="need-submit-hint">Type anything to enable. Drafts auto-save to your browser as you go.</span>
@@ -3217,35 +3216,29 @@ function installTrigger() {
     });
   }
 
-  // === Behind-the-scenes form delivery via Formsubmit ===
-  // Uses Formsubmit's plain endpoint with mode: 'no-cors' and a "simple"
-  // form-encoded body, which sidesteps CORS preflight entirely. We can't read
-  // the opaque response, but Formsubmit still receives + processes the POST.
-  // First-time submissions trigger a one-click activation email on Keith's
-  // side — once he clicks it, every future submission delivers silently.
+  // === Behind-the-scenes form delivery via Keith's Apps Script ===
+  // POSTs JSON to the same Pine Point Apps Script that captures live leads —
+  // it routes the submission to a sendHandoffEmail() handler that mails
+  // keith@fitfosystems.com. No third-party dependency, no activation flow.
+  // Apps Script Web Apps don't echo CORS headers, so we use mode: 'no-cors'
+  // and trust the POST is delivered if fetch resolves without throwing.
   const SUBMIT_DEST = 'keith@fitfosystems.com';
-  const SUBMIT_URL = 'https://formsubmit.co/' + encodeURIComponent(SUBMIT_DEST);
+  const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbz68dVyIGyruTPSofHei6UqcbkBuDZKhGybFLFjcowc2uCSIkDol4NWOJ0FOZdqlxOXpQ/exec';
 
   async function sendBehindTheScenes(payload) {
-    const merged = Object.assign({
-      _subject: payload.subject || '[Pine Point handoff] Note',
-      _captcha: 'false',
-      _template: 'box'
+    // formType lets the Apps Script route this to sendHandoffEmail.
+    const body = Object.assign({
+      formType: payload.kind === 'test_feedback' ? 'handoff_test' : 'handoff_input',
+      _subject: payload.subject || '[Pine Point handoff] Note'
     }, payload);
-    delete merged.subject; // mapped to _subject above
-    const params = new URLSearchParams();
-    for (const [k, v] of Object.entries(merged)) {
-      params.append(k, String(v == null ? '' : v));
-    }
+    delete body.subject; // mapped to _subject
     try {
       await fetch(SUBMIT_URL, {
         method: 'POST',
         mode: 'no-cors',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: params.toString()
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(body)
       });
-      // With no-cors we can't read the response, but if fetch didn't throw,
-      // the POST was delivered to Formsubmit. That's good enough.
       return { ok: true };
     } catch (e) {
       return { ok: false, reason: 'network_error' };
@@ -3361,7 +3354,7 @@ function installTrigger() {
           if (drafts.length === 0) {
             needSubmitHint.textContent = 'Type anything to enable. Drafts auto-save to your browser as you go.';
           } else {
-            needSubmitHint.textContent = drafts.length + ' filled, ' + (total - drafts.length) + ' empty (you can submit a partial batch — drafts you keep stay saved).';
+            needSubmitHint.textContent = drafts.length + ' of 6 cards have notes (partial submissions are fine — drafts stay saved).';
           }
         }
       }

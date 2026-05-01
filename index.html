@@ -376,6 +376,35 @@
       color: var(--medium-gray);
       font-size: 0.78rem;
     }
+    .card-reply__history { margin-top: 12px; }
+    .card-reply__history[data-history-empty="true"] { display: none; }
+    .card-reply__history-title {
+      font-size: 0.72rem;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--light-gray);
+      margin: 0 0 6px;
+      font-weight: 700;
+    }
+    .card-reply__post {
+      padding: 10px 12px;
+      background: var(--black);
+      border-left: 2px solid var(--green);
+      border-radius: 0 4px 4px 0;
+      margin-bottom: 6px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .card-reply__post-meta {
+      color: var(--medium-gray);
+      font-size: 0.74rem;
+      margin-bottom: 4px;
+    }
+    .card-reply__post-body {
+      color: var(--off-white);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
     .card-check {
       background: transparent;
       color: var(--light-gray);
@@ -1075,7 +1104,6 @@
       <li><a href="#setup" data-section="setup">Setting up notifications</a></li>
       <li><a href="#test" data-section="test">Test everything</a></li>
       <li><a href="#need" data-section="need">What we need from you</a></li>
-      <li><a href="#ask" data-section="ask">Ask a question</a></li>
     </ul>
   </aside>
 
@@ -2699,7 +2727,7 @@ function installTrigger() {
       <h2>What we need from you</h2>
 
       <div class="section-progress">
-        <span class="section-progress__label">Items addressed: <span id="need-progress-text">0 / 5</span></span>
+        <span class="section-progress__label">Items addressed: <span id="need-progress-text">0 / 6</span></span>
         <div class="section-progress__bar"><div class="section-progress__fill" id="need-progress-fill"></div></div>
       </div>
 
@@ -2716,10 +2744,10 @@ function installTrigger() {
           <label class="card-reply__label" for="reply-pricing">Your reply</label>
           <textarea class="card-reply__textarea" id="reply-pricing" data-reply-id="need-pricing" placeholder="What feels right or wrong about the price ranges? Anything you'd tune?"></textarea>
           <div class="card-reply__actions">
-            <button class="card-reply__submit" data-reply-topic="Pricing reality check" data-reply-source="need-pricing">Send reply</button>
             <button class="card-check">Mark addressed</button>
-            <span class="card-reply__hint">Saved as you type. Send opens your email app.</span>
+            <span class="card-reply__hint">Saved as you type. Submit at the bottom of this section sends everything in one go.</span>
           </div>
+          <div class="card-reply__history" data-history-empty="true"></div>
         </div>
       </div>
 
@@ -2736,10 +2764,10 @@ function installTrigger() {
           <label class="card-reply__label" for="reply-invoicing">Your reply</label>
           <textarea class="card-reply__textarea" id="reply-invoicing" data-reply-id="need-invoicing" placeholder="What do you use for invoices today? Any interest in trying Google Sheets?"></textarea>
           <div class="card-reply__actions">
-            <button class="card-reply__submit" data-reply-topic="Invoicing" data-reply-source="need-invoicing">Send reply</button>
             <button class="card-check">Mark addressed</button>
-            <span class="card-reply__hint">Saved as you type. Send opens your email app.</span>
+            <span class="card-reply__hint">Saved as you type. Submit at the bottom of this section sends everything in one go.</span>
           </div>
+          <div class="card-reply__history" data-history-empty="true"></div>
         </div>
       </div>
 
@@ -2751,10 +2779,10 @@ function installTrigger() {
           <label class="card-reply__label" for="reply-scheduling">Your reply</label>
           <textarea class="card-reply__textarea" id="reply-scheduling" data-reply-id="need-scheduling" placeholder="Time-window picker (current) or Calendly-style specific slots?"></textarea>
           <div class="card-reply__actions">
-            <button class="card-reply__submit" data-reply-topic="Callback scheduling style" data-reply-source="need-scheduling">Send reply</button>
             <button class="card-check">Mark addressed</button>
-            <span class="card-reply__hint">Saved as you type. Send opens your email app.</span>
+            <span class="card-reply__hint">Saved as you type. Submit at the bottom of this section sends everything in one go.</span>
           </div>
+          <div class="card-reply__history" data-history-empty="true"></div>
         </div>
       </div>
 
@@ -2773,10 +2801,10 @@ function installTrigger() {
           <label class="card-reply__label" for="reply-out-of-area">Your reply</label>
           <textarea class="card-reply__textarea" id="reply-out-of-area" data-reply-id="need-out-of-area" placeholder="Which option (a-f)? If distance-tiered, what cutoffs feel right?"></textarea>
           <div class="card-reply__actions">
-            <button class="card-reply__submit" data-reply-topic="Out-of-area policy" data-reply-source="need-out-of-area">Send reply</button>
             <button class="card-check">Mark addressed</button>
-            <span class="card-reply__hint">Saved as you type. Send opens your email app.</span>
+            <span class="card-reply__hint">Saved as you type. Submit at the bottom of this section sends everything in one go.</span>
           </div>
+          <div class="card-reply__history" data-history-empty="true"></div>
         </div>
       </div>
 
@@ -2801,34 +2829,38 @@ function installTrigger() {
           <label class="card-reply__label" for="reply-small-items">Your reply</label>
           <textarea class="card-reply__textarea" id="reply-small-items" data-reply-id="need-small-items" placeholder="Any of the three above — or all of them — your call."></textarea>
           <div class="card-reply__actions">
-            <button class="card-reply__submit" data-reply-topic="Small items" data-reply-source="need-small-items">Send reply</button>
             <button class="card-check">Mark addressed</button>
-            <span class="card-reply__hint">Saved as you type. Send opens your email app.</span>
+            <span class="card-reply__hint">Saved as you type. Submit at the bottom of this section sends everything in one go.</span>
           </div>
+          <div class="card-reply__history" data-history-empty="true"></div>
         </div>
       </div>
-    </section>
 
-    <!-- ASK FORM -->
-    <section id="ask" data-keywords="question ask feedback contact form submit message anything missed catchall">
-      <div class="section-eyebrow">Catchall</div>
-      <h2>Anything we missed?</h2>
-      <p class="lead">Use the inline reply boxes above for the specific questions. This one is for everything else — ideas, things that look wrong, stuff that wasn't covered, whatever's on your mind.</p>
+      <div class="card card--checkable" data-need-id="need-anything-else">
+        <h3>7. Anything else?</h3>
+        <p>Ideas, things that look wrong, stuff that wasn't covered above — whatever's on your mind. This card gets sent along with the rest in the same batch.</p>
+        <div class="card-reply">
+          <label class="card-reply__label" for="reply-anything-else">Your note</label>
+          <textarea class="card-reply__textarea" id="reply-anything-else" data-reply-id="need-anything-else" placeholder="Anything we missed. A sentence is fine, paragraphs are great."></textarea>
+          <div class="card-reply__actions">
+            <button class="card-check">Mark addressed</button>
+            <span class="card-reply__hint">Saved as you type. Submit at the bottom of this section sends everything in one go.</span>
+          </div>
+          <div class="card-reply__history" data-history-empty="true"></div>
+        </div>
+      </div>
 
-      <form class="ask-form" id="ask-form">
-        <div class="field">
-          <label for="ask-message">Your note or question</label>
-          <textarea id="ask-message" name="message" placeholder="Anything else on your mind. A sentence is fine, paragraphs are great." required></textarea>
+      <div class="test-summary" id="need-summary">
+        <div class="test-summary__counts">
+          <span class="ok-count"><strong id="need-filled-count">0</strong> filled in</span>
+          <span class="untested-count"><strong id="need-empty-count">6</strong> untouched</span>
         </div>
-        <div class="field">
-          <label for="ask-email">Your email <span style="color:var(--medium-gray);font-weight:400">(so Keith can reply)</span></label>
-          <input type="email" id="ask-email" name="email" placeholder="pinepointtreeservice@gmail.com">
+        <p style="color:var(--off-white);font-size:0.95rem;margin:0 0 14px">Hit submit anytime — partial replies are fine. Each submission is timestamped and shown under the cards you replied to, so you can pick up where you left off and Keith can see the thread.</p>
+        <div class="test-summary__actions">
+          <button type="button" class="test-submit" id="need-submit" disabled>Submit input</button>
+          <span class="test-summary__hint" id="need-submit-hint">Type anything to enable. Drafts auto-save to your browser as you go.</span>
         </div>
-        <div class="ask-actions">
-          <button type="submit" class="btn">Send to Keith</button>
-          <span class="hint">Opens your email app with the message pre-filled.</span>
-        </div>
-      </form>
+      </div>
     </section>
 
   </main>
@@ -3224,120 +3256,187 @@ function installTrigger() {
     if (label !== undefined) btn.textContent = label;
   }
 
-  // === Catchall "Anything we missed?" form ===
-  const askForm = document.getElementById('ask-form');
-  const askMsg = document.getElementById('ask-message');
-  const askEmail = document.getElementById('ask-email');
-  const askSubmitBtn = askForm.querySelector('button[type="submit"]');
-  askForm.addEventListener('submit', async e => {
-    e.preventDefault();
-    const message = (askMsg.value || '').trim();
-    if (!message) return;
-    setSubmitState(askSubmitBtn, 'sending', 'Sending…');
-    askSubmitBtn.disabled = true;
-    const result = await sendBehindTheScenes({
-      subject: '[Pine Point handoff] Anything we missed',
-      kind: 'catchall',
-      message: message,
-      replyEmail: askEmail.value || '(not provided)',
-      page: location.href
-    });
-    if (result.ok) {
-      setSubmitState(askSubmitBtn, 'sent', 'Sent ✓ thanks');
-      askMsg.value = '';
-    } else {
-      setSubmitState(askSubmitBtn, 'failed', 'Failed — try email');
-      askSubmitBtn.disabled = false;
-      // Last-ditch fallback so they can still get the message to Keith.
-      const subject = '[Pine Point handoff] Anything we missed';
-      const body = message + (askEmail.value ? '\n\nReply to: ' + askEmail.value : '');
-      setTimeout(() => {
-        window.location.href = 'mailto:' + SUBMIT_DEST
-          + '?subject=' + encodeURIComponent(subject)
-          + '&body=' + encodeURIComponent(body);
-      }, 600);
-    }
-  });
-
-  // === Inline replies on each "What we need" card ===
+  // === "What we need from you" — drafts, history, batch submit ===
   const STORAGE_KEY_REPLIES = 'pinepoint.handoff.replies.v1';
+  const STORAGE_KEY_HISTORY = 'pinepoint.handoff.needHistory.v1';
   let replyDrafts = {};
+  let needHistory = {}; // { 'need-pricing': [{ ts, msg }, ...] }
   try {
     const raw = localStorage.getItem(STORAGE_KEY_REPLIES);
     if (raw) replyDrafts = JSON.parse(raw);
+  } catch (e) {}
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_HISTORY);
+    if (raw) needHistory = JSON.parse(raw);
   } catch (e) {}
 
   function saveDrafts() {
     try { localStorage.setItem(STORAGE_KEY_REPLIES, JSON.stringify(replyDrafts)); } catch (e) {}
   }
-
-  function refreshSubmitButton(ta) {
-    const card = ta.closest('.card--checkable');
-    if (!card) return;
-    const btn = card.querySelector('.card-reply__submit');
-    if (!btn || btn.classList.contains('is-sent') || btn.classList.contains('is-sending')) return;
-    btn.disabled = !ta.value.trim();
+  function saveHistory() {
+    try { localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(needHistory)); } catch (e) {}
   }
 
-  document.querySelectorAll('.card-reply__textarea').forEach(ta => {
-    const id = ta.dataset.replyId;
-    if (replyDrafts[id]) ta.value = replyDrafts[id];
-    refreshSubmitButton(ta);
-    ta.addEventListener('input', () => {
-      replyDrafts[id] = ta.value;
-      saveDrafts();
-      const card = ta.closest('.card--checkable');
-      const btn = card.querySelector('.card-reply__submit');
-      // If user keeps typing after sending, allow sending again.
-      if (btn && btn.classList.contains('is-sent')) {
-        setSubmitState(btn, null, 'Send reply');
-      }
-      refreshSubmitButton(ta);
-    });
+  function escHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  }
+
+  function fmtTimestamp(iso) {
+    try {
+      const d = new Date(iso);
+      return d.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+    } catch (e) { return iso; }
+  }
+
+  function renderHistory(card) {
+    const id = card.dataset.needId;
+    const wrap = card.querySelector('.card-reply__history');
+    if (!wrap) return;
+    const entries = needHistory[id] || [];
+    if (!entries.length) {
+      wrap.dataset.historyEmpty = 'true';
+      wrap.innerHTML = '';
+      return;
+    }
+    wrap.dataset.historyEmpty = 'false';
+    const posts = entries.map(e => (
+      '<div class="card-reply__post">' +
+        '<div class="card-reply__post-meta">Sent ' + escHtml(fmtTimestamp(e.ts)) + '</div>' +
+        '<div class="card-reply__post-body">' + escHtml(e.msg) + '</div>' +
+      '</div>'
+    )).join('');
+    wrap.innerHTML = '<div class="card-reply__history-title">Sent so far</div>' + posts;
+  }
+
+  // Hydrate textareas + per-card history on load.
+  const needCheckableCards = Array.from(document.querySelectorAll('#need .card--checkable'));
+  needCheckableCards.forEach(card => {
+    const ta = card.querySelector('.card-reply__textarea');
+    if (ta) {
+      const id = ta.dataset.replyId;
+      if (replyDrafts[id]) ta.value = replyDrafts[id];
+      ta.addEventListener('input', () => {
+        replyDrafts[id] = ta.value;
+        saveDrafts();
+        refreshNeedSubmit();
+      });
+    }
+    renderHistory(card);
   });
 
-  document.querySelectorAll('.card-reply__submit').forEach(btn => {
-    btn.addEventListener('click', async e => {
-      e.preventDefault();
-      const card = btn.closest('.card--checkable');
+  // === Batch submit for the whole "What we need from you" section ===
+  const needSubmitBtn = document.getElementById('need-submit');
+  const needSubmitHint = document.getElementById('need-submit-hint');
+  const needFilledCountEl = document.getElementById('need-filled-count');
+  const needEmptyCountEl = document.getElementById('need-empty-count');
+
+  function gatherNeedDrafts() {
+    const out = [];
+    needCheckableCards.forEach(card => {
       const ta = card.querySelector('.card-reply__textarea');
-      const text = (ta?.value || '').trim();
-      if (!text) return;
-      const topic = btn.dataset.replyTopic || 'Reply';
-      setSubmitState(btn, 'sending', 'Sending…');
-      btn.disabled = true;
-      const result = await sendBehindTheScenes({
-        subject: '[Pine Point handoff] ' + topic,
-        kind: 'inline_reply',
-        topic: topic,
-        message: text,
-        page: location.href
+      if (!ta) return;
+      const text = (ta.value || '').trim();
+      if (text) out.push({
+        cardId: card.dataset.needId,
+        topic: card.querySelector('h3')?.textContent.trim() || card.dataset.needId,
+        text: text,
+        cardEl: card,
+        textarea: ta
       });
-      if (result.ok) {
-        setSubmitState(btn, 'sent', 'Sent ✓');
-        // Auto-mark the card addressed since they actually replied.
-        if (!card.classList.contains('is-done')) {
-          card.classList.add('is-done');
-          const checkBtn = card.querySelector('.card-check');
-          if (checkBtn) checkBtn.textContent = 'Addressed';
-          if (card.dataset.needId) {
-            needDoneSet.add(card.dataset.needId);
-            try { localStorage.setItem(STORAGE_KEY_NEED, JSON.stringify(Array.from(needDoneSet))); } catch (e) {}
-            refreshNeedProgress();
+    });
+    return out;
+  }
+
+  function refreshNeedSubmit() {
+    const drafts = gatherNeedDrafts();
+    const total = needCheckableCards.length;
+    if (needFilledCountEl) needFilledCountEl.textContent = drafts.length;
+    if (needEmptyCountEl) needEmptyCountEl.textContent = total - drafts.length;
+    if (needSubmitBtn) {
+      if (!needSubmitBtn.classList.contains('is-sent') && !needSubmitBtn.classList.contains('is-sending')) {
+        needSubmitBtn.disabled = drafts.length === 0;
+        if (needSubmitHint) {
+          if (drafts.length === 0) {
+            needSubmitHint.textContent = 'Type anything to enable. Drafts auto-save to your browser as you go.';
+          } else {
+            needSubmitHint.textContent = drafts.length + ' filled, ' + (total - drafts.length) + ' empty (you can submit a partial batch — drafts you keep stay saved).';
           }
         }
+      }
+    }
+  }
+
+  if (needSubmitBtn) {
+    needSubmitBtn.addEventListener('click', async () => {
+      const drafts = gatherNeedDrafts();
+      if (!drafts.length) return;
+
+      const stamp = new Date().toISOString();
+      const lines = [];
+      lines.push('Pine Point handoff — input from Jason');
+      lines.push('=====================================');
+      lines.push('Submitted: ' + new Date(stamp).toLocaleString());
+      lines.push('Items in this batch: ' + drafts.length + ' / ' + needCheckableCards.length);
+      lines.push('');
+      drafts.forEach(d => {
+        lines.push('---- ' + d.topic + ' ----');
+        lines.push(d.text);
+        lines.push('');
+      });
+      const body = lines.join('\n');
+
+      setSubmitState(needSubmitBtn, 'sending', 'Sending…');
+      needSubmitBtn.disabled = true;
+
+      const result = await sendBehindTheScenes({
+        subject: '[Pine Point handoff] Input batch (' + drafts.length + ' item' + (drafts.length === 1 ? '' : 's') + ')',
+        kind: 'need_batch',
+        item_count: String(drafts.length),
+        message: body,
+        page: location.href
+      });
+
+      if (result.ok) {
+        setSubmitState(needSubmitBtn, 'sent', 'Sent ✓ thanks');
+        // Archive each contributing card's draft as a timestamped post.
+        drafts.forEach(d => {
+          if (!needHistory[d.cardId]) needHistory[d.cardId] = [];
+          needHistory[d.cardId].push({ ts: stamp, msg: d.text });
+          renderHistory(d.cardEl);
+          // Auto-mark addressed once they've actually sent something.
+          if (!d.cardEl.classList.contains('is-done')) {
+            d.cardEl.classList.add('is-done');
+            const checkBtn = d.cardEl.querySelector('.card-check');
+            if (checkBtn) checkBtn.textContent = 'Addressed';
+            if (d.cardId) {
+              needDoneSet.add(d.cardId);
+              try { localStorage.setItem(STORAGE_KEY_NEED, JSON.stringify(Array.from(needDoneSet))); } catch (e) {}
+              refreshNeedProgress();
+            }
+          }
+        });
+        saveHistory();
+        if (needSubmitHint) needSubmitHint.textContent = 'Sent. Submit again later to add to the thread — drafts stay so you can edit and resend.';
+        // Re-enable after a moment so they can keep iterating.
+        setTimeout(() => {
+          if (needSubmitBtn.classList.contains('is-sent')) {
+            needSubmitBtn.disabled = false;
+            setSubmitState(needSubmitBtn, null, 'Submit input (again)');
+            refreshNeedSubmit();
+          }
+        }, 2400);
       } else {
-        setSubmitState(btn, 'failed', 'Failed — try email');
-        btn.disabled = false;
-        const subject = '[Pine Point handoff] ' + topic;
+        setSubmitState(needSubmitBtn, 'failed', 'Failed — try email');
+        needSubmitBtn.disabled = false;
         setTimeout(() => {
           window.location.href = 'mailto:' + SUBMIT_DEST
-            + '?subject=' + encodeURIComponent(subject)
-            + '&body=' + encodeURIComponent(text);
+            + '?subject=' + encodeURIComponent('[Pine Point handoff] Input batch')
+            + '&body=' + encodeURIComponent(body);
         }, 600);
       }
     });
-  });
+  }
+  refreshNeedSubmit();
 
 })();
 </script>

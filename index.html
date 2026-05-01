@@ -311,10 +311,47 @@
       color: var(--green-hover);
       font-weight: 800;
     }
-    .card-check {
-      margin-top: 14px;
-      background: var(--dark-gray);
-      color: var(--off-white);
+
+    /* Inline reply (textarea + submit) on each checkable card */
+    .card-reply {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--dark-gray);
+    }
+    .card-reply__label {
+      display: block;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--light-gray);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .card-reply__textarea {
+      width: 100%;
+      padding: 10px 12px;
+      background: var(--black);
+      border: 1px solid var(--dark-gray);
+      border-radius: 4px;
+      color: var(--white);
+      font-family: inherit;
+      font-size: 0.92rem;
+      line-height: 1.5;
+      resize: vertical;
+      min-height: 70px;
+      outline: none;
+    }
+    .card-reply__textarea:focus { border-color: var(--green); }
+    .card-reply__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 8px;
+    }
+    .card-reply__submit {
+      background: var(--green);
+      color: var(--white);
       border: none;
       padding: 8px 16px;
       border-radius: 4px;
@@ -323,8 +360,29 @@
       font-weight: 600;
       cursor: pointer;
     }
-    .card-check:hover { background: var(--medium-gray); }
-    .card--checkable.is-done .card-check { background: var(--green); color: var(--white); }
+    .card-reply__submit:hover { background: var(--green-hover); }
+    .card-reply__submit:disabled {
+      background: var(--dark-gray);
+      color: var(--medium-gray);
+      cursor: not-allowed;
+    }
+    .card-reply__hint {
+      color: var(--medium-gray);
+      font-size: 0.78rem;
+    }
+    .card-check {
+      background: transparent;
+      color: var(--light-gray);
+      border: 1px solid var(--dark-gray);
+      padding: 8px 14px;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .card-check:hover { color: var(--white); border-color: var(--medium-gray); }
+    .card--checkable.is-done .card-check { background: var(--green); color: var(--white); border-color: var(--green); }
     .card--checkable.is-done .card-check::before { content: '\2713 '; }
 
     .grid-2 {
@@ -2370,7 +2428,15 @@ function installTrigger() {
           <li>For lot clearing, are the size buckets (under 1/4 acre, 1/4–1/2, 1/2–1, 1+) the right cut points?</li>
         </ul>
         <p style="color:var(--light-gray);font-size:0.9rem;margin-top:10px"><strong>Bonus that'll save us a round-trip:</strong> if you can send 5–10 of your recent invoices, I can reverse-engineer your real rates and tune the tool to match before you even test it. Less guesswork on both sides.</p>
-        <button class="card-check">Mark addressed</button>
+        <div class="card-reply">
+          <label class="card-reply__label" for="reply-pricing">Your reply</label>
+          <textarea class="card-reply__textarea" id="reply-pricing" data-reply-id="need-pricing" placeholder="What feels right or wrong about the price ranges? Anything you'd tune?"></textarea>
+          <div class="card-reply__actions">
+            <button class="card-reply__submit" data-reply-topic="Pricing reality check" data-reply-source="need-pricing">Send reply</button>
+            <button class="card-check">Mark addressed</button>
+            <span class="card-reply__hint">Saved as you type. Send opens your email app.</span>
+          </div>
+        </div>
       </div>
 
       <div class="card card--checkable" data-need-id="need-invoicing">
@@ -2382,14 +2448,30 @@ function installTrigger() {
           <li><strong>The cleanest path is probably Google Sheets</strong> — same Drive as your leads, you can copy-paste from the All Leads tab into a "2026 Invoices" tab, totals roll up automatically, no more files lost on a laptop. I can set up an invoice template tab if you want to try it.</li>
           <li><strong>Sticking with Excel is also fine</strong> — zero migration. Tradeoff is the data lives in two places and you'd manually copy estimate #s across.</li>
         </ul>
-        <button class="card-check">Mark addressed</button>
+        <div class="card-reply">
+          <label class="card-reply__label" for="reply-invoicing">Your reply</label>
+          <textarea class="card-reply__textarea" id="reply-invoicing" data-reply-id="need-invoicing" placeholder="What do you use for invoices today? Any interest in trying Google Sheets?"></textarea>
+          <div class="card-reply__actions">
+            <button class="card-reply__submit" data-reply-topic="Invoicing" data-reply-source="need-invoicing">Send reply</button>
+            <button class="card-check">Mark addressed</button>
+            <span class="card-reply__hint">Saved as you type. Send opens your email app.</span>
+          </div>
+        </div>
       </div>
 
       <div class="card card--checkable" data-need-id="need-scheduling">
         <h3>3. Callback scheduling style</h3>
         <p>Right now customers pick a time window (Morning / Afternoon / Evening / Weekend). Cleanest alternative: a free Calendly link where they pick a specific 15-min slot with calendar invites + reminders. Less phone tag, but another tool to maintain.</p>
         <p>Either is fine — say which you prefer.</p>
-        <button class="card-check">Mark addressed</button>
+        <div class="card-reply">
+          <label class="card-reply__label" for="reply-scheduling">Your reply</label>
+          <textarea class="card-reply__textarea" id="reply-scheduling" data-reply-id="need-scheduling" placeholder="Time-window picker (current) or Calendly-style specific slots?"></textarea>
+          <div class="card-reply__actions">
+            <button class="card-reply__submit" data-reply-topic="Callback scheduling style" data-reply-source="need-scheduling">Send reply</button>
+            <button class="card-check">Mark addressed</button>
+            <span class="card-reply__hint">Saved as you type. Send opens your email app.</span>
+          </div>
+        </div>
       </div>
 
       <div class="card card--checkable" data-need-id="need-out-of-area">
@@ -2403,7 +2485,15 @@ function installTrigger() {
           <li><strong>(e)</strong> Take it but auto-add a travel surcharge</li>
           <li><strong>(f)</strong> No different from any other lead</li>
         </ul>
-        <button class="card-check">Mark addressed</button>
+        <div class="card-reply">
+          <label class="card-reply__label" for="reply-out-of-area">Your reply</label>
+          <textarea class="card-reply__textarea" id="reply-out-of-area" data-reply-id="need-out-of-area" placeholder="Which option (a-f)? If distance-tiered, what cutoffs feel right?"></textarea>
+          <div class="card-reply__actions">
+            <button class="card-reply__submit" data-reply-topic="Out-of-area policy" data-reply-source="need-out-of-area">Send reply</button>
+            <button class="card-check">Mark addressed</button>
+            <span class="card-reply__hint">Saved as you type. Send opens your email app.</span>
+          </div>
+        </div>
       </div>
 
       <div class="card">
@@ -2423,34 +2513,28 @@ function installTrigger() {
           <li><strong>Add your personal cell</strong> alongside the main 774-262-2145?</li>
           <li><strong>Anyone else who should see the leads?</strong> Employees, partners — send their Google email and I'll give them sheet access.</li>
         </ul>
-        <button class="card-check">Mark addressed</button>
+        <div class="card-reply">
+          <label class="card-reply__label" for="reply-small-items">Your reply</label>
+          <textarea class="card-reply__textarea" id="reply-small-items" data-reply-id="need-small-items" placeholder="Any of the three above — or all of them — your call."></textarea>
+          <div class="card-reply__actions">
+            <button class="card-reply__submit" data-reply-topic="Small items" data-reply-source="need-small-items">Send reply</button>
+            <button class="card-check">Mark addressed</button>
+            <span class="card-reply__hint">Saved as you type. Send opens your email app.</span>
+          </div>
+        </div>
       </div>
     </section>
 
     <!-- ASK FORM -->
-    <section id="ask" data-keywords="question ask feedback contact form submit message">
-      <div class="section-eyebrow">Best way to get a fast answer</div>
-      <h2>Ask a question</h2>
-      <p class="lead">Reply to my email if you'd rather, or submit here — either way it lands in my inbox. Most things I can push live in under an hour.</p>
+    <section id="ask" data-keywords="question ask feedback contact form submit message anything missed catchall">
+      <div class="section-eyebrow">Catchall</div>
+      <h2>Anything we missed?</h2>
+      <p class="lead">Use the inline reply boxes above for the specific questions. This one is for everything else — ideas, things that look wrong, stuff that wasn't covered, whatever's on your mind.</p>
 
       <form class="ask-form" id="ask-form">
         <div class="field">
-          <label for="ask-topic">Topic</label>
-          <select id="ask-topic" name="topic" required>
-            <option value="">Pick what this is about…</option>
-            <option>Pricing feedback</option>
-            <option>Apps Script setup help</option>
-            <option>Sheet / email looks wrong</option>
-            <option>Customer experience / wording</option>
-            <option>Invoicing question</option>
-            <option>Out-of-area / scheduling</option>
-            <option>Photo / image swap</option>
-            <option>Something else</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="ask-message">Your question or note</label>
-          <textarea id="ask-message" name="message" placeholder="Detail — a sentence is fine, paragraphs are great. Specific Estimate #s help if relevant." required></textarea>
+          <label for="ask-message">Your note or question</label>
+          <textarea id="ask-message" name="message" placeholder="Anything else on your mind. A sentence is fine, paragraphs are great." required></textarea>
         </div>
         <div class="field">
           <label for="ask-email">Your email <span style="color:var(--medium-gray);font-weight:400">(so Keith can reply)</span></label>
@@ -2682,19 +2766,74 @@ function installTrigger() {
   });
   updateProgress();
 
-  // === Question form (mailto) ===
+  // === Catchall question form (mailto) ===
   const askForm = document.getElementById('ask-form');
   askForm.addEventListener('submit', e => {
     e.preventDefault();
-    const topic = document.getElementById('ask-topic').value;
     const message = document.getElementById('ask-message').value;
     const email = document.getElementById('ask-email').value;
-    const subject = '[Pine Point handoff] ' + (topic || 'Question');
-    const body = (email ? 'From: ' + email + '\n\n' : '') + message + '\n\n---\nSent from pinepointtrees.com/handoff';
-    const mailto = 'mailto:keith@fitfosystems.com'
+    const subject = '[Pine Point handoff] Anything we missed';
+    const body = (email ? 'From: ' + email + '\n\n' : '') + message + '\n\n---\nSent from the handoff page.';
+    window.location.href = 'mailto:keith@fitfosystems.com'
       + '?subject=' + encodeURIComponent(subject)
       + '&body=' + encodeURIComponent(body);
-    window.location.href = mailto;
+  });
+
+  // === Inline replies on each "What we need" card ===
+  const STORAGE_KEY_REPLIES = 'pinepoint.handoff.replies.v1';
+  let replyDrafts = {};
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_REPLIES);
+    if (raw) replyDrafts = JSON.parse(raw);
+  } catch (e) {}
+
+  function saveDrafts() {
+    try { localStorage.setItem(STORAGE_KEY_REPLIES, JSON.stringify(replyDrafts)); } catch (e) {}
+  }
+
+  document.querySelectorAll('.card-reply__textarea').forEach(ta => {
+    const id = ta.dataset.replyId;
+    if (replyDrafts[id]) ta.value = replyDrafts[id];
+    refreshSubmitButton(ta);
+    ta.addEventListener('input', () => {
+      replyDrafts[id] = ta.value;
+      saveDrafts();
+      refreshSubmitButton(ta);
+    });
+  });
+
+  function refreshSubmitButton(ta) {
+    const card = ta.closest('.card--checkable');
+    if (!card) return;
+    const btn = card.querySelector('.card-reply__submit');
+    if (btn) btn.disabled = !ta.value.trim();
+  }
+
+  document.querySelectorAll('.card-reply__submit').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.preventDefault();
+      const card = btn.closest('.card--checkable');
+      const ta = card.querySelector('.card-reply__textarea');
+      const text = (ta?.value || '').trim();
+      if (!text) return;
+      const topic = btn.dataset.replyTopic || 'Reply';
+      const subject = '[Pine Point handoff] ' + topic;
+      const body = text + '\n\n---\nSent from the handoff page (' + topic + ').';
+      // Also auto-mark this card as addressed since they actually replied.
+      if (!card.classList.contains('is-done')) {
+        card.classList.add('is-done');
+        const checkBtn = card.querySelector('.card-check');
+        if (checkBtn) checkBtn.textContent = 'Addressed';
+        if (card.dataset.needId) {
+          needDoneSet.add(card.dataset.needId);
+          try { localStorage.setItem(STORAGE_KEY_NEED, JSON.stringify(Array.from(needDoneSet))); } catch (e) {}
+          refreshNeedProgress();
+        }
+      }
+      window.location.href = 'mailto:keith@fitfosystems.com'
+        + '?subject=' + encodeURIComponent(subject)
+        + '&body=' + encodeURIComponent(body);
+    });
   });
 
 })();

@@ -819,26 +819,118 @@
     .checklist__group h3:first-of-type { margin-top: 0; }
     .checklist__item {
       display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 12px;
-      padding: 10px 14px;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      padding: 12px 16px;
       background: var(--charcoal);
       border: 1px solid var(--dark-gray);
       border-radius: 4px;
       margin-bottom: 6px;
-      cursor: pointer;
-      align-items: start;
-      transition: all 0.12s;
+      align-items: center;
+      transition: border-color 0.12s, background 0.12s;
     }
     .checklist__item:hover { border-color: var(--medium-gray); }
-    .checklist__item input { margin-top: 4px; cursor: pointer; }
-    .checklist__item.is-checked {
-      background: rgba(45, 90, 39, 0.15);
+    .checklist__item.is-ok {
+      background: rgba(45, 90, 39, 0.1);
       border-color: var(--green);
     }
-    .checklist__item.is-checked .checklist__label { text-decoration: line-through; color: var(--light-gray); }
+    .checklist__item.is-issue {
+      background: rgba(200, 90, 40, 0.08);
+      border-color: var(--rust);
+    }
     .checklist__label { font-size: 0.95rem; line-height: 1.5; }
     .checklist__hint { color: var(--light-gray); font-size: 0.85rem; margin-top: 2px; display: block; }
+
+    .checklist__btn-group {
+      display: flex;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .checklist__btn {
+      background: transparent;
+      color: var(--light-gray);
+      border: 1px solid var(--dark-gray);
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .checklist__btn:hover { color: var(--white); border-color: var(--medium-gray); }
+    .checklist__btn[data-status="ok"].is-active {
+      background: var(--green);
+      color: var(--white);
+      border-color: var(--green);
+    }
+    .checklist__btn[data-status="issue"].is-active {
+      background: var(--rust);
+      color: var(--white);
+      border-color: var(--rust);
+    }
+    .checklist__notes {
+      grid-column: 1 / -1;
+      width: 100%;
+      margin-top: 4px;
+      padding: 8px 12px;
+      background: var(--black);
+      border: 1px solid var(--dark-gray);
+      border-radius: 4px;
+      color: var(--white);
+      font-family: inherit;
+      font-size: 0.92rem;
+      line-height: 1.5;
+      resize: vertical;
+      min-height: 44px;
+      outline: none;
+      display: none;
+    }
+    .checklist__notes:focus { border-color: var(--rust); }
+    .checklist__item.is-issue .checklist__notes { display: block; }
+
+    /* Test summary + batch submit */
+    .test-summary {
+      margin: 22px 0 0;
+      padding: 18px 22px;
+      background: var(--charcoal);
+      border: 1px solid var(--dark-gray);
+      border-radius: 6px;
+    }
+    .test-summary__counts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin-bottom: 14px;
+      font-size: 0.92rem;
+    }
+    .test-summary__counts strong { color: var(--white); }
+    .test-summary__counts .ok-count strong { color: var(--green-hover); }
+    .test-summary__counts .issue-count strong { color: var(--rust); }
+    .test-summary__counts .untested-count strong { color: var(--light-gray); }
+    .test-summary__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .test-submit {
+      background: var(--green);
+      color: var(--white);
+      border: none;
+      padding: 11px 22px;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .test-submit:hover { background: var(--green-hover); }
+    .test-submit:disabled { background: var(--dark-gray); color: var(--medium-gray); cursor: not-allowed; }
+    .test-submit.is-sending { background: var(--medium-gray); cursor: wait; }
+    .test-submit.is-sent { background: var(--green-hover); }
+    .test-submit.is-failed { background: var(--rust); }
+    .test-summary__hint { color: var(--medium-gray); font-size: 0.85rem; }
 
     /* === Question form === */
     .ask-form {
@@ -2364,55 +2456,241 @@ function installTrigger() {
       <div id="checklist">
         <div class="checklist__group" data-group="estimate">
           <h3>Estimate flow</h3>
-          <label class="checklist__item"><input type="checkbox" data-id="t-removal-small"><span class="checklist__label">Tree Removal: small job (1 tree, easy access)</span></label>
-          <label class="checklist__item"><input type="checkbox" data-id="t-removal-big"><span class="checklist__label">Tree Removal: big job (5+ trees, near house, no access)</span></label>
-          <label class="checklist__item"><input type="checkbox" data-id="t-trim-overhang"><span class="checklist__label">Trimming: overhang clearing</span></label>
-          <label class="checklist__item"><input type="checkbox" data-id="t-trim-shaping"><span class="checklist__label">Trimming: shaping / thinning</span></label>
-          <label class="checklist__item"><input type="checkbox" data-id="t-trim-deadwood"><span class="checklist__label">Trimming: deadwood removal</span></label>
-          <label class="checklist__item"><input type="checkbox" data-id="t-trim-clearance"><span class="checklist__label">Trimming: structure / line clearance</span></label>
-          <label class="checklist__item"><input type="checkbox" data-id="t-lot-small"><span class="checklist__label">Lot Clearing: small lot, brush-only</span></label>
-          <label class="checklist__item"><input type="checkbox" data-id="t-lot-big"><span class="checklist__label">Lot Clearing: 1+ acres, dense woods</span></label>
+          <div class="checklist__item" data-test-id="t-removal-small">
+            <span class="checklist__label">Tree Removal: small job (1 tree, easy access)</span>
+            <div class="checklist__btn-group">
+              <button type="button" class="checklist__btn" data-status="ok">&#10003; OK</button>
+              <button type="button" class="checklist__btn" data-status="issue">&#9888; Issue</button>
+            </div>
+            <textarea class="checklist__notes" placeholder="What's the issue? (optional, but really helpful)"></textarea>
+          </div>
+          <div class="checklist__item" data-test-id="t-removal-big">
+            <span class="checklist__label">Tree Removal: big job (5+ trees, near house, no access)</span>
+            <div class="checklist__btn-group">
+              <button type="button" class="checklist__btn" data-status="ok">&#10003; OK</button>
+              <button type="button" class="checklist__btn" data-status="issue">&#9888; Issue</button>
+            </div>
+            <textarea class="checklist__notes" placeholder="What's the issue? (optional, but really helpful)"></textarea>
+          </div>
+          <div class="checklist__item" data-test-id="t-trim-overhang">
+            <span class="checklist__label">Trimming: overhang clearing</span>
+            <div class="checklist__btn-group">
+              <button type="button" class="checklist__btn" data-status="ok">&#10003; OK</button>
+              <button type="button" class="checklist__btn" data-status="issue">&#9888; Issue</button>
+            </div>
+            <textarea class="checklist__notes" placeholder="What's the issue? (optional, but really helpful)"></textarea>
+          </div>
+          <div class="checklist__item" data-test-id="t-trim-shaping">
+            <span class="checklist__label">Trimming: shaping / thinning</span>
+            <div class="checklist__btn-group">
+              <button type="button" class="checklist__btn" data-status="ok">&#10003; OK</button>
+              <button type="button" class="checklist__btn" data-status="issue">&#9888; Issue</button>
+            </div>
+            <textarea class="checklist__notes" placeholder="What's the issue? (optional, but really helpful)"></textarea>
+          </div>
+          <div class="checklist__item" data-test-id="t-trim-deadwood">
+            <span class="checklist__label">Trimming: deadwood removal</span>
+            <div class="checklist__btn-group">
+              <button type="button" class="checklist__btn" data-status="ok">&#10003; OK</button>
+              <button type="button" class="checklist__btn" data-status="issue">&#9888; Issue</button>
+            </div>
+            <textarea class="checklist__notes" placeholder="What's the issue? (optional, but really helpful)"></textarea>
+          </div>
+          <div class="checklist__item" data-test-id="t-trim-clearance">
+            <span class="checklist__label">Trimming: structure / line clearance</span>
+            <div class="checklist__btn-group">
+              <button type="button" class="checklist__btn" data-status="ok">&#10003; OK</button>
+              <button type="button" class="checklist__btn" data-status="issue">&#9888; Issue</button>
+            </div>
+            <textarea class="checklist__notes" placeholder="What's the issue? (optional, but really helpful)"></textarea>
+          </div>
+          <div class="checklist__item" data-test-id="t-lot-small">
+            <span class="checklist__label">Lot Clearing: small lot, brush-only</span>
+            <div class="checklist__btn-group">
+              <button type="button" class="checklist__btn" data-status="ok">&#10003; OK</button>
+              <button type="button" class="checklist__btn" data-status="issue">&#9888; Issue</button>
+            </div>
+            <textarea class="checklist__notes" placeholder="What's the issue? (optional, but really helpful)"></textarea>
+          </div>
+          <div class="checklist__item" data-test-id="t-lot-big">
+            <span class="checklist__label">Lot Clearing: 1+ acres, dense woods</span>
+            <div class="checklist__btn-group">
+              <button type="button" class="checklist__btn" data-status="ok">&#10003; OK</button>
+              <button type="button" class="checklist__btn" data-status="issue">&#9888; Issue</button>
+            </div>
+            <textarea class="checklist__notes" placeholder="What's the issue? (optional, but really helpful)"></textarea>
+          </div>
         </div>
 
         <div class="checklist__group">
           <h3>Photos &amp; emails</h3>
-          <label class="checklist__item"><input type="checkbox" data-id="t-photos-attach"><span class="checklist__label">Attach 2–3 photos to a submission — confirm they show in the email AND the Drive folder<span class="checklist__hint">Drive: Pine Point Lead Photos / [month_year] / [estimate folder]</span></span></label>
-          <label class="checklist__item"><input type="checkbox" data-id="t-lead-only"><span class="checklist__label">Submit and wait 5+ min without scheduling — confirm the "New Lead" email arrives</span></label>
-          <label class="checklist__item"><input type="checkbox" data-id="t-callback-fast"><span class="checklist__label">Submit, then immediately Schedule a Follow-Up — only the "Callback Requested" email should arrive (no separate lead email)</span></label>
-          <label class="checklist__item"><input type="checkbox" data-id="t-callback-slow"><span class="checklist__label">Submit, wait 6+ min for the lead email, THEN come back and schedule — callback email should show the yellow ℹ "Update on existing lead" banner</span></label>
+          <div class="checklist__item" data-test-id="t-photos-attach">
+            <span class="checklist__label">Attach 2–3 photos to a submission — confirm they show in the email AND the Drive folder<span class="checklist__hint">Drive: Pine Point Lead Photos / [month_year] / [estimate folder]</span></span>
+            <div class="checklist__btn-group">
+              <button type="button" class="checklist__btn" data-status="ok">&#10003; OK</button>
+              <button type="button" class="checklist__btn" data-status="issue">&#9888; Issue</button>
+            </div>
+            <textarea class="checklist__notes" placeholder="What's the issue? (optional, but really helpful)"></textarea>
+          </div>
+          <div class="checklist__item" data-test-id="t-lead-only">
+            <span class="checklist__label">Submit and wait 5+ min without scheduling — confirm the "New Lead" email arrives</span>
+            <div class="checklist__btn-group">
+              <button type="button" class="checklist__btn" data-status="ok">&#10003; OK</button>
+              <button type="button" class="checklist__btn" data-status="issue">&#9888; Issue</button>
+            </div>
+            <textarea class="checklist__notes" placeholder="What's the issue? (optional, but really helpful)"></textarea>
+          </div>
+          <div class="checklist__item" data-test-id="t-callback-fast">
+            <span class="checklist__label">Submit, then immediately Schedule a Follow-Up — only the "Callback Requested" email should arrive (no separate lead email)</span>
+            <div class="checklist__btn-group">
+              <button type="button" class="checklist__btn" data-status="ok">&#10003; OK</button>
+              <button type="button" class="checklist__btn" data-status="issue">&#9888; Issue</button>
+            </div>
+            <textarea class="checklist__notes" placeholder="What's the issue? (optional, but really helpful)"></textarea>
+          </div>
+          <div class="checklist__item" data-test-id="t-callback-slow">
+            <span class="checklist__label">Submit, wait 6+ min for the lead email, THEN come back and schedule — callback email should show the yellow ℹ "Update on existing lead" banner</span>
+            <div class="checklist__btn-group">
+              <button type="button" class="checklist__btn" data-status="ok">&#10003; OK</button>
+              <button type="button" class="checklist__btn" data-status="issue">&#9888; Issue</button>
+            </div>
+            <textarea class="checklist__notes" placeholder="What's the issue? (optional, but really helpful)"></textarea>
+          </div>
         </div>
 
         <div class="checklist__group">
           <h3>Edge cases</h3>
-          <label class="checklist__item"><input type="checkbox" data-id="t-out-area"><span class="checklist__label">Try ZIP <code>02134</code> (Boston) — should still submit, but the email gets a yellow ⚠ "Outside service area" banner</span></label>
-          <label class="checklist__item"><input type="checkbox" data-id="t-bad-phone"><span class="checklist__label">Try entering a 7-digit phone — should show a clear orange "Enter a 10-digit phone number" message</span></label>
-          <label class="checklist__item"><input type="checkbox" data-id="t-photo-cap"><span class="checklist__label">Try selecting 7 photos — only first 6 accepted; warning if total exceeds 25 MB</span></label>
+          <div class="checklist__item" data-test-id="t-out-area">
+            <span class="checklist__label">Try ZIP <code>02134</code> (Boston) — should still submit, but the email gets a yellow ⚠ "Outside service area" banner</span>
+            <div class="checklist__btn-group">
+              <button type="button" class="checklist__btn" data-status="ok">&#10003; OK</button>
+              <button type="button" class="checklist__btn" data-status="issue">&#9888; Issue</button>
+            </div>
+            <textarea class="checklist__notes" placeholder="What's the issue? (optional, but really helpful)"></textarea>
+          </div>
+          <div class="checklist__item" data-test-id="t-bad-phone">
+            <span class="checklist__label">Try entering a 7-digit phone — should show a clear orange "Enter a 10-digit phone number" message</span>
+            <div class="checklist__btn-group">
+              <button type="button" class="checklist__btn" data-status="ok">&#10003; OK</button>
+              <button type="button" class="checklist__btn" data-status="issue">&#9888; Issue</button>
+            </div>
+            <textarea class="checklist__notes" placeholder="What's the issue? (optional, but really helpful)"></textarea>
+          </div>
+          <div class="checklist__item" data-test-id="t-photo-cap">
+            <span class="checklist__label">Try selecting 7 photos — only first 6 accepted; warning if total exceeds 25 MB</span>
+            <div class="checklist__btn-group">
+              <button type="button" class="checklist__btn" data-status="ok">&#10003; OK</button>
+              <button type="button" class="checklist__btn" data-status="issue">&#9888; Issue</button>
+            </div>
+            <textarea class="checklist__notes" placeholder="What's the issue? (optional, but really helpful)"></textarea>
+          </div>
         </div>
 
         <div class="checklist__group">
           <h3>The site itself (best from your phone)</h3>
-          <label class="checklist__item"><input type="checkbox" data-id="t-mobile"><span class="checklist__label">Open pinepointtrees.com on your phone — does everything look right?</span></label>
-          <label class="checklist__item"><input type="checkbox" data-id="t-tap-call"><span class="checklist__label">Tap the phone number in the header — does it open your dialer?</span></label>
-          <label class="checklist__item"><input type="checkbox" data-id="t-scroll"><span class="checklist__label">Scroll the homepage: services, video, before/after slider, gallery, reviews, map</span></label>
-          <label class="checklist__item"><input type="checkbox" data-id="t-review-links"><span class="checklist__label">Click any review's source link (Google / Facebook / BBB) — does it open the right page?</span></label>
+          <div class="checklist__item" data-test-id="t-mobile">
+            <span class="checklist__label">Open pinepointtrees.com on your phone — does everything look right?</span>
+            <div class="checklist__btn-group">
+              <button type="button" class="checklist__btn" data-status="ok">&#10003; OK</button>
+              <button type="button" class="checklist__btn" data-status="issue">&#9888; Issue</button>
+            </div>
+            <textarea class="checklist__notes" placeholder="What's the issue? (optional, but really helpful)"></textarea>
+          </div>
+          <div class="checklist__item" data-test-id="t-tap-call">
+            <span class="checklist__label">Tap the phone number in the header — does it open your dialer?</span>
+            <div class="checklist__btn-group">
+              <button type="button" class="checklist__btn" data-status="ok">&#10003; OK</button>
+              <button type="button" class="checklist__btn" data-status="issue">&#9888; Issue</button>
+            </div>
+            <textarea class="checklist__notes" placeholder="What's the issue? (optional, but really helpful)"></textarea>
+          </div>
+          <div class="checklist__item" data-test-id="t-scroll">
+            <span class="checklist__label">Scroll the homepage: services, video, before/after slider, gallery, reviews, map</span>
+            <div class="checklist__btn-group">
+              <button type="button" class="checklist__btn" data-status="ok">&#10003; OK</button>
+              <button type="button" class="checklist__btn" data-status="issue">&#9888; Issue</button>
+            </div>
+            <textarea class="checklist__notes" placeholder="What's the issue? (optional, but really helpful)"></textarea>
+          </div>
+          <div class="checklist__item" data-test-id="t-review-links">
+            <span class="checklist__label">Click any review's source link (Google / Facebook / BBB) — does it open the right page?</span>
+            <div class="checklist__btn-group">
+              <button type="button" class="checklist__btn" data-status="ok">&#10003; OK</button>
+              <button type="button" class="checklist__btn" data-status="issue">&#9888; Issue</button>
+            </div>
+            <textarea class="checklist__notes" placeholder="What's the issue? (optional, but really helpful)"></textarea>
+          </div>
         </div>
 
         <div class="checklist__group">
           <h3>Sheets &amp; Drive</h3>
-          <label class="checklist__item"><input type="checkbox" data-id="t-all-leads"><span class="checklist__label">Each submission shows up as one row in the All Leads tab with the right Lead Type</span></label>
-          <label class="checklist__item"><input type="checkbox" data-id="t-detail-tabs"><span class="checklist__label">Estimate Leads + Schedule Requests tabs have full details for every event</span></label>
-          <label class="checklist__item"><input type="checkbox" data-id="t-clickable"><span class="checklist__label">Phone numbers in email bodies are clickable on your phone</span></label>
+          <div class="checklist__item" data-test-id="t-all-leads">
+            <span class="checklist__label">Each submission shows up as one row in the All Leads tab with the right Lead Type</span>
+            <div class="checklist__btn-group">
+              <button type="button" class="checklist__btn" data-status="ok">&#10003; OK</button>
+              <button type="button" class="checklist__btn" data-status="issue">&#9888; Issue</button>
+            </div>
+            <textarea class="checklist__notes" placeholder="What's the issue? (optional, but really helpful)"></textarea>
+          </div>
+          <div class="checklist__item" data-test-id="t-detail-tabs">
+            <span class="checklist__label">Estimate Leads + Schedule Requests tabs have full details for every event</span>
+            <div class="checklist__btn-group">
+              <button type="button" class="checklist__btn" data-status="ok">&#10003; OK</button>
+              <button type="button" class="checklist__btn" data-status="issue">&#9888; Issue</button>
+            </div>
+            <textarea class="checklist__notes" placeholder="What's the issue? (optional, but really helpful)"></textarea>
+          </div>
+          <div class="checklist__item" data-test-id="t-clickable">
+            <span class="checklist__label">Phone numbers in email bodies are clickable on your phone</span>
+            <div class="checklist__btn-group">
+              <button type="button" class="checklist__btn" data-status="ok">&#10003; OK</button>
+              <button type="button" class="checklist__btn" data-status="issue">&#9888; Issue</button>
+            </div>
+            <textarea class="checklist__notes" placeholder="What's the issue? (optional, but really helpful)"></textarea>
+          </div>
         </div>
 
         <div class="checklist__group">
           <h3>Pricing review (most important)</h3>
-          <label class="checklist__item"><input type="checkbox" data-id="t-price-feel"><span class="checklist__label">For each service path you tested, does the price feel right vs. what you'd actually quote?</span></label>
-          <label class="checklist__item"><input type="checkbox" data-id="t-price-spread"><span class="checklist__label">Does the Low / Typical / High spread feel reasonable?</span></label>
-          <label class="checklist__item"><input type="checkbox" data-id="t-price-breakdown"><span class="checklist__label">Is the one-line breakdown ("Based on: ...") accurate?</span></label>
+          <div class="checklist__item" data-test-id="t-price-feel">
+            <span class="checklist__label">For each service path you tested, does the price feel right vs. what you'd actually quote?</span>
+            <div class="checklist__btn-group">
+              <button type="button" class="checklist__btn" data-status="ok">&#10003; OK</button>
+              <button type="button" class="checklist__btn" data-status="issue">&#9888; Issue</button>
+            </div>
+            <textarea class="checklist__notes" placeholder="What's the issue? (optional, but really helpful)"></textarea>
+          </div>
+          <div class="checklist__item" data-test-id="t-price-spread">
+            <span class="checklist__label">Does the Low / Typical / High spread feel reasonable?</span>
+            <div class="checklist__btn-group">
+              <button type="button" class="checklist__btn" data-status="ok">&#10003; OK</button>
+              <button type="button" class="checklist__btn" data-status="issue">&#9888; Issue</button>
+            </div>
+            <textarea class="checklist__notes" placeholder="What's the issue? (optional, but really helpful)"></textarea>
+          </div>
+          <div class="checklist__item" data-test-id="t-price-breakdown">
+            <span class="checklist__label">Is the one-line breakdown ("Based on: ...") accurate?</span>
+            <div class="checklist__btn-group">
+              <button type="button" class="checklist__btn" data-status="ok">&#10003; OK</button>
+              <button type="button" class="checklist__btn" data-status="issue">&#9888; Issue</button>
+            </div>
+            <textarea class="checklist__notes" placeholder="What's the issue? (optional, but really helpful)"></textarea>
+          </div>
         </div>
       </div>
 
-      <div class="callout">If anything is off — even rough notes like “removal feels 20% low” or “the overhang option should ask about height differently” — use the form at the bottom of this page or just text me. That's gold for me.</div>
+      <div class="test-summary">
+        <div class="test-summary__counts">
+          <span class="ok-count"><strong id="test-ok-count">0</strong> OK</span>
+          <span class="issue-count"><strong id="test-issue-count">0</strong> issues</span>
+          <span class="untested-count"><strong id="test-untested-count">25</strong> untested</span>
+        </div>
+        <p style="color:var(--off-white);font-size:0.95rem;margin:0 0 14px">When you've worked through the list, hit submit and I'll get a single email with everything you marked — including any issue notes you typed.</p>
+        <div class="test-summary__actions">
+          <button type="button" class="test-submit" id="test-submit" disabled>Submit test feedback</button>
+          <span class="test-summary__hint" id="test-submit-hint">Mark at least one item to enable.</span>
+        </div>
+      </div>
     </section>
 
     <!-- WHAT WE NEED -->
@@ -2739,38 +3017,178 @@ function installTrigger() {
     });
   });
 
-  // === Test checklist with localStorage ===
-  const STORAGE_KEY_CHECK = 'pinepoint.handoff.checklist.v1';
-  const checkboxes = Array.from(document.querySelectorAll('#checklist input[type="checkbox"]'));
+  // === Test checklist v2: per-item status (ok/issue) + issue notes + batch submit ===
+  const STORAGE_KEY_CHECK = 'pinepoint.handoff.checklist.v2';
+  const testItems = Array.from(document.querySelectorAll('#checklist .checklist__item'));
   const progressFill = document.getElementById('progress-fill');
   const progressText = document.getElementById('progress-text');
-  let checkedSet = new Set();
+  const okCountEl = document.getElementById('test-ok-count');
+  const issueCountEl = document.getElementById('test-issue-count');
+  const untestedCountEl = document.getElementById('test-untested-count');
+  const testSubmitBtn = document.getElementById('test-submit');
+  const testSubmitHint = document.getElementById('test-submit-hint');
+
+  let testResults = {}; // { 't-removal-small': { status: 'ok'|'issue', notes: '...' } }
   try {
     const raw = localStorage.getItem(STORAGE_KEY_CHECK);
-    if (raw) checkedSet = new Set(JSON.parse(raw));
-  } catch (e) {}
+    if (raw) testResults = JSON.parse(raw) || {};
+  } catch (e) { testResults = {}; }
 
-  function updateProgress() {
-    const total = checkboxes.length;
-    const done = checkboxes.filter(c => c.checked).length;
-    progressText.textContent = done + ' / ' + total;
-    progressFill.style.width = total ? (done / total * 100) + '%' : '0%';
+  function persistResults() {
+    try { localStorage.setItem(STORAGE_KEY_CHECK, JSON.stringify(testResults)); } catch (e) {}
   }
-  checkboxes.forEach(cb => {
-    if (checkedSet.has(cb.dataset.id)) {
-      cb.checked = true;
-      cb.closest('.checklist__item').classList.add('is-checked');
+
+  function applyItemState(item, status, notes) {
+    item.classList.remove('is-ok', 'is-issue');
+    item.querySelectorAll('.checklist__btn').forEach(b => b.classList.remove('is-active'));
+    if (status === 'ok' || status === 'issue') {
+      item.classList.add('is-' + status);
+      const activeBtn = item.querySelector('.checklist__btn[data-status="' + status + '"]');
+      if (activeBtn) activeBtn.classList.add('is-active');
     }
-    cb.addEventListener('change', () => {
-      const item = cb.closest('.checklist__item');
-      item.classList.toggle('is-checked', cb.checked);
-      if (cb.checked) checkedSet.add(cb.dataset.id);
-      else checkedSet.delete(cb.dataset.id);
-      try { localStorage.setItem(STORAGE_KEY_CHECK, JSON.stringify(Array.from(checkedSet))); } catch (e) {}
-      updateProgress();
+    const ta = item.querySelector('.checklist__notes');
+    if (ta) ta.value = notes || '';
+  }
+
+  function updateTestProgress() {
+    const total = testItems.length;
+    let okCount = 0, issueCount = 0;
+    for (const item of testItems) {
+      const r = testResults[item.dataset.testId];
+      if (r && r.status === 'ok') okCount++;
+      else if (r && r.status === 'issue') issueCount++;
+    }
+    const tested = okCount + issueCount;
+    const untested = total - tested;
+    progressText.textContent = tested + ' / ' + total;
+    progressFill.style.width = total ? (tested / total * 100) + '%' : '0%';
+    if (okCountEl) okCountEl.textContent = okCount;
+    if (issueCountEl) issueCountEl.textContent = issueCount;
+    if (untestedCountEl) untestedCountEl.textContent = untested;
+    if (testSubmitBtn) {
+      // Don't reset terminal "Sent ✓" / "Failed" states — only adjust if neutral.
+      if (!testSubmitBtn.classList.contains('is-sent') && !testSubmitBtn.classList.contains('is-sending')) {
+        testSubmitBtn.disabled = tested === 0;
+        if (testSubmitHint) {
+          if (tested === 0) testSubmitHint.textContent = 'Mark at least one item to enable.';
+          else testSubmitHint.textContent = tested + ' marked, ' + untested + ' still to go (you can submit anytime).';
+        }
+      }
+    }
+  }
+
+  testItems.forEach(item => {
+    const id = item.dataset.testId;
+    const stored = testResults[id] || {};
+    applyItemState(item, stored.status, stored.notes);
+
+    item.querySelectorAll('.checklist__btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const status = btn.dataset.status;
+        const current = (testResults[id] && testResults[id].status) || null;
+        if (current === status) {
+          // Toggle off — back to untested.
+          delete testResults[id];
+        } else {
+          testResults[id] = Object.assign(testResults[id] || {}, { status: status });
+        }
+        applyItemState(item, testResults[id]?.status, testResults[id]?.notes);
+        persistResults();
+        updateTestProgress();
+      });
     });
+
+    const ta = item.querySelector('.checklist__notes');
+    if (ta) {
+      ta.addEventListener('input', () => {
+        if (!testResults[id]) testResults[id] = { status: 'issue' };
+        testResults[id].notes = ta.value;
+        persistResults();
+      });
+    }
   });
-  updateProgress();
+  updateTestProgress();
+
+  // Batch-submit all test feedback as a single compiled email.
+  if (testSubmitBtn) {
+    testSubmitBtn.addEventListener('click', async () => {
+      let okCount = 0, issueCount = 0;
+      const okList = [];
+      const issueList = [];
+      const untestedList = [];
+      for (const item of testItems) {
+        const labelEl = item.querySelector('.checklist__label');
+        // Strip nested hint span when reading the label.
+        const label = (labelEl?.firstChild?.textContent || labelEl?.textContent || '').trim();
+        const r = testResults[item.dataset.testId];
+        if (r && r.status === 'ok') {
+          okCount++;
+          okList.push('  - ' + label);
+        } else if (r && r.status === 'issue') {
+          issueCount++;
+          const note = (r.notes || '').trim();
+          issueList.push('  - ' + label + (note ? '\n      Note: ' + note : ''));
+        } else {
+          untestedList.push('  - ' + label);
+        }
+      }
+
+      const lines = [];
+      lines.push('Pine Point handoff — test results');
+      lines.push('==================================');
+      lines.push('OK: ' + okCount + ' / ' + testItems.length);
+      lines.push('Issues: ' + issueCount);
+      lines.push('Untested: ' + untestedList.length);
+      lines.push('');
+      if (issueList.length) {
+        lines.push('ISSUES:');
+        lines.push(...issueList);
+        lines.push('');
+      }
+      if (okList.length) {
+        lines.push('PASSED:');
+        lines.push(...okList);
+        lines.push('');
+      }
+      if (untestedList.length) {
+        lines.push('UNTESTED:');
+        lines.push(...untestedList);
+      }
+      const body = lines.join('\n');
+
+      setSubmitState(testSubmitBtn, 'sending', 'Sending…');
+      testSubmitBtn.disabled = true;
+      const result = await sendBehindTheScenes({
+        subject: '[Pine Point handoff] Test feedback (' + okCount + ' OK, ' + issueCount + ' issues)',
+        kind: 'test_feedback',
+        ok_count: String(okCount),
+        issue_count: String(issueCount),
+        untested_count: String(untestedList.length),
+        message: body,
+        page: location.href
+      });
+      if (result.ok) {
+        setSubmitState(testSubmitBtn, 'sent', 'Sent ✓ thanks');
+        if (testSubmitHint) testSubmitHint.textContent = 'Keith got the report. Keep adding more if you spot anything else — submitting again sends an updated batch.';
+        // Allow re-submission for follow-up rounds: re-enable after a moment so they can update.
+        setTimeout(() => {
+          if (testSubmitBtn.classList.contains('is-sent')) {
+            testSubmitBtn.disabled = false;
+            setSubmitState(testSubmitBtn, null, 'Submit test feedback (again)');
+          }
+        }, 2400);
+      } else {
+        setSubmitState(testSubmitBtn, 'failed', 'Failed — try email');
+        testSubmitBtn.disabled = false;
+        const subject = '[Pine Point handoff] Test feedback';
+        setTimeout(() => {
+          window.location.href = 'mailto:' + SUBMIT_DEST
+            + '?subject=' + encodeURIComponent(subject)
+            + '&body=' + encodeURIComponent(body);
+        }, 600);
+      }
+    });
+  }
 
   // === Behind-the-scenes form delivery via Formsubmit ===
   // POSTs JSON to Formsubmit's AJAX endpoint, which emails the contents to

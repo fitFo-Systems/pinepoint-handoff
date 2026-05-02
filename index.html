@@ -1091,48 +1091,71 @@
     .card-status--complete   { background: rgba(45,90,39,0.3);  color: #7ec97a; border: 1px solid rgba(126,201,122,0.4); }
     .card-status--in-progress{ background: rgba(56,139,182,0.2); color: #72bfe8; border: 1px solid rgba(114,191,232,0.35); }
     .card-status--followup   { background: rgba(212,173,26,0.2); color: #e8c84a; border: 1px solid rgba(212,173,26,0.4); }
-    .card-status--closed     { background: rgba(107,107,107,0.2);color: var(--light-gray); border: 1px solid rgba(160,160,160,0.3); }
+    .card-status--closed     { background: rgba(160,160,160,0.18); color: #d0d0d0; border: 1px solid rgba(210,210,210,0.35); }
 
     /* === Status filter bar === */
     .status-filter {
       display: flex;
       align-items: center;
       flex-wrap: wrap;
-      gap: 8px;
-      margin: 0 0 28px;
-      padding: 14px 16px;
-      background: var(--charcoal);
-      border: 1px solid var(--dark-gray);
+      gap: 10px;
+      margin: 0 0 32px;
+      padding: 18px 20px;
+      background: #1a1a1a;
+      border: 1px solid #444;
+      border-top: 3px solid var(--green);
       border-radius: 6px;
+      box-shadow: 0 3px 16px rgba(0,0,0,0.5);
     }
     .status-filter__label {
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--medium-gray);
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--off-white);
       text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-right: 4px;
+      letter-spacing: 1.2px;
+      margin-right: 6px;
       white-space: nowrap;
     }
     .status-filter__btn {
-      padding: 5px 13px;
-      border-radius: 20px;
-      border: 1px solid var(--dark-gray);
-      background: transparent;
-      color: var(--light-gray);
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: 1px solid #444;
+      background: var(--charcoal);
+      color: var(--off-white);
       font-family: inherit;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.12s;
+      transition: all 0.14s;
+      line-height: 1;
     }
-    .status-filter__btn:hover { border-color: var(--medium-gray); color: var(--off-white); }
-    .status-filter__btn.is-active { color: var(--white); border-color: currentColor; }
-    .status-filter__btn[data-filter="all"].is-active      { color: var(--off-white); border-color: var(--medium-gray); background: rgba(255,255,255,0.06); }
-    .status-filter__btn[data-filter="complete"].is-active  { color: #7ec97a; border-color: #7ec97a; background: rgba(126,201,122,0.1); }
-    .status-filter__btn[data-filter="in-progress"].is-active{ color: #72bfe8; border-color: #72bfe8; background: rgba(114,191,232,0.1); }
-    .status-filter__btn[data-filter="followup"].is-active  { color: #e8c84a; border-color: #e8c84a; background: rgba(212,173,26,0.12); }
-    .status-filter__btn[data-filter="closed"].is-active    { color: var(--light-gray); border-color: var(--light-gray); background: rgba(160,160,160,0.08); }
+    .status-filter__btn:hover { border-color: var(--medium-gray); background: var(--dark-gray); }
+    .status-filter__btn .btn-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 22px;
+      height: 20px;
+      padding: 0 5px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.1);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1;
+    }
+    .status-filter__btn[data-filter="all"].is-active      { background: #2a2a2a; border-color: var(--medium-gray); color: var(--white); }
+    .status-filter__btn[data-filter="complete"].is-active  { background: rgba(45,90,39,0.35);  border-color: #7ec97a; color: #7ec97a; }
+    .status-filter__btn[data-filter="complete"].is-active .btn-count { background: rgba(126,201,122,0.25); }
+    .status-filter__btn[data-filter="in-progress"].is-active{ background: rgba(30,80,120,0.35); border-color: #72bfe8; color: #72bfe8; }
+    .status-filter__btn[data-filter="in-progress"].is-active .btn-count { background: rgba(114,191,232,0.25); }
+    .status-filter__btn[data-filter="followup"].is-active  { background: rgba(110,85,0,0.35);  border-color: #e8c84a; color: #e8c84a; }
+    .status-filter__btn[data-filter="followup"].is-active .btn-count { background: rgba(232,200,74,0.25); }
+    .status-filter__btn[data-filter="closed"].is-active    { background: rgba(80,80,80,0.35);   border-color: #d0d0d0; color: #d0d0d0; }
+    .status-filter__btn[data-filter="closed"].is-active .btn-count { background: rgba(210,210,210,0.2); }
     .card--filtered-out { display: none !important; }
 
     /* === Conversation thread === */
@@ -2914,11 +2937,11 @@ function installTrigger() {
     <!-- STATUS FILTER BAR -->
     <div class="status-filter" id="status-filter">
       <span class="status-filter__label">Filter by status</span>
-      <button class="status-filter__btn is-active" data-filter="all">All items</button>
-      <button class="status-filter__btn" data-filter="complete">✓ Complete</button>
-      <button class="status-filter__btn" data-filter="in-progress">In Progress</button>
-      <button class="status-filter__btn" data-filter="followup">Followup Requested</button>
-      <button class="status-filter__btn" data-filter="closed">Closed</button>
+      <button class="status-filter__btn is-active" data-filter="all">All items <span class="btn-count"></span></button>
+      <button class="status-filter__btn" data-filter="complete">✓ Complete <span class="btn-count"></span></button>
+      <button class="status-filter__btn" data-filter="in-progress">In Progress <span class="btn-count"></span></button>
+      <button class="status-filter__btn" data-filter="followup">Followup Requested <span class="btn-count"></span></button>
+      <button class="status-filter__btn" data-filter="closed">Closed <span class="btn-count"></span></button>
     </div>
 
     <!-- WHAT WE NEED -->
@@ -3441,6 +3464,21 @@ function installTrigger() {
       }
     });
   }
+
+  // Populate counts into each button on load
+  function refreshStatusCounts() {
+    const counts = {};
+    allStatusCards.forEach(c => {
+      const s = c.dataset.cardStatus;
+      counts[s] = (counts[s] || 0) + 1;
+    });
+    counts['all'] = allStatusCards.length;
+    statusFilterBtns.forEach(btn => {
+      const countEl = btn.querySelector('.btn-count');
+      if (countEl) countEl.textContent = counts[btn.dataset.filter] || 0;
+    });
+  }
+  refreshStatusCounts();
 
   statusFilterBtns.forEach(btn => {
     btn.addEventListener('click', () => {

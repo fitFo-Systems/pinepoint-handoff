@@ -136,6 +136,25 @@
       transition: background 0.15s;
     }
     .header-cta:hover { background: var(--green-hover); text-decoration: none; }
+    .header-refresh {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 16px;
+      background: transparent;
+      color: var(--light-gray);
+      border: 1px solid var(--dark-gray);
+      border-radius: 4px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.14s;
+      white-space: nowrap;
+    }
+    .header-refresh:hover { border-color: var(--medium-gray); color: var(--off-white); background: var(--charcoal); }
+    .header-refresh.is-spinning svg { animation: spin 0.6s linear; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* === Layout === */
     .layout {
@@ -1206,6 +1225,10 @@
       <span class="search__icon">&#128269;</span>
       <input type="search" id="search" class="search__input" placeholder="Search… e.g. “photos”, “script”, “invoice”">
     </div>
+    <button class="header-refresh" id="hard-refresh" title="Hard refresh — clears cached version">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4.5A7 7 0 0 1 14.5 8"/><polyline points="1 1 1 4.5 4.5 4.5"/><path d="M15 11.5A7 7 0 0 1 1.5 8"/><polyline points="15 15 15 11.5 11.5 11.5"/></svg>
+      Refresh
+    </button>
     <a class="header-cta" href="https://pinepointtrees.com" target="_blank" rel="noopener">Open the site &#8599;</a>
   </div>
 </header>
@@ -3229,6 +3252,15 @@ function installTrigger() {
 
 <script>
 (function () {
+  // === Hard refresh button ===
+  const hardRefreshBtn = document.getElementById('hard-refresh');
+  if (hardRefreshBtn) {
+    hardRefreshBtn.addEventListener('click', () => {
+      hardRefreshBtn.classList.add('is-spinning');
+      setTimeout(() => window.location.reload(true), 200);
+    });
+  }
+
   // === Search filter ===
   const searchInput = document.getElementById('search');
   const sections = Array.from(document.querySelectorAll('main > section'));

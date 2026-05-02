@@ -1104,6 +1104,7 @@
       <li><a href="#setup" data-section="setup">Setting up notifications</a></li>
       <li><a href="#test" data-section="test">Test everything</a></li>
       <li><a href="#need" data-section="need">What we need from you</a></li>
+      <li><a href="#followup1" data-section="followup1">Follow-up 1</a></li>
     </ul>
   </aside>
 
@@ -2862,6 +2863,105 @@ function installTrigger() {
       </div>
     </section>
 
+    <!-- FOLLOW-UP 1 -->
+    <section id="followup1" data-keywords="followup follow-up trunk wood pricing invoicing calendar scheduling urgency incentive booking offer">
+      <div class="section-eyebrow">Round 2 — based on your feedback</div>
+      <h2>Follow-up 1</h2>
+      <p class="lead">We've shipped a bunch of changes based on your initial feedback. A few open questions came out of that work — answers here will let us finish the remaining items cleanly.</p>
+
+      <div class="section-progress">
+        <span class="section-progress__label">Items addressed: <span id="fu1-progress-text">0 / 4</span></span>
+        <div class="section-progress__bar"><div class="section-progress__fill" id="fu1-progress-fill"></div></div>
+      </div>
+
+      <div class="card card--checkable" data-need-id="fu1-trunk-wood">
+        <h3>1. Trunk wood — does it affect pricing?</h3>
+        <p>When we remove a tree, we added a question asking whether the customer wants the trunk wood left on the property. We held off on wiring it into the price estimate because we weren't sure if keeping vs. hauling actually changes what you charge.</p>
+        <p>Two questions:</p>
+        <ul>
+          <li>Does leaving trunk wood on-site vs. hauling it away change your price?</li>
+          <li>If yes — roughly how much? (e.g. flat add-on, percentage, varies by job size)</li>
+        </ul>
+        <p style="color:var(--light-gray);font-size:0.9rem;margin-top:10px">If it doesn't affect price, we'll keep the question as context for you when you review the lead — no math change needed. If it does, we'll tune the estimator to reflect it.</p>
+        <div class="card-reply">
+          <label class="card-reply__label" for="fu1-reply-trunk-wood">Your reply</label>
+          <textarea class="card-reply__textarea" id="fu1-reply-trunk-wood" data-reply-id="fu1-trunk-wood" placeholder="Does hauling trunk wood change your price? If so, roughly how much?"></textarea>
+          <div class="card-reply__actions">
+            <button class="card-check">Mark addressed</button>
+            <span class="card-reply__hint">Saved as you type. Submit at the bottom sends everything in one go.</span>
+          </div>
+          <div class="card-reply__history" data-history-empty="true"></div>
+        </div>
+      </div>
+
+      <div class="card card--checkable" data-need-id="fu1-invoicing">
+        <h3>2. Invoicing — what do you use today?</h3>
+        <p>Before we build anything here, we want to make sure we're building the right thing. A few quick questions:</p>
+        <ul>
+          <li>What are you currently using for invoices? (Excel, QuickBooks, pen and paper, something else?)</li>
+          <li>Are you open to a Google Sheets invoice template that lives in the same Drive folder as your leads — so estimate number, customer name, and job details are already there?</li>
+          <li>Or would you rather keep your current tool and just have a clean estimate # to copy across?</li>
+        </ul>
+        <div class="card-reply">
+          <label class="card-reply__label" for="fu1-reply-invoicing">Your reply</label>
+          <textarea class="card-reply__textarea" id="fu1-reply-invoicing" data-reply-id="fu1-invoicing" placeholder="What do you use for invoices today, and how much do you want to change?"></textarea>
+          <div class="card-reply__actions">
+            <button class="card-check">Mark addressed</button>
+            <span class="card-reply__hint">Saved as you type. Submit at the bottom sends everything in one go.</span>
+          </div>
+          <div class="card-reply__history" data-history-empty="true"></div>
+        </div>
+      </div>
+
+      <div class="card card--checkable" data-need-id="fu1-booking-offer">
+        <h3>3. Booking incentive — finish this sentence</h3>
+        <p>We want to add a line to the estimate result screen that gives customers a reason to schedule their follow-up right now rather than thinking about it. The format would be something like:</p>
+        <p style="background:var(--charcoal);padding:12px 16px;border-radius:6px;font-style:italic;margin:12px 0">"Book your follow-up now and we'll <strong>[something valuable]</strong>."</p>
+        <p>It should cost Pine Point little but feel genuinely useful to the customer. What would you offer? Could be something like free debris haul, priority scheduling, a complimentary property assessment while on-site — whatever feels natural to you.</p>
+        <div class="card-reply">
+          <label class="card-reply__label" for="fu1-reply-booking-offer">Your reply</label>
+          <textarea class="card-reply__textarea" id="fu1-reply-booking-offer" data-reply-id="fu1-booking-offer" placeholder='"Book now and we\'ll…" — what feels right to you?'></textarea>
+          <div class="card-reply__actions">
+            <button class="card-check">Mark addressed</button>
+            <span class="card-reply__hint">Saved as you type. Submit at the bottom sends everything in one go.</span>
+          </div>
+          <div class="card-reply__history" data-history-empty="true"></div>
+        </div>
+      </div>
+
+      <div class="card card--checkable" data-need-id="fu1-scheduling">
+        <h3>4. Scheduling — how do you manage your calendar today?</h3>
+        <p>Right now the site collects callback requests and emails them to you, and you coordinate from there. We're looking at options that could make the urgency message ("limited slots this week") actually true — which makes it far more effective.</p>
+        <p>A few options ranging from simple to more involved:</p>
+        <ul>
+          <li><strong>Link to your calendar</strong> — a "Book a time →" link to a Calendly or Google Calendar booking page. You confirm every request manually before it's locked.</li>
+          <li><strong>Request-based Calendly</strong> — customer picks from slots you publish, you get notified and approve or decline. You stay in control. We could wire this into the estimate result so the button opens directly into your real availability.</li>
+          <li><strong>Keep current flow</strong> — no change, just the urgency line we've already added.</li>
+        </ul>
+        <p>Before we go further on this: <strong>do you always prefer a phone call or text before heading out to a job?</strong> That changes whether "confirmed slot" means anything or whether there's always a call in between regardless.</p>
+        <div class="card-reply">
+          <label class="card-reply__label" for="fu1-reply-scheduling">Your reply</label>
+          <textarea class="card-reply__textarea" id="fu1-reply-scheduling" data-reply-id="fu1-scheduling" placeholder="How do you manage your schedule today? And do you always call/text before heading out?"></textarea>
+          <div class="card-reply__actions">
+            <button class="card-check">Mark addressed</button>
+            <span class="card-reply__hint">Saved as you type. Submit at the bottom sends everything in one go.</span>
+          </div>
+          <div class="card-reply__history" data-history-empty="true"></div>
+        </div>
+      </div>
+
+      <div class="test-summary" id="fu1-summary">
+        <div class="test-summary__counts">
+          <span class="ok-count"><strong id="fu1-filled-count">0</strong> of 4 cards have notes</span>
+        </div>
+        <p style="color:var(--off-white);font-size:0.95rem;margin:0 0 14px">Hit submit anytime — partial replies are fine. Each submission is timestamped and shown under the card you replied to.</p>
+        <div class="test-summary__actions">
+          <button type="button" class="test-submit" id="fu1-submit" disabled>Send replies</button>
+          <span class="test-summary__hint" id="fu1-submit-hint">Type anything to enable. Drafts auto-save to your browser as you go.</span>
+        </div>
+      </div>
+    </section>
+
   </main>
 </div>
 
@@ -3428,6 +3528,153 @@ function installTrigger() {
     });
   }
   refreshNeedSubmit();
+
+  // === Follow-up 1 section ===
+  const STORAGE_KEY_FU1_REPLIES  = 'pinepoint.handoff.fu1replies.v1';
+  const STORAGE_KEY_FU1_HISTORY  = 'pinepoint.handoff.fu1history.v1';
+  const STORAGE_KEY_FU1_DONE     = 'pinepoint.handoff.fu1done.v1';
+  let fu1Drafts  = {};
+  let fu1History = {};
+  let fu1DoneSet = new Set();
+  try { const r = localStorage.getItem(STORAGE_KEY_FU1_REPLIES);  if (r) fu1Drafts  = JSON.parse(r); } catch(e) {}
+  try { const r = localStorage.getItem(STORAGE_KEY_FU1_HISTORY);  if (r) fu1History = JSON.parse(r); } catch(e) {}
+  try { const r = localStorage.getItem(STORAGE_KEY_FU1_DONE);     if (r) fu1DoneSet = new Set(JSON.parse(r)); } catch(e) {}
+
+  const fu1Cards          = Array.from(document.querySelectorAll('#followup1 .card--checkable'));
+  const fu1ProgressFill   = document.getElementById('fu1-progress-fill');
+  const fu1ProgressText   = document.getElementById('fu1-progress-text');
+  const fu1FilledCountEl  = document.getElementById('fu1-filled-count');
+  const fu1SubmitBtn      = document.getElementById('fu1-submit');
+  const fu1SubmitHint     = document.getElementById('fu1-submit-hint');
+
+  function refreshFu1Progress() {
+    const total = fu1Cards.length;
+    const done  = fu1Cards.filter(c => c.classList.contains('is-done')).length;
+    if (fu1ProgressText) fu1ProgressText.textContent = done + ' / ' + total;
+    if (fu1ProgressFill) fu1ProgressFill.style.width = total ? (done / total * 100) + '%' : '0%';
+  }
+
+  function renderFu1History(card) {
+    const id   = card.dataset.needId;
+    const wrap = card.querySelector('.card-reply__history');
+    if (!wrap) return;
+    const entries = fu1History[id] || [];
+    if (!entries.length) { wrap.dataset.historyEmpty = 'true'; wrap.innerHTML = ''; return; }
+    wrap.dataset.historyEmpty = 'false';
+    wrap.innerHTML = '<div class="card-reply__history-title">Sent so far</div>' +
+      entries.map(e =>
+        '<div class="card-reply__post">' +
+          '<div class="card-reply__post-meta">Sent ' + escHtml(fmtTimestamp(e.ts)) + '</div>' +
+          '<div class="card-reply__post-body">' + escHtml(e.msg) + '</div>' +
+        '</div>'
+      ).join('');
+  }
+
+  function gatherFu1Drafts() {
+    return fu1Cards.reduce((out, card) => {
+      const ta   = card.querySelector('.card-reply__textarea');
+      const text = (ta?.value || '').trim();
+      if (text) out.push({ cardId: card.dataset.needId, topic: card.querySelector('h3')?.textContent.trim() || card.dataset.needId, text, cardEl: card, textarea: ta });
+      return out;
+    }, []);
+  }
+
+  function refreshFu1Submit() {
+    const drafts = gatherFu1Drafts();
+    if (fu1FilledCountEl) fu1FilledCountEl.textContent = drafts.length;
+    if (fu1SubmitBtn && !fu1SubmitBtn.classList.contains('is-sent') && !fu1SubmitBtn.classList.contains('is-sending')) {
+      fu1SubmitBtn.disabled = drafts.length === 0;
+      if (fu1SubmitHint) {
+        fu1SubmitHint.textContent = drafts.length === 0
+          ? 'Type anything to enable. Drafts auto-save to your browser as you go.'
+          : drafts.length + ' of ' + fu1Cards.length + ' cards have notes (partial submissions are fine).';
+      }
+    }
+  }
+
+  // Hydrate cards
+  fu1Cards.forEach(card => {
+    const id = card.dataset.needId;
+    if (fu1DoneSet.has(id)) {
+      card.classList.add('is-done');
+      const btn = card.querySelector('.card-check');
+      if (btn) btn.textContent = 'Addressed';
+    }
+    const checkBtn = card.querySelector('.card-check');
+    if (checkBtn) {
+      checkBtn.addEventListener('click', () => {
+        const wasDone = card.classList.toggle('is-done');
+        checkBtn.textContent = wasDone ? 'Addressed' : 'Mark addressed';
+        if (wasDone) fu1DoneSet.add(id); else fu1DoneSet.delete(id);
+        try { localStorage.setItem(STORAGE_KEY_FU1_DONE, JSON.stringify(Array.from(fu1DoneSet))); } catch(e) {}
+        refreshFu1Progress();
+      });
+    }
+    const ta = card.querySelector('.card-reply__textarea');
+    if (ta) {
+      if (fu1Drafts[id]) ta.value = fu1Drafts[id];
+      ta.addEventListener('input', () => {
+        fu1Drafts[id] = ta.value;
+        try { localStorage.setItem(STORAGE_KEY_FU1_REPLIES, JSON.stringify(fu1Drafts)); } catch(e) {}
+        refreshFu1Submit();
+      });
+    }
+    renderFu1History(card);
+  });
+
+  if (fu1SubmitBtn) {
+    fu1SubmitBtn.addEventListener('click', async () => {
+      const drafts = gatherFu1Drafts();
+      if (!drafts.length) return;
+      const stamp = new Date().toISOString();
+      const lines = ['Pine Point — Follow-up 1 replies from Jason', '=============================================', 'Submitted: ' + new Date(stamp).toLocaleString(), 'Items in this batch: ' + drafts.length + ' / ' + fu1Cards.length, ''];
+      drafts.forEach(d => { lines.push('---- ' + d.topic + ' ----'); lines.push(d.text); lines.push(''); });
+
+      setSubmitState(fu1SubmitBtn, 'sending', 'Sending…');
+      fu1SubmitBtn.disabled = true;
+
+      const result = await sendBehindTheScenes({
+        subject: '[Pine Point follow-up 1] Replies (' + drafts.length + ' item' + (drafts.length === 1 ? '' : 's') + ')',
+        kind: 'followup1_batch',
+        item_count: String(drafts.length),
+        message: lines.join('\n'),
+        page: location.href
+      });
+
+      if (result.ok) {
+        setSubmitState(fu1SubmitBtn, 'sent', 'Sent ✓ thanks');
+        drafts.forEach(d => {
+          if (!fu1History[d.cardId]) fu1History[d.cardId] = [];
+          fu1History[d.cardId].push({ ts: stamp, msg: d.text });
+          renderFu1History(d.cardEl);
+          if (!d.cardEl.classList.contains('is-done')) {
+            d.cardEl.classList.add('is-done');
+            const b = d.cardEl.querySelector('.card-check');
+            if (b) b.textContent = 'Addressed';
+            fu1DoneSet.add(d.cardId);
+            try { localStorage.setItem(STORAGE_KEY_FU1_DONE, JSON.stringify(Array.from(fu1DoneSet))); } catch(e) {}
+            refreshFu1Progress();
+          }
+        });
+        try { localStorage.setItem(STORAGE_KEY_FU1_HISTORY, JSON.stringify(fu1History)); } catch(e) {}
+        if (fu1SubmitHint) fu1SubmitHint.textContent = 'Sent. Submit again to add more — drafts stay saved.';
+        setTimeout(() => {
+          if (fu1SubmitBtn.classList.contains('is-sent')) {
+            fu1SubmitBtn.disabled = false;
+            setSubmitState(fu1SubmitBtn, null, 'Send replies (again)');
+            refreshFu1Submit();
+          }
+        }, 2400);
+      } else {
+        setSubmitState(fu1SubmitBtn, 'failed', "Couldn't send — try again");
+        fu1SubmitBtn.disabled = false;
+        if (fu1SubmitHint) fu1SubmitHint.textContent = 'Network looked off. Your drafts are saved — hit submit again in a moment.';
+      }
+    });
+  }
+
+  refreshFu1Progress();
+  refreshFu1Submit();
 
 })();
 </script>

@@ -2938,7 +2938,7 @@ function installTrigger() {
       </div>
 
       <div class="card card--checkable" data-need-id="fu1-script-url">
-        <h3>4. Quick check — confirm your script URL</h3>
+        <h3>5. Quick check — confirm your script URL</h3>
         <p>When you sent over your Apps Script URL it was in this format:</p>
         <p style="background:var(--charcoal);padding:10px 14px;border-radius:6px;font-size:0.82rem;word-break:break-all;margin:10px 0"><code>https://script.googleusercontent.com/macros/echo?user_content_key=...</code></p>
         <p>That's typically a <strong>preview URL</strong>, not the live deployment URL. The one the site needs to actually send leads to your inbox looks like this instead:</p>
@@ -3072,7 +3072,7 @@ function installTrigger() {
 
   // === Need-cards (What we need from you) — checkable + section progress ===
   const STORAGE_KEY_NEED = 'pinepoint.handoff.needDone.v1';
-  const needCards = Array.from(document.querySelectorAll('.card--checkable'));
+  const needCards = Array.from(document.querySelectorAll('#need .card--checkable'));
   const needProgressFill = document.getElementById('need-progress-fill');
   const needProgressText = document.getElementById('need-progress-text');
   let needDoneSet = new Set();

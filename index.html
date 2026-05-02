@@ -1223,7 +1223,6 @@
       <li><a href="#setup" data-section="setup">Setting up notifications</a></li>
       <li><a href="#test" data-section="test">Test everything</a></li>
       <li><a href="#need" data-section="need">What we need from you</a></li>
-      <li><a href="#followup1" data-section="followup1">Follow-up 1</a></li>
     </ul>
   </aside>
 
@@ -2945,28 +2944,22 @@ function installTrigger() {
     </div>
 
     <!-- WHAT WE NEED -->
-    <section id="need" data-keywords="need feedback pricing invoices invoicing quickbooks excel calendly callback scheduling outside area policy">
-      <div class="section-eyebrow">Where I need your input</div>
+    <section id="need" data-keywords="need feedback pricing trunk wood invoices invoicing quickbooks excel scheduling callback outside area policy script url">
+      <div class="section-eyebrow">Full conversation — all rounds combined</div>
       <h2>What we need from you</h2>
 
       <div class="section-progress">
-        <span class="section-progress__label">Items addressed: <span id="need-progress-text">0 / 6</span></span>
+        <span class="section-progress__label">Items addressed: <span id="need-progress-text">0 / 8</span></span>
         <div class="section-progress__bar"><div class="section-progress__fill" id="need-progress-fill"></div></div>
       </div>
 
       <div class="card card--checkable" data-need-id="need-pricing" data-card-status="followup">
-        <h3>1. Pricing reality check <span class="card-status card-status--followup">Followup Requested</span></h3>
-        <p>The math is fully tunable — I can change base rates, multipliers (access, hazards, volume), and the Low/High spread in minutes. Specific things worth flagging:</p>
-        <ul>
-          <li>Are the price ranges appropriately wide?</li>
-          <li>Should there always be a $500 minimum on jobs? (It's there now.)</li>
-          <li>For lot clearing, are the size buckets (under 1/4 acre, 1/4–1/2, 1/2–1, 1+) the right cut points?</li>
-        </ul>
-        <p style="color:var(--light-gray);font-size:0.9rem;margin-top:10px"><strong>Bonus that'll save us a round-trip:</strong> if you can send 5–10 of your recent invoices, I can reverse-engineer your real rates and tune the tool to match before you even test it. Less guesswork on both sides.</p>
+        <h3>1. Pricing &amp; wood removal <span class="card-status card-status--followup">Followup Requested</span></h3>
+        <p>Base rates, multipliers, and the trunk wood question — all pricing feedback across both rounds in one thread.</p>
         <div class="convo-thread">
           <div class="convo-msg">
             <span class="convo-label convo-label--fitfo">FITFO</span>
-            <p>Are price ranges appropriately wide? Should there always be a $500 minimum? For lot clearing, are the size buckets the right cut points?</p>
+            <p>Are price ranges appropriately wide? $500 minimum on all jobs? For lot clearing, are the size buckets the right cut points?</p>
           </div>
           <div class="convo-msg">
             <span class="convo-label convo-label--client">PINE POINT</span>
@@ -2974,29 +2967,35 @@ function installTrigger() {
           </div>
           <div class="convo-msg">
             <span class="convo-label convo-label--followup">FITFO FOLLOWUP</span>
-            <p><span class="convo-done">✓ Done</span> — lot clearing +15% applied, 1+ acre shows "Call for pricing," tier descriptions removed (Low / Typical / High labels only), trunk wood question added to Tree Removal and Lot Clearing flows. Wood removal pricing — see Follow-up 1 → Item 1 for the open detail.</p>
+            <p><span class="convo-done">✓ Done</span> — lot clearing +15% applied, 1+ acre shows "Call for pricing," tier descriptions removed (Low / Typical / High labels only), trunk wood question added to Tree Removal and Lot Clearing flows.</p>
+          </div>
+          <div class="convo-msg">
+            <span class="convo-label convo-label--fitfo">FITFO</span>
+            <p>Does leaving trunk wood vs. hauling it away change what you charge? If yes — roughly how much?</p>
+          </div>
+          <div class="convo-msg">
+            <span class="convo-label convo-label--client">PINE POINT</span>
+            <p>Yes, varies by job size and type of wood. If no wood removed, target large trees at $1,400 for median price. Also, can we adjust the descriptions to reflect anything 9" diameter or larger?</p>
+          </div>
+          <div class="convo-msg">
+            <span class="convo-label convo-label--followup">FITFO FOLLOWUP</span>
+            <p>Confirmed — $1,400 median for large trees when wood is left on property. Wood removal pricing varies by job — <strong>following up to get the removal price range</strong> before wiring into the estimator. 9" diameter descriptor for large trees: will add to the estimate flow once you confirm placement.</p>
           </div>
         </div>
         <div class="card-reply">
           <label class="card-reply__label" for="reply-pricing">Your reply</label>
-          <textarea class="card-reply__textarea" id="reply-pricing" data-reply-id="need-pricing" placeholder="What feels right or wrong about the price ranges? Anything you'd tune?"></textarea>
+          <textarea class="card-reply__textarea" id="reply-pricing" data-reply-id="need-pricing" placeholder="Wood removal price range when hauling? Confirm 9&quot; diameter placement?"></textarea>
           <div class="card-reply__actions">
             <button class="card-check">Mark addressed</button>
-            <span class="card-reply__hint">Saved as you type. Submit at the bottom of this section sends everything in one go.</span>
+            <span class="card-reply__hint">Saved as you type. Submit at the bottom sends everything in one go.</span>
           </div>
           <div class="card-reply__history" data-history-empty="true"></div>
         </div>
       </div>
 
       <div class="card card--checkable" data-need-id="need-invoicing" data-card-status="in-progress">
-        <h3>2. Invoicing — what do you use today? <span class="card-status card-status--in-progress">In Progress</span></h3>
-        <p>If I understood right, you've been doing invoices in Excel — confirm? The Estimate # (e.g. <code>2026_00001</code>) is designed to bridge the online lead to the real invoice so every customer keeps one number from first click through to paid.</p>
-        <p>A few things to think about:</p>
-        <ul>
-          <li><strong>Not every job comes through the website</strong> — totally fine. We can still tag every customer with an estimate # (you'd manually issue one for walk-ups using the same format) so the data feels uniform regardless of source.</li>
-          <li><strong>The cleanest path is probably Google Sheets</strong> — same Drive as your leads, you can copy-paste from the All Leads tab into a "2026 Invoices" tab, totals roll up automatically, no more files lost on a laptop. I can set up an invoice template tab if you want to try it.</li>
-          <li><strong>Sticking with Excel is also fine</strong> — zero migration. Tradeoff is the data lives in two places and you'd manually copy estimate #s across.</li>
-        </ul>
+        <h3>2. Invoicing <span class="card-status card-status--in-progress">In Progress</span></h3>
+        <p>Google Sheets invoice template — lives in the same Drive folder as your leads. Estimate #, customer name, and job details pre-filled when you open it.</p>
         <div class="convo-thread">
           <div class="convo-msg">
             <span class="convo-label convo-label--fitfo">FITFO</span>
@@ -3007,25 +3006,36 @@ function installTrigger() {
             <p>Definitely interested in trying out a Sheets template. Would be much easier than my current process.</p>
           </div>
           <div class="convo-msg">
+            <span class="convo-label convo-label--fitfo">FITFO</span>
+            <p>What does your current invoice look like? Do you itemize, charge tax, track deposits, or keep it to one total line? Attach a sample if you have one.</p>
+          </div>
+          <div class="convo-msg">
+            <span class="convo-label convo-label--client">PINE POINT</span>
+            <p>No tax, no deposits. I'm ok with one total line as long as there is functionality to itemize — optional.</p>
+          </div>
+          <div class="convo-msg">
             <span class="convo-label convo-label--followup">FITFO FOLLOWUP</span>
-            <p>Building the invoice template — see Follow-up 1 → Item 2 for the specifics (no tax, no deposits, one total line with optional itemization).</p>
+            <p>Building the template now — no tax line, no deposit tracking, one total row with optional itemized breakdown. In queue.</p>
           </div>
         </div>
         <div class="card-reply">
           <label class="card-reply__label" for="reply-invoicing">Your reply</label>
-          <textarea class="card-reply__textarea" id="reply-invoicing" data-reply-id="need-invoicing" placeholder="What do you use for invoices today? Any interest in trying Google Sheets?"></textarea>
+          <textarea class="card-reply__textarea" id="reply-invoicing" data-reply-id="need-invoicing" placeholder="Any other details on how you want the template structured?"></textarea>
+          <div style="margin-top:10px">
+            <label class="card-reply__label" style="display:block;margin-bottom:6px">Attach sample invoices <span style="font-weight:400;color:var(--light-gray);text-transform:none;letter-spacing:0">(optional — PDF, image, or Excel)</span></label>
+            <input type="file" id="fu1-invoice-files" multiple accept=".pdf,.xls,.xlsx,.doc,.docx,image/*" style="font-size:0.85rem;color:var(--off-white)">
+          </div>
           <div class="card-reply__actions">
             <button class="card-check">Mark addressed</button>
-            <span class="card-reply__hint">Saved as you type. Submit at the bottom of this section sends everything in one go.</span>
+            <span class="card-reply__hint">Saved as you type. Attached files are sent with the submit below.</span>
           </div>
           <div class="card-reply__history" data-history-empty="true"></div>
         </div>
       </div>
 
       <div class="card card--checkable" data-need-id="need-scheduling" data-card-status="complete">
-        <h3>3. Callback scheduling style <span class="card-status card-status--complete">Complete</span></h3>
-        <p>Right now customers pick a time window (Morning / Afternoon / Evening / Weekend). Cleanest alternative: a free Calendly link where they pick a specific 15-min slot with calendar invites + reminders. Less phone tag, but another tool to maintain.</p>
-        <p>Either is fine — say which you prefer.</p>
+        <h3>3. Scheduling &amp; callbacks <span class="card-status card-status--complete">Complete</span></h3>
+        <p>How customers reach you after seeing their estimate, and how you manage your calendar.</p>
         <div class="convo-thread">
           <div class="convo-msg">
             <span class="convo-label convo-label--fitfo">FITFO</span>
@@ -3037,15 +3047,27 @@ function installTrigger() {
           </div>
           <div class="convo-msg">
             <span class="convo-label convo-label--followup">FITFO FOLLOWUP</span>
-            <p><span class="convo-done">✓ Done</span> — contact method picker now shows Email / Text / Phone Call. Choosing phone shows the time-window selector. Time slots only appear when a callback is needed.</p>
+            <p><span class="convo-done">✓ Done</span> — contact method picker now shows Email / Text / Phone Call. Choosing phone shows the time-window selector.</p>
+          </div>
+          <div class="convo-msg">
+            <span class="convo-label convo-label--fitfo">FITFO</span>
+            <p>How do you manage your schedule today? Do you always call/text before heading out? Calendar link, Calendly, or keep the current flow?</p>
+          </div>
+          <div class="convo-msg">
+            <span class="convo-label convo-label--client">PINE POINT</span>
+            <p>No need to change this right now — I don't handle any of it and it's a lot of coordination between subcontractors and employees. We only work weekends for now.</p>
+          </div>
+          <div class="convo-msg">
+            <span class="convo-label convo-label--followup">FITFO FOLLOWUP</span>
+            <p><span class="convo-done">✓ Closed</span> — no scheduling changes at this stage. Keeping the current flow. Revisit when weekend-only scheduling changes.</p>
           </div>
         </div>
         <div class="card-reply">
           <label class="card-reply__label" for="reply-scheduling">Your reply</label>
-          <textarea class="card-reply__textarea" id="reply-scheduling" data-reply-id="need-scheduling" placeholder="Time-window picker (current) or Calendly-style specific slots?"></textarea>
+          <textarea class="card-reply__textarea" id="reply-scheduling" data-reply-id="need-scheduling" placeholder="Anything else on scheduling or callback flow?"></textarea>
           <div class="card-reply__actions">
             <button class="card-check">Mark addressed</button>
-            <span class="card-reply__hint">Saved as you type. Submit at the bottom of this section sends everything in one go.</span>
+            <span class="card-reply__hint">Saved as you type. Submit at the bottom sends everything in one go.</span>
           </div>
           <div class="card-reply__history" data-history-empty="true"></div>
         </div>
@@ -3087,14 +3109,19 @@ function installTrigger() {
         </div>
       </div>
 
-      <div class="card">
-        <h3>5. Already confirmed (just acknowledging)</h3>
+      <div class="card card--checkable" data-need-id="need-confirmed" data-card-status="complete">
+        <h3>5. Already confirmed <span class="card-status card-status--complete">Complete</span></h3>
         <table class="data-table" style="margin-top:8px">
-          <tr><td><strong>Service area towns</strong></td><td>Leaving as is: Leicester, Spencer, Paxton, Auburn, Charlton, Oxford, Worcester, Rutland, Holden, Sterling</td></tr>
-          <tr><td><strong>Years in business</strong></td><td>"over 3 years"</td></tr>
-          <tr><td><strong>Storm / emergency calls</strong></td><td>Yes — already on the site</td></tr>
-          <tr><td><strong>Custom stump carving</strong></td><td>Out — removed from site materials</td></tr>
+          <tr><td><strong>Service area towns</strong></td><td>Leicester, Spencer, Paxton, Auburn, Charlton, Oxford, Worcester, Rutland, Holden, Sterling, Grafton, Boylston, Northbridge, and surrounding towns — <span class="convo-done">✓ expanded</span></td></tr>
+          <tr><td><strong>Years in business</strong></td><td>"over 3 years" — <span class="convo-done">✓ on site</span></td></tr>
+          <tr><td><strong>Storm / emergency calls</strong></td><td>Yes — <span class="convo-done">✓ on site</span></td></tr>
+          <tr><td><strong>Custom stump carving</strong></td><td>Out — <span class="convo-done">✓ removed from site</span></td></tr>
         </table>
+        <div class="card-reply">
+          <div class="card-reply__actions" style="margin-top:12px">
+            <button class="card-check">Mark acknowledged</button>
+          </div>
+        </div>
       </div>
 
       <div class="card card--checkable" data-need-id="need-small-items" data-card-status="followup">
@@ -3115,7 +3142,7 @@ function installTrigger() {
           </div>
           <div class="convo-msg">
             <span class="convo-label convo-label--followup">FITFO FOLLOWUP</span>
-            <p>Send photos to <strong>keith@fitfosystems.com</strong> — we'll swap them in on the next update. The gallery carousel is already built and ready. For future self-service photo management, an admin upload page is queued for a later stage.</p>
+            <p>Send photos to <strong>fitfo@fitfosystems.com</strong> — we'll swap them in on the next update. The gallery carousel is already built and ready. For future self-service photo management, an admin upload page is queued for a later stage.</p>
           </div>
         </div>
         <div class="card-reply">
@@ -3153,146 +3180,9 @@ function installTrigger() {
         </div>
       </div>
 
-      <div class="test-summary" id="need-summary">
-        <div class="test-summary__counts">
-          <span class="ok-count"><strong id="need-filled-count">0</strong> of 6 cards have notes</span>
-        </div>
-        <p style="color:var(--off-white);font-size:0.95rem;margin:0 0 14px">Hit submit anytime — partial replies are fine. (The "Already confirmed" card is acknowledgments only and doesn't count toward this.) Each submission is timestamped and shown under the cards you replied to.</p>
-        <div class="test-summary__actions">
-          <button type="button" class="test-submit" id="need-submit" disabled>Submit input</button>
-          <span class="test-summary__hint" id="need-submit-hint">Type anything to enable. Drafts auto-save to your browser as you go.</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- FOLLOW-UP 1 -->
-    <section id="followup1" data-keywords="followup follow-up trunk wood pricing invoicing calendar scheduling urgency incentive booking offer">
-      <div class="section-eyebrow">Round 2 — based on your feedback</div>
-      <h2>Follow-up 1</h2>
-      <p class="lead">We've shipped a bunch of changes based on your initial feedback. A few open questions came out of that work — answers here will let us finish the remaining items cleanly.</p>
-
-      <div class="section-progress">
-        <span class="section-progress__label">Items addressed: <span id="fu1-progress-text">0 / 4</span></span>
-        <div class="section-progress__bar"><div class="section-progress__fill" id="fu1-progress-fill"></div></div>
-      </div>
-
-      <div class="card card--checkable" data-need-id="fu1-trunk-wood" data-card-status="followup">
-        <h3>1. Trunk wood — does it affect pricing? <span class="card-status card-status--followup">Followup Requested</span></h3>
-        <p>When we remove a tree, we added a question asking whether the customer wants the trunk wood left on the property. We held off on wiring it into the price estimate because we weren't sure if keeping vs. hauling actually changes what you charge.</p>
-        <p>Two questions:</p>
-        <ul>
-          <li>Does leaving trunk wood on-site vs. hauling it away change your price?</li>
-          <li>If yes — roughly how much? (e.g. flat add-on, percentage, varies by job size)</li>
-        </ul>
-        <p style="color:var(--light-gray);font-size:0.9rem;margin-top:10px">If it doesn't affect price, we'll keep the question as context for you when you review the lead — no math change needed. If it does, we'll tune the estimator to reflect it.</p>
-        <div class="convo-thread">
-          <div class="convo-msg">
-            <span class="convo-label convo-label--fitfo">FITFO</span>
-            <p>Does leaving trunk wood vs. hauling it away change what you charge? If yes — roughly how much?</p>
-          </div>
-          <div class="convo-msg">
-            <span class="convo-label convo-label--client">PINE POINT</span>
-            <p>Yes, varies by job size and type of wood. If no wood removed, target large trees at $1,400 for median price. Also, can we adjust the descriptions to reflect anything 9" diameter or larger?</p>
-          </div>
-          <div class="convo-msg">
-            <span class="convo-label convo-label--followup">FITFO FOLLOWUP</span>
-            <p>Confirmed: $1,400 median for large trees when wood is left on property. Wood removal pricing varies by job — <strong>following up to get the removal price range</strong> before wiring it into the estimator. 9" diameter descriptor for large trees: will add to the estimate flow once you confirm the placement.</p>
-          </div>
-        </div>
-        <div class="card-reply">
-          <label class="card-reply__label" for="fu1-reply-trunk-wood">Your reply</label>
-          <textarea class="card-reply__textarea" id="fu1-reply-trunk-wood" data-reply-id="fu1-trunk-wood" placeholder="Does hauling trunk wood change your price? If so, roughly how much?"></textarea>
-          <div class="card-reply__actions">
-            <button class="card-check">Mark addressed</button>
-            <span class="card-reply__hint">Saved as you type. Submit at the bottom sends everything in one go.</span>
-          </div>
-          <div class="card-reply__history" data-history-empty="true"></div>
-        </div>
-      </div>
-
-      <div class="card card--checkable" data-need-id="fu1-invoicing" data-card-status="in-progress">
-        <h3>2. Invoicing — help us build it right <span class="card-status card-status--in-progress">In Progress</span></h3>
-        <p>We're building a Google Sheets invoice template that lives in the same Drive folder as your leads — estimate number, customer name, and job details will already be there when you open it. To make sure it matches how you actually work, two quick things:</p>
-        <ul>
-          <li><strong>What does your current invoice look like?</strong> Attach a sample below (blank is fine — we just want to see the fields you're used to). If you don't have a digital copy, just describe what you typically include: job description, line items, tax, deposit, final balance, etc.</li>
-          <li><strong>Anything you definitely want included or excluded?</strong> For example — do you itemize by service type, charge tax, track deposits separately, or keep it simple with one total line?</li>
-        </ul>
-        <div class="convo-thread">
-          <div class="convo-msg">
-            <span class="convo-label convo-label--fitfo">FITFO</span>
-            <p>What does your current invoice look like? Do you itemize, charge tax, track deposits, or keep it to one total line?</p>
-          </div>
-          <div class="convo-msg">
-            <span class="convo-label convo-label--client">PINE POINT</span>
-            <p>No tax, no deposits. I'm ok with one total line as long as there is functionality to itemize — optional.</p>
-          </div>
-          <div class="convo-msg">
-            <span class="convo-label convo-label--followup">FITFO FOLLOWUP</span>
-            <p>Building the template now — no tax line, no deposit tracking, one total row with optional itemized breakdown. In queue (last item in this round).</p>
-          </div>
-        </div>
-        <div class="card-reply">
-          <label class="card-reply__label" for="fu1-reply-invoicing">Your reply</label>
-          <textarea class="card-reply__textarea" id="fu1-reply-invoicing" data-reply-id="fu1-invoicing" placeholder="What do you use for invoices today, and how much do you want to change?"></textarea>
-          <div style="margin-top:10px">
-            <label class="card-reply__label" style="display:block;margin-bottom:6px">Attach sample invoices <span style="font-weight:400;color:var(--light-gray);text-transform:none;letter-spacing:0">(optional — PDF, image, or Excel · helps us match your format)</span></label>
-            <input type="file" id="fu1-invoice-files" multiple accept=".pdf,.xls,.xlsx,.doc,.docx,image/*" style="font-size:0.85rem;color:var(--off-white)">
-          </div>
-          <div class="card-reply__actions">
-            <button class="card-check">Mark addressed</button>
-            <span class="card-reply__hint">Saved as you type. Attached files are sent with the submit below.</span>
-          </div>
-          <div class="card-reply__history" data-history-empty="true"></div>
-        </div>
-      </div>
-
-      <div class="card card--checkable" data-need-id="fu1-scheduling" data-card-status="closed">
-        <h3>3. Scheduling — how do you manage your calendar today? <span class="card-status card-status--closed">Closed</span></h3>
-        <p>Right now the site collects callback requests and emails them to you, and you coordinate from there. We're looking at options that could make the urgency message ("limited slots this week") actually true — which makes it far more effective.</p>
-        <p>A few options ranging from simple to more involved:</p>
-        <ul>
-          <li><strong>Link to your calendar</strong> — a "Book a time →" link to a Calendly or Google Calendar booking page. You confirm every request manually before it's locked.</li>
-          <li><strong>Request-based Calendly</strong> — customer picks from slots you publish, you get notified and approve or decline. You stay in control. We could wire this into the estimate result so the button opens directly into your real availability.</li>
-          <li><strong>Keep current flow</strong> — no change, just the urgency line we've already added.</li>
-        </ul>
-        <p>Before we go further on this: <strong>do you always prefer a phone call or text before heading out to a job?</strong> That changes whether "confirmed slot" means anything or whether there's always a call in between regardless.</p>
-        <div class="convo-thread">
-          <div class="convo-msg">
-            <span class="convo-label convo-label--fitfo">FITFO</span>
-            <p>How do you manage your schedule today? Do you always call/text before heading out? Calendar link, Calendly, or keep the current flow?</p>
-          </div>
-          <div class="convo-msg">
-            <span class="convo-label convo-label--client">PINE POINT</span>
-            <p>No need to change this right now — I don't handle any of it and it's a lot of coordination between subcontractors and employees. We only work weekends for now.</p>
-          </div>
-          <div class="convo-msg">
-            <span class="convo-label convo-label--followup">FITFO FOLLOWUP</span>
-            <p><span class="convo-done">✓ Closed</span> — no scheduling changes at this stage. Keeping the current flow (urgency line under the button + callback request). Revisit when weekend-only scheduling changes.</p>
-          </div>
-        </div>
-        <div class="card-reply">
-          <label class="card-reply__label" for="fu1-reply-scheduling">Your reply</label>
-          <textarea class="card-reply__textarea" id="fu1-reply-scheduling" data-reply-id="fu1-scheduling" placeholder="How do you manage your schedule today? And do you always call/text before heading out?"></textarea>
-          <div class="card-reply__actions">
-            <button class="card-check">Mark addressed</button>
-            <span class="card-reply__hint">Saved as you type. Submit at the bottom sends everything in one go.</span>
-          </div>
-          <div class="card-reply__history" data-history-empty="true"></div>
-        </div>
-      </div>
-
       <div class="card card--checkable" data-need-id="fu1-script-url" data-card-status="complete">
-        <h3>4. Quick check — confirm your script URL <span class="card-status card-status--complete">Complete</span></h3>
-        <p>When you sent over your Apps Script URL it was in this format:</p>
-        <p style="background:var(--charcoal);padding:10px 14px;border-radius:6px;font-size:0.82rem;word-break:break-all;margin:10px 0"><code>https://script.googleusercontent.com/macros/echo?user_content_key=...</code></p>
-        <p>That's typically a <strong>preview URL</strong>, not the live deployment URL. The one the site needs to actually send leads to your inbox looks like this instead:</p>
-        <p style="background:var(--charcoal);padding:10px 14px;border-radius:6px;font-size:0.82rem;margin:10px 0"><code>https://script.google.com/macros/s/<em>[your-script-id]</em>/exec</code></p>
-        <p>To grab the right one: in the Apps Script editor → <strong>Deploy → Manage deployments</strong> → copy the URL under "Web app."</p>
-        <p>Two options — just reply with one:</p>
-        <ul>
-          <li><strong>"No issues"</strong> — if you've already done a test submission and the leads are hitting your inbox, you're good.</li>
-          <li><strong>Paste your <code>/exec</code> URL</strong> — and we'll swap it in. One-line change, two minutes.</li>
-        </ul>
+        <h3>8. Apps Script URL <span class="card-status card-status--complete">Complete</span></h3>
+        <p>Confirming the correct deployment URL so leads actually reach your inbox.</p>
         <div class="convo-thread">
           <div class="convo-msg">
             <span class="convo-label convo-label--fitfo">FITFO</span>
@@ -3304,12 +3194,12 @@ function installTrigger() {
           </div>
           <div class="convo-msg">
             <span class="convo-label convo-label--followup">FITFO FOLLOWUP</span>
-            <p><span class="convo-done">✓ Done</span> — correct <code>/exec</code> URL confirmed and swapped into the site. Leads now routing directly to your script. <strong>One action needed:</strong> copy the latest script from the <a href="#script">Apps Script source</a> section above and redeploy (Deploy → Manage deployments → Edit → Deploy) to get all the latest fixes live in your account.</p>
+            <p><span class="convo-done">✓ Done</span> — correct <code>/exec</code> URL confirmed and swapped into the site. Leads now routing directly to your script. <strong>One action needed:</strong> copy the latest script from the <a href="#script">Apps Script source</a> section above and redeploy (Deploy → Manage deployments → Edit → Deploy) to pick up all the latest fixes.</p>
           </div>
         </div>
         <div class="card-reply">
-          <label class="card-reply__label" for="fu1-reply-script-url">Your reply</label>
-          <textarea class="card-reply__textarea" id="fu1-reply-script-url" data-reply-id="fu1-script-url" placeholder='"No issues" or paste your /exec URL here'></textarea>
+          <label class="card-reply__label" for="reply-script-url">Your reply</label>
+          <textarea class="card-reply__textarea" id="reply-script-url" data-reply-id="fu1-script-url" placeholder='"Redeployed" or any notes'></textarea>
           <div class="card-reply__actions">
             <button class="card-check">Mark addressed</button>
             <span class="card-reply__hint">Saved as you type. Submit at the bottom sends everything in one go.</span>
@@ -3318,14 +3208,14 @@ function installTrigger() {
         </div>
       </div>
 
-      <div class="test-summary" id="fu1-summary">
+      <div class="test-summary" id="need-summary">
         <div class="test-summary__counts">
-          <span class="ok-count"><strong id="fu1-filled-count">0</strong> of 4 cards have notes</span>
+          <span class="ok-count"><strong id="need-filled-count">0</strong> of 8 cards have notes</span>
         </div>
         <p style="color:var(--off-white);font-size:0.95rem;margin:0 0 14px">Hit submit anytime — partial replies are fine. Each submission is timestamped and shown under the card you replied to.</p>
         <div class="test-summary__actions">
-          <button type="button" class="test-submit" id="fu1-submit" disabled>Send replies</button>
-          <span class="test-summary__hint" id="fu1-submit-hint">Type anything to enable. Drafts auto-save to your browser as you go.</span>
+          <button type="button" class="test-submit" id="need-submit" disabled>Submit input</button>
+          <span class="test-summary__hint" id="need-submit-hint">Type anything to enable. Drafts auto-save to your browser as you go.</span>
         </div>
       </div>
     </section>
@@ -3443,7 +3333,7 @@ function installTrigger() {
     });
     // Show/hide section-level empty state: if ALL checkable cards in a section are filtered out,
     // collapse just the card list and show a gentle note. Keep section headings visible.
-    ['need', 'followup1'].forEach(sectionId => {
+    ['need'].forEach(sectionId => {
       const sec = document.getElementById(sectionId);
       if (!sec) return;
       const cards = Array.from(sec.querySelectorAll('.card--checkable[data-card-status]'));
@@ -3882,7 +3772,7 @@ function installTrigger() {
           if (drafts.length === 0) {
             needSubmitHint.textContent = 'Type anything to enable. Drafts auto-save to your browser as you go.';
           } else {
-            needSubmitHint.textContent = drafts.length + ' of 6 cards have notes (partial submissions are fine — drafts stay saved).';
+            needSubmitHint.textContent = drafts.length + ' of ' + needCheckableCards.length + ' cards have notes (partial submissions are fine — drafts stay saved).';
           }
         }
       }
@@ -3906,18 +3796,24 @@ function installTrigger() {
         lines.push(d.text);
         lines.push('');
       });
+      // Collect any invoice files attached to the invoicing card.
+      const invoiceAttachments = await readFilesAsAttachments(document.getElementById('fu1-invoice-files'));
+      if (invoiceAttachments.length) lines.push('--- ' + invoiceAttachments.length + ' invoice file' + (invoiceAttachments.length === 1 ? '' : 's') + ' attached ---');
       const body = lines.join('\n');
 
       setSubmitState(needSubmitBtn, 'sending', 'Sending…');
       needSubmitBtn.disabled = true;
 
-      const result = await sendBehindTheScenes({
-        subject: '[Pine Point handoff] Input batch (' + drafts.length + ' item' + (drafts.length === 1 ? '' : 's') + ')',
+      const payload = {
+        subject: '[Pine Point handoff] Input batch (' + drafts.length + ' item' + (drafts.length === 1 ? '' : 's') + (invoiceAttachments.length ? ', ' + invoiceAttachments.length + ' attachment' + (invoiceAttachments.length === 1 ? '' : 's') : '') + ')',
         kind: 'need_batch',
         item_count: String(drafts.length),
         message: body,
         page: location.href
-      });
+      };
+      if (invoiceAttachments.length) payload.invoice_attachments = JSON.stringify(invoiceAttachments);
+
+      const result = await sendBehindTheScenes(payload);
 
       if (result.ok) {
         setSubmitState(needSubmitBtn, 'sent', 'Sent ✓ thanks');

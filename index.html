@@ -1091,7 +1091,9 @@
     .card-status--complete   { background: rgba(45,90,39,0.3);  color: #7ec97a; border: 1px solid rgba(126,201,122,0.4); }
     .card-status--in-progress{ background: rgba(56,139,182,0.2); color: #72bfe8; border: 1px solid rgba(114,191,232,0.35); }
     .card-status--followup   { background: rgba(212,173,26,0.2); color: #e8c84a; border: 1px solid rgba(212,173,26,0.4); }
-    .card-status--closed     { background: rgba(160,160,160,0.18); color: #d0d0d0; border: 1px solid rgba(210,210,210,0.35); }
+    /* card-status--closed removed — use complete instead */
+    /* Hide "Mark addressed" on already-complete cards — nothing left to do */
+    .card--checkable[data-card-status="complete"] .card-check { display: none; }
 
     /* === Status filter bar === */
     .status-filter {
@@ -1154,8 +1156,6 @@
     .status-filter__btn[data-filter="in-progress"].is-active .btn-count { background: rgba(114,191,232,0.25); }
     .status-filter__btn[data-filter="followup"].is-active  { background: rgba(110,85,0,0.35);  border-color: #e8c84a; color: #e8c84a; }
     .status-filter__btn[data-filter="followup"].is-active .btn-count { background: rgba(232,200,74,0.25); }
-    .status-filter__btn[data-filter="closed"].is-active    { background: rgba(80,80,80,0.35);   border-color: #d0d0d0; color: #d0d0d0; }
-    .status-filter__btn[data-filter="closed"].is-active .btn-count { background: rgba(210,210,210,0.2); }
     .card--filtered-out { display: none !important; }
 
     /* === Conversation thread === */
@@ -1180,7 +1180,7 @@
     }
     .convo-label--fitfo   { background: rgba(45,90,39,0.25); color: #7ec97a; border: 1px solid rgba(126,201,122,0.3); }
     .convo-label--client  { background: rgba(245,240,235,0.1); color: var(--off-white); border: 1px solid rgba(245,240,235,0.2); }
-    .convo-label--followup{ background: rgba(212,173,26,0.18); color: #e8c84a; border: 1px solid rgba(212,173,26,0.35); }
+    /* convo-label--followup removed — all FITFO labels use convo-label--fitfo */
     .convo-msg p {
       margin: 0;
       font-size: 0.9rem;
@@ -2940,7 +2940,6 @@ function installTrigger() {
       <button class="status-filter__btn" data-filter="complete">✓ Complete <span class="btn-count"></span></button>
       <button class="status-filter__btn" data-filter="in-progress">In Progress <span class="btn-count"></span></button>
       <button class="status-filter__btn" data-filter="followup">Followup Requested <span class="btn-count"></span></button>
-      <button class="status-filter__btn" data-filter="closed">Closed <span class="btn-count"></span></button>
     </div>
 
     <!-- WHAT WE NEED -->
@@ -2966,7 +2965,7 @@ function installTrigger() {
             <p>All the pricing looks good. Yes, $500 minimum should show. For lot clearing, anything 1+ acre → call for price. Pricing should be about +15% higher. Also want to add a question for whether trunk wood stays on property. Remove the descriptions under pricing — just show Low / Typical / High with the dollar values.</p>
           </div>
           <div class="convo-msg">
-            <span class="convo-label convo-label--followup">FITFO FOLLOWUP</span>
+            <span class="convo-label convo-label--fitfo">FITFO</span>
             <p><span class="convo-done">✓ Done</span> — lot clearing +15% applied, 1+ acre shows "Call for pricing," tier descriptions removed (Low / Typical / High labels only), trunk wood question added to Tree Removal and Lot Clearing flows.</p>
           </div>
           <div class="convo-msg">
@@ -2978,7 +2977,7 @@ function installTrigger() {
             <p>Yes, varies by job size and type of wood. If no wood removed, target large trees at $1,400 for median price. Also, can we adjust the descriptions to reflect anything 9" diameter or larger?</p>
           </div>
           <div class="convo-msg">
-            <span class="convo-label convo-label--followup">FITFO FOLLOWUP</span>
+            <span class="convo-label convo-label--fitfo">FITFO</span>
             <p>Confirmed — $1,400 median for large trees when wood is left on property. Wood removal pricing varies by job — <strong>following up to get the removal price range</strong> before wiring into the estimator. 9" diameter descriptor for large trees: will add to the estimate flow once you confirm placement.</p>
           </div>
         </div>
@@ -3014,7 +3013,7 @@ function installTrigger() {
             <p>No tax, no deposits. I'm ok with one total line as long as there is functionality to itemize — optional.</p>
           </div>
           <div class="convo-msg">
-            <span class="convo-label convo-label--followup">FITFO FOLLOWUP</span>
+            <span class="convo-label convo-label--fitfo">FITFO</span>
             <p>Building the template now — no tax line, no deposit tracking, one total row with optional itemized breakdown. In queue.</p>
           </div>
         </div>
@@ -3046,7 +3045,7 @@ function installTrigger() {
             <p>Could we switch to preferred contact method: email, text, or phone call? If phone call, then select a day/time slot like you have.</p>
           </div>
           <div class="convo-msg">
-            <span class="convo-label convo-label--followup">FITFO FOLLOWUP</span>
+            <span class="convo-label convo-label--fitfo">FITFO</span>
             <p><span class="convo-done">✓ Done</span> — contact method picker now shows Email / Text / Phone Call. Choosing phone shows the time-window selector.</p>
           </div>
           <div class="convo-msg">
@@ -3058,8 +3057,8 @@ function installTrigger() {
             <p>No need to change this right now — I don't handle any of it and it's a lot of coordination between subcontractors and employees. We only work weekends for now.</p>
           </div>
           <div class="convo-msg">
-            <span class="convo-label convo-label--followup">FITFO FOLLOWUP</span>
-            <p><span class="convo-done">✓ Closed</span> — no scheduling changes at this stage. Keeping the current flow. Revisit when weekend-only scheduling changes.</p>
+            <span class="convo-label convo-label--fitfo">FITFO</span>
+            <p><span class="convo-done">✓ Complete</span> — no scheduling changes at this stage. Keeping the current flow. Revisit when weekend-only scheduling changes.</p>
           </div>
         </div>
         <div class="card-reply">
@@ -3094,7 +3093,7 @@ function installTrigger() {
             <p>We can keep and decide based on each lead.</p>
           </div>
           <div class="convo-msg">
-            <span class="convo-label convo-label--followup">FITFO FOLLOWUP</span>
+            <span class="convo-label convo-label--fitfo">FITFO</span>
             <p><span class="convo-done">✓ Confirmed</span> — option (a) locked in. Out-of-area leads get a ⚠ yellow banner in your email so you can triage case-by-case. No customer-facing changes needed.</p>
           </div>
         </div>
@@ -3141,7 +3140,7 @@ function installTrigger() {
             <p>I have some land clearing photos I can send over. Working on getting some better before/afters. What's the process to update?</p>
           </div>
           <div class="convo-msg">
-            <span class="convo-label convo-label--followup">FITFO FOLLOWUP</span>
+            <span class="convo-label convo-label--fitfo">FITFO</span>
             <p>Send photos to <strong>fitfo@fitfosystems.com</strong> — we'll swap them in on the next update. The gallery carousel is already built and ready. For future self-service photo management, an admin upload page is queued for a later stage.</p>
           </div>
         </div>
@@ -3165,7 +3164,7 @@ function installTrigger() {
             <p>Add Holden, Rutland, Grafton, Boylston, Northbridge — maybe surrounding towns?</p>
           </div>
           <div class="convo-msg">
-            <span class="convo-label convo-label--followup">FITFO FOLLOWUP</span>
+            <span class="convo-label convo-label--fitfo">FITFO</span>
             <p><span class="convo-done">✓ Done</span> — all five towns added to the service map and every town listing across the site. Added "and surrounding towns" to the service area text so nearby leads aren't turned away by an incomplete list.</p>
           </div>
         </div>
@@ -3193,7 +3192,7 @@ function installTrigger() {
             <p><code>https://script.google.com/macros/s/AKfycby5Ss1I9EUZP2e0ZuGGkP48JPDYIWjllVY7BadNjRpqiK2JHUyEDgzc_e5-VaVzosi6QQ/exec</code></p>
           </div>
           <div class="convo-msg">
-            <span class="convo-label convo-label--followup">FITFO FOLLOWUP</span>
+            <span class="convo-label convo-label--fitfo">FITFO</span>
             <p><span class="convo-done">✓ Done</span> — correct <code>/exec</code> URL confirmed and swapped into the site. Leads now routing directly to your script. <strong>One action needed:</strong> copy the latest script from the <a href="#script">Apps Script source</a> section above and redeploy (Deploy → Manage deployments → Edit → Deploy) to pick up all the latest fixes.</p>
           </div>
         </div>

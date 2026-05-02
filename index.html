@@ -2870,7 +2870,7 @@ function installTrigger() {
       <p class="lead">We've shipped a bunch of changes based on your initial feedback. A few open questions came out of that work — answers here will let us finish the remaining items cleanly.</p>
 
       <div class="section-progress">
-        <span class="section-progress__label">Items addressed: <span id="fu1-progress-text">0 / 3</span></span>
+        <span class="section-progress__label">Items addressed: <span id="fu1-progress-text">0 / 4</span></span>
         <div class="section-progress__bar"><div class="section-progress__fill" id="fu1-progress-fill"></div></div>
       </div>
 
@@ -2937,9 +2937,32 @@ function installTrigger() {
         </div>
       </div>
 
+      <div class="card card--checkable" data-need-id="fu1-script-url">
+        <h3>4. Quick check — confirm your script URL</h3>
+        <p>When you sent over your Apps Script URL it was in this format:</p>
+        <p style="background:var(--charcoal);padding:10px 14px;border-radius:6px;font-size:0.82rem;word-break:break-all;margin:10px 0"><code>https://script.googleusercontent.com/macros/echo?user_content_key=...</code></p>
+        <p>That's typically a <strong>preview URL</strong>, not the live deployment URL. The one the site needs to actually send leads to your inbox looks like this instead:</p>
+        <p style="background:var(--charcoal);padding:10px 14px;border-radius:6px;font-size:0.82rem;margin:10px 0"><code>https://script.google.com/macros/s/<em>[your-script-id]</em>/exec</code></p>
+        <p>To grab the right one: in the Apps Script editor → <strong>Deploy → Manage deployments</strong> → copy the URL under "Web app."</p>
+        <p>Two options — just reply with one:</p>
+        <ul>
+          <li><strong>"No issues"</strong> — if you've already done a test submission and the leads are hitting your inbox, you're good.</li>
+          <li><strong>Paste your <code>/exec</code> URL</strong> — and we'll swap it in. One-line change, two minutes.</li>
+        </ul>
+        <div class="card-reply">
+          <label class="card-reply__label" for="fu1-reply-script-url">Your reply</label>
+          <textarea class="card-reply__textarea" id="fu1-reply-script-url" data-reply-id="fu1-script-url" placeholder='"No issues" or paste your /exec URL here'></textarea>
+          <div class="card-reply__actions">
+            <button class="card-check">Mark addressed</button>
+            <span class="card-reply__hint">Saved as you type. Submit at the bottom sends everything in one go.</span>
+          </div>
+          <div class="card-reply__history" data-history-empty="true"></div>
+        </div>
+      </div>
+
       <div class="test-summary" id="fu1-summary">
         <div class="test-summary__counts">
-          <span class="ok-count"><strong id="fu1-filled-count">0</strong> of 3 cards have notes</span>
+          <span class="ok-count"><strong id="fu1-filled-count">0</strong> of 4 cards have notes</span>
         </div>
         <p style="color:var(--off-white);font-size:0.95rem;margin:0 0 14px">Hit submit anytime — partial replies are fine. Each submission is timestamped and shown under the card you replied to.</p>
         <div class="test-summary__actions">

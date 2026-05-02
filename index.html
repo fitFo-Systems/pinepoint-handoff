@@ -1071,6 +1071,70 @@
       .mockup-email { padding: 18px 16px; }
     }
 
+    /* === Status badge (on card h3) === */
+    .card-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 3px;
+      vertical-align: middle;
+      margin-left: 10px;
+      white-space: nowrap;
+      position: relative;
+      top: -1px;
+    }
+    .card-status--complete   { background: rgba(45,90,39,0.3);  color: #7ec97a; border: 1px solid rgba(126,201,122,0.4); }
+    .card-status--in-progress{ background: rgba(56,139,182,0.2); color: #72bfe8; border: 1px solid rgba(114,191,232,0.35); }
+    .card-status--followup   { background: rgba(212,173,26,0.2); color: #e8c84a; border: 1px solid rgba(212,173,26,0.4); }
+    .card-status--closed     { background: rgba(107,107,107,0.2);color: var(--light-gray); border: 1px solid rgba(160,160,160,0.3); }
+
+    /* === Status filter bar === */
+    .status-filter {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 28px;
+      padding: 14px 16px;
+      background: var(--charcoal);
+      border: 1px solid var(--dark-gray);
+      border-radius: 6px;
+    }
+    .status-filter__label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--medium-gray);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-right: 4px;
+      white-space: nowrap;
+    }
+    .status-filter__btn {
+      padding: 5px 13px;
+      border-radius: 20px;
+      border: 1px solid var(--dark-gray);
+      background: transparent;
+      color: var(--light-gray);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+    .status-filter__btn:hover { border-color: var(--medium-gray); color: var(--off-white); }
+    .status-filter__btn.is-active { color: var(--white); border-color: currentColor; }
+    .status-filter__btn[data-filter="all"].is-active      { color: var(--off-white); border-color: var(--medium-gray); background: rgba(255,255,255,0.06); }
+    .status-filter__btn[data-filter="complete"].is-active  { color: #7ec97a; border-color: #7ec97a; background: rgba(126,201,122,0.1); }
+    .status-filter__btn[data-filter="in-progress"].is-active{ color: #72bfe8; border-color: #72bfe8; background: rgba(114,191,232,0.1); }
+    .status-filter__btn[data-filter="followup"].is-active  { color: #e8c84a; border-color: #e8c84a; background: rgba(212,173,26,0.12); }
+    .status-filter__btn[data-filter="closed"].is-active    { color: var(--light-gray); border-color: var(--light-gray); background: rgba(160,160,160,0.08); }
+    .card--filtered-out { display: none !important; }
+
     /* === Conversation thread === */
     .convo-thread {
       margin: 18px 0 0;
@@ -2847,6 +2911,16 @@ function installTrigger() {
       </div>
     </section>
 
+    <!-- STATUS FILTER BAR -->
+    <div class="status-filter" id="status-filter">
+      <span class="status-filter__label">Filter by status</span>
+      <button class="status-filter__btn is-active" data-filter="all">All items</button>
+      <button class="status-filter__btn" data-filter="complete">✓ Complete</button>
+      <button class="status-filter__btn" data-filter="in-progress">In Progress</button>
+      <button class="status-filter__btn" data-filter="followup">Followup Requested</button>
+      <button class="status-filter__btn" data-filter="closed">Closed</button>
+    </div>
+
     <!-- WHAT WE NEED -->
     <section id="need" data-keywords="need feedback pricing invoices invoicing quickbooks excel calendly callback scheduling outside area policy">
       <div class="section-eyebrow">Where I need your input</div>
@@ -2857,8 +2931,8 @@ function installTrigger() {
         <div class="section-progress__bar"><div class="section-progress__fill" id="need-progress-fill"></div></div>
       </div>
 
-      <div class="card card--checkable" data-need-id="need-pricing">
-        <h3>1. Pricing reality check</h3>
+      <div class="card card--checkable" data-need-id="need-pricing" data-card-status="followup">
+        <h3>1. Pricing reality check <span class="card-status card-status--followup">Followup Requested</span></h3>
         <p>The math is fully tunable — I can change base rates, multipliers (access, hazards, volume), and the Low/High spread in minutes. Specific things worth flagging:</p>
         <ul>
           <li>Are the price ranges appropriately wide?</li>
@@ -2891,8 +2965,8 @@ function installTrigger() {
         </div>
       </div>
 
-      <div class="card card--checkable" data-need-id="need-invoicing">
-        <h3>2. Invoicing — what do you use today?</h3>
+      <div class="card card--checkable" data-need-id="need-invoicing" data-card-status="in-progress">
+        <h3>2. Invoicing — what do you use today? <span class="card-status card-status--in-progress">In Progress</span></h3>
         <p>If I understood right, you've been doing invoices in Excel — confirm? The Estimate # (e.g. <code>2026_00001</code>) is designed to bridge the online lead to the real invoice so every customer keeps one number from first click through to paid.</p>
         <p>A few things to think about:</p>
         <ul>
@@ -2925,8 +2999,8 @@ function installTrigger() {
         </div>
       </div>
 
-      <div class="card card--checkable" data-need-id="need-scheduling">
-        <h3>3. Callback scheduling style</h3>
+      <div class="card card--checkable" data-need-id="need-scheduling" data-card-status="complete">
+        <h3>3. Callback scheduling style <span class="card-status card-status--complete">Complete</span></h3>
         <p>Right now customers pick a time window (Morning / Afternoon / Evening / Weekend). Cleanest alternative: a free Calendly link where they pick a specific 15-min slot with calendar invites + reminders. Less phone tag, but another tool to maintain.</p>
         <p>Either is fine — say which you prefer.</p>
         <div class="convo-thread">
@@ -2954,8 +3028,8 @@ function installTrigger() {
         </div>
       </div>
 
-      <div class="card card--checkable" data-need-id="need-out-of-area">
-        <h3>4. Out-of-area policy</h3>
+      <div class="card card--checkable" data-need-id="need-out-of-area" data-card-status="complete">
+        <h3>4. Out-of-area policy <span class="card-status card-status--complete">Complete</span></h3>
         <p>Today the email gets a yellow ⚠ banner so you can decide per-lead. What do you actually want to happen?</p>
         <ul>
           <li><strong>(a)</strong> Keep flagging, you decide per lead</li>
@@ -3000,8 +3074,8 @@ function installTrigger() {
         </table>
       </div>
 
-      <div class="card card--checkable" data-need-id="need-small-items">
-        <h3>6. Open small items</h3>
+      <div class="card card--checkable" data-need-id="need-small-items" data-card-status="followup">
+        <h3>6. Open small items <span class="card-status card-status--followup">Followup Requested</span></h3>
         <ul>
           <li><strong>Better photos?</strong> Got any sharper before/afters or specific job shots you'd want swapped in?</li>
           <li><strong>Add your personal cell</strong> alongside the main 774-262-2145?</li>
@@ -3032,8 +3106,8 @@ function installTrigger() {
         </div>
       </div>
 
-      <div class="card card--checkable" data-need-id="need-anything-else">
-        <h3>7. Anything else?</h3>
+      <div class="card card--checkable" data-need-id="need-anything-else" data-card-status="complete">
+        <h3>7. Anything else? <span class="card-status card-status--complete">Complete</span></h3>
         <p>Ideas, things that look wrong, stuff that wasn't covered above — whatever's on your mind. This card gets sent along with the rest in the same batch.</p>
         <div class="convo-thread">
           <div class="convo-msg">
@@ -3079,8 +3153,8 @@ function installTrigger() {
         <div class="section-progress__bar"><div class="section-progress__fill" id="fu1-progress-fill"></div></div>
       </div>
 
-      <div class="card card--checkable" data-need-id="fu1-trunk-wood">
-        <h3>1. Trunk wood — does it affect pricing?</h3>
+      <div class="card card--checkable" data-need-id="fu1-trunk-wood" data-card-status="followup">
+        <h3>1. Trunk wood — does it affect pricing? <span class="card-status card-status--followup">Followup Requested</span></h3>
         <p>When we remove a tree, we added a question asking whether the customer wants the trunk wood left on the property. We held off on wiring it into the price estimate because we weren't sure if keeping vs. hauling actually changes what you charge.</p>
         <p>Two questions:</p>
         <ul>
@@ -3113,8 +3187,8 @@ function installTrigger() {
         </div>
       </div>
 
-      <div class="card card--checkable" data-need-id="fu1-invoicing">
-        <h3>2. Invoicing — help us build it right</h3>
+      <div class="card card--checkable" data-need-id="fu1-invoicing" data-card-status="in-progress">
+        <h3>2. Invoicing — help us build it right <span class="card-status card-status--in-progress">In Progress</span></h3>
         <p>We're building a Google Sheets invoice template that lives in the same Drive folder as your leads — estimate number, customer name, and job details will already be there when you open it. To make sure it matches how you actually work, two quick things:</p>
         <ul>
           <li><strong>What does your current invoice look like?</strong> Attach a sample below (blank is fine — we just want to see the fields you're used to). If you don't have a digital copy, just describe what you typically include: job description, line items, tax, deposit, final balance, etc.</li>
@@ -3149,8 +3223,8 @@ function installTrigger() {
         </div>
       </div>
 
-      <div class="card card--checkable" data-need-id="fu1-scheduling">
-        <h3>3. Scheduling — how do you manage your calendar today?</h3>
+      <div class="card card--checkable" data-need-id="fu1-scheduling" data-card-status="closed">
+        <h3>3. Scheduling — how do you manage your calendar today? <span class="card-status card-status--closed">Closed</span></h3>
         <p>Right now the site collects callback requests and emails them to you, and you coordinate from there. We're looking at options that could make the urgency message ("limited slots this week") actually true — which makes it far more effective.</p>
         <p>A few options ranging from simple to more involved:</p>
         <ul>
@@ -3184,8 +3258,8 @@ function installTrigger() {
         </div>
       </div>
 
-      <div class="card card--checkable" data-need-id="fu1-script-url">
-        <h3>4. Quick check — confirm your script URL</h3>
+      <div class="card card--checkable" data-need-id="fu1-script-url" data-card-status="complete">
+        <h3>4. Quick check — confirm your script URL <span class="card-status card-status--complete">Complete</span></h3>
         <p>When you sent over your Apps Script URL it was in this format:</p>
         <p style="background:var(--charcoal);padding:10px 14px;border-radius:6px;font-size:0.82rem;word-break:break-all;margin:10px 0"><code>https://script.googleusercontent.com/macros/echo?user_content_key=...</code></p>
         <p>That's typically a <strong>preview URL</strong>, not the live deployment URL. The one the site needs to actually send leads to your inbox looks like this instead:</p>
@@ -3330,6 +3404,51 @@ function installTrigger() {
   // Auto-open the first incomplete wizard step
   const firstIncomplete = wizardSteps.find(s => !s.classList.contains('is-done'));
   if (firstIncomplete) firstIncomplete.classList.add('is-open');
+
+  // === Status filter bar ===
+  const statusFilterBar = document.getElementById('status-filter');
+  const statusFilterBtns = statusFilterBar ? Array.from(statusFilterBar.querySelectorAll('.status-filter__btn')) : [];
+  const allStatusCards = Array.from(document.querySelectorAll('.card--checkable[data-card-status]'));
+
+  function applyStatusFilter(filter) {
+    allStatusCards.forEach(card => {
+      if (filter === 'all' || card.dataset.cardStatus === filter) {
+        card.classList.remove('card--filtered-out');
+      } else {
+        card.classList.add('card--filtered-out');
+      }
+    });
+    // Show/hide section-level empty state: if ALL checkable cards in a section are filtered out,
+    // collapse just the card list and show a gentle note. Keep section headings visible.
+    ['need', 'followup1'].forEach(sectionId => {
+      const sec = document.getElementById(sectionId);
+      if (!sec) return;
+      const cards = Array.from(sec.querySelectorAll('.card--checkable[data-card-status]'));
+      const visible = cards.filter(c => !c.classList.contains('card--filtered-out'));
+      let notice = sec.querySelector('.status-filter-empty');
+      if (visible.length === 0) {
+        if (!notice) {
+          notice = document.createElement('p');
+          notice.className = 'status-filter-empty';
+          notice.style.cssText = 'color:var(--medium-gray);font-size:0.9rem;padding:8px 0 4px;';
+          notice.textContent = 'No items with this status in this section.';
+          const firstCard = cards[0];
+          if (firstCard) firstCard.parentNode.insertBefore(notice, firstCard);
+        }
+        notice.style.display = '';
+      } else {
+        if (notice) notice.style.display = 'none';
+      }
+    });
+  }
+
+  statusFilterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      statusFilterBtns.forEach(b => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      applyStatusFilter(btn.dataset.filter);
+    });
+  });
 
   // === Need-cards (What we need from you) — checkable + section progress ===
   const STORAGE_KEY_NEED = 'pinepoint.handoff.needDone.v1';

@@ -2905,22 +2905,31 @@ function installTrigger() {
         <div class="card-reply">
           <label class="card-reply__label" for="fu1-reply-invoicing">Your reply</label>
           <textarea class="card-reply__textarea" id="fu1-reply-invoicing" data-reply-id="fu1-invoicing" placeholder="What do you use for invoices today, and how much do you want to change?"></textarea>
+          <div style="margin-top:10px">
+            <label class="card-reply__label" style="display:block;margin-bottom:6px">Attach sample invoices <span style="font-weight:400;color:var(--light-gray);text-transform:none;letter-spacing:0">(optional — PDF, image, or Excel · helps us match your format)</span></label>
+            <input type="file" id="fu1-invoice-files" multiple accept=".pdf,.xls,.xlsx,.doc,.docx,image/*" style="font-size:0.85rem;color:var(--off-white)">
+          </div>
           <div class="card-reply__actions">
             <button class="card-check">Mark addressed</button>
-            <span class="card-reply__hint">Saved as you type. Submit at the bottom sends everything in one go.</span>
+            <span class="card-reply__hint">Saved as you type. Attached files are sent with the submit below.</span>
           </div>
           <div class="card-reply__history" data-history-empty="true"></div>
         </div>
       </div>
 
       <div class="card card--checkable" data-need-id="fu1-booking-offer">
-        <h3>3. Booking incentive — finish this sentence</h3>
-        <p>We want to add a line to the estimate result screen that gives customers a reason to schedule their follow-up right now rather than thinking about it. The format would be something like:</p>
-        <p style="background:var(--charcoal);padding:12px 16px;border-radius:6px;font-style:italic;margin:12px 0">"Book your follow-up now and we'll <strong>[something valuable]</strong>."</p>
-        <p>It should cost Pine Point little but feel genuinely useful to the customer. What would you offer? Could be something like free debris haul, priority scheduling, a complimentary property assessment while on-site — whatever feels natural to you.</p>
+        <h3>3. Making the "Schedule a Follow-Up" button convert better</h3>
+        <p>The estimate result page already has a nudge below the button:</p>
+        <p style="background:var(--charcoal);padding:12px 16px;border-radius:6px;font-style:italic;margin:12px 0">"Our schedule fills up fast — the sooner you reach out, the sooner we can get you locked in."</p>
+        <p>That's live now and it's a good baseline. We can make it noticeably stronger in two ways — either one or both:</p>
+        <ul>
+          <li><strong>Add a tangible offer.</strong> A line like <em>"Book your follow-up now and we'll [something valuable]."</em> It should cost Pine Point little but feel genuinely useful — think along the lines of a free on-site assessment, priority scheduling, or anything else that comes naturally to you. What would you feel good offering?</li>
+          <li><strong>Tie it to real availability.</strong> If we integrate a calendar (see card 4), we can replace the generic line with something like <em>"2 time slots still open this week — book now."</em> That kind of specificity converts much better because it's honest and concrete.</li>
+        </ul>
+        <p>Your call on whether one or both makes sense. Even just the tangible offer is a meaningful upgrade on its own.</p>
         <div class="card-reply">
           <label class="card-reply__label" for="fu1-reply-booking-offer">Your reply</label>
-          <textarea class="card-reply__textarea" id="fu1-reply-booking-offer" data-reply-id="fu1-booking-offer" placeholder='"Book now and we\'ll…" — what feels right to you?'></textarea>
+          <textarea class="card-reply__textarea" id="fu1-reply-booking-offer" data-reply-id="fu1-booking-offer" placeholder="What would you offer a customer for booking immediately? And are you open to a calendar tie-in?"></textarea>
           <div class="card-reply__actions">
             <button class="card-check">Mark addressed</button>
             <span class="card-reply__hint">Saved as you type. Submit at the bottom sends everything in one go.</span>
@@ -3622,6 +3631,20 @@ function installTrigger() {
     renderFu1History(card);
   });
 
+  // Read files as base64 DataURLs for attaching to the handoff email.
+  async function readFilesAsAttachments(input) {
+    if (!input || !input.files || !input.files.length) return [];
+    return Promise.all(Array.from(input.files).map(file => new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = e => resolve({
+        filename: file.name,
+        mimeType: file.type || 'application/octet-stream',
+        data_base64: e.target.result.split(',')[1]
+      });
+      reader.readAsDataURL(file);
+    })));
+  }
+
   if (fu1SubmitBtn) {
     fu1SubmitBtn.addEventListener('click', async () => {
       const drafts = gatherFu1Drafts();
@@ -3630,16 +3653,23 @@ function installTrigger() {
       const lines = ['Pine Point — Follow-up 1 replies from Jason', '=============================================', 'Submitted: ' + new Date(stamp).toLocaleString(), 'Items in this batch: ' + drafts.length + ' / ' + fu1Cards.length, ''];
       drafts.forEach(d => { lines.push('---- ' + d.topic + ' ----'); lines.push(d.text); lines.push(''); });
 
+      // Collect any invoice files attached to the invoicing card.
+      const invoiceAttachments = await readFilesAsAttachments(document.getElementById('fu1-invoice-files'));
+      if (invoiceAttachments.length) lines.push('--- ' + invoiceAttachments.length + ' invoice file' + (invoiceAttachments.length === 1 ? '' : 's') + ' attached ---');
+
       setSubmitState(fu1SubmitBtn, 'sending', 'Sending…');
       fu1SubmitBtn.disabled = true;
 
-      const result = await sendBehindTheScenes({
-        subject: '[Pine Point follow-up 1] Replies (' + drafts.length + ' item' + (drafts.length === 1 ? '' : 's') + ')',
+      const payload = {
+        subject: '[Pine Point follow-up 1] Replies (' + drafts.length + ' item' + (drafts.length === 1 ? '' : 's') + (invoiceAttachments.length ? ', ' + invoiceAttachments.length + ' attachment' + (invoiceAttachments.length === 1 ? '' : 's') : '') + ')',
         kind: 'followup1_batch',
         item_count: String(drafts.length),
         message: lines.join('\n'),
         page: location.href
-      });
+      };
+      if (invoiceAttachments.length) payload.invoice_attachments = JSON.stringify(invoiceAttachments);
+
+      const result = await sendBehindTheScenes(payload);
 
       if (result.ok) {
         setSubmitState(fu1SubmitBtn, 'sent', 'Sent ✓ thanks');

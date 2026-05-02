@@ -1445,15 +1445,15 @@
  * Pine Point — Lead Capture Endpoint
  *
  * Receives JSON POSTs from pinepointtrees.com (estimate.html):
- *   - formType: "estimate_contact" — user submitted contact form on the estimate page
- *   - formType: "schedule"         — user clicked "Schedule a Follow-Up" after seeing price
+ *   - formType: &quot;estimate_contact&quot; — user submitted contact form on the estimate page
+ *   - formType: &quot;schedule&quot;         — user clicked &quot;Schedule a Follow-Up&quot; after seeing price
  *
  * Email behavior — exactly ONE email per user journey:
- *   - Estimate filled, no schedule within EMAIL_DELAY_MINUTES → "New Lead" email
- *   - Estimate filled + schedule from same phone/email      → "Callback Requested" email only
+ *   - Estimate filled, no schedule within EMAIL_DELAY_MINUTES → &quot;New Lead&quot; email
+ *   - Estimate filled + schedule from same phone/email      → &quot;Callback Requested&quot; email only
  * Both submissions still write rows to their respective sheet tabs regardless.
  *
- * The trigger that sends "New Lead" emails also defends against a race where
+ * The trigger that sends &quot;New Lead&quot; emails also defends against a race where
  * the schedule POST lands at the server before the estimate_contact POST: it
  * checks the Schedule Requests sheet for a recent matching row and skips the
  * lead email if one exists.
@@ -1462,7 +1462,7 @@
  * Short version:
  *   1. Paste this code into Code.gs in the Apps Script editor
  *   2. Run → installTrigger (creates the 1-min time trigger)
- *   3. Deploy → New deployment → Web app → "Anyone" access
+ *   3. Deploy → New deployment → Web app → &quot;Anyone&quot; access
  */
 
 const NOTIFY_EMAIL = Session.getEffectiveUser().getEmail();
@@ -1473,91 +1473,91 @@ const SHEETS = {
   // Clean, deduplicated view that combines Estimate Leads + Schedule Requests
   // into one row per Estimate # with just the columns Jason cares about for
   // follow-up. Each customer = exactly one row, Lead Type updates from
-  // "Lead" → "Callback" when they schedule.
+  // &quot;Lead&quot; → &quot;Callback&quot; when they schedule.
   summary: {
-    name: 'All Leads',
+    name: &#x27;All Leads&#x27;,
     headers: [
-      'Estimate #', 'Name', 'Phone', 'Email', 'ZIP',
-      'Lead Type', 'Job Type', 'Estimate Range'
+      &#x27;Estimate #&#x27;, &#x27;Name&#x27;, &#x27;Phone&#x27;, &#x27;Email&#x27;, &#x27;ZIP&#x27;,
+      &#x27;Lead Type&#x27;, &#x27;Job Type&#x27;, &#x27;Estimate Range&#x27;
     ]
   },
   estimate_contact: {
-    name: 'Estimate Leads',
+    name: &#x27;Estimate Leads&#x27;,
     headers: [
-      'Estimate #', 'Timestamp', 'Name', 'Phone', 'Email',
-      'ZIP', 'City', 'State', 'Distance (mi)', 'Outside Area',
-      'Service', 'Tree Count', 'Tree Height', 'Hazards', 'Access',
-      'Prune Type', 'Lot Size', 'Lot Density', 'End Goal',
-      'Price Low', 'Price Typical', 'Price High',
-      'Notes', 'Photos', 'Page'
+      &#x27;Estimate #&#x27;, &#x27;Timestamp&#x27;, &#x27;Name&#x27;, &#x27;Phone&#x27;, &#x27;Email&#x27;,
+      &#x27;ZIP&#x27;, &#x27;City&#x27;, &#x27;State&#x27;, &#x27;Distance (mi)&#x27;, &#x27;Outside Area&#x27;,
+      &#x27;Service&#x27;, &#x27;Tree Count&#x27;, &#x27;Tree Height&#x27;, &#x27;Hazards&#x27;, &#x27;Access&#x27;,
+      &#x27;Prune Type&#x27;, &#x27;Lot Size&#x27;, &#x27;Lot Density&#x27;, &#x27;End Goal&#x27;,
+      &#x27;Price Low&#x27;, &#x27;Price Typical&#x27;, &#x27;Price High&#x27;,
+      &#x27;Notes&#x27;, &#x27;Photos&#x27;, &#x27;Page&#x27;
     ]
   },
   schedule: {
-    name: 'Schedule Requests',
+    name: &#x27;Schedule Requests&#x27;,
     headers: [
-      'Estimate #', 'Timestamp', 'Name', 'Phone', 'Email',
-      'ZIP', 'City', 'State', 'Distance (mi)', 'Outside Area',
-      'Best Time',
-      'Service', 'Details', 'Price Typical', 'Notes', 'Photos', 'Page'
+      &#x27;Estimate #&#x27;, &#x27;Timestamp&#x27;, &#x27;Name&#x27;, &#x27;Phone&#x27;, &#x27;Email&#x27;,
+      &#x27;ZIP&#x27;, &#x27;City&#x27;, &#x27;State&#x27;, &#x27;Distance (mi)&#x27;, &#x27;Outside Area&#x27;,
+      &#x27;Best Time&#x27;,
+      &#x27;Service&#x27;, &#x27;Details&#x27;, &#x27;Price Typical&#x27;, &#x27;Notes&#x27;, &#x27;Photos&#x27;, &#x27;Page&#x27;
     ]
   },
   pending: {
-    name: '_Pending Lead Emails',
-    headers: ['Queued At', 'Phone Key', 'Email Key', 'Payload JSON'],
+    name: &#x27;_Pending Lead Emails&#x27;,
+    headers: [&#x27;Queued At&#x27;, &#x27;Phone Key&#x27;, &#x27;Email Key&#x27;, &#x27;Payload JSON&#x27;],
     hidden: true  // internal queue used by the script — not for Jason to look at
   }
 };
 
-// Pine Point's service center (Leicester, MA) and operating radius.
+// Pine Point&#x27;s service center (Leicester, MA) and operating radius.
 const SERVICE_CENTER_LAT = 42.2459;
 const SERVICE_CENTER_LNG = -71.9087;
-const SERVICE_RADIUS_MILES = 15;
+const SERVICE_RADIUS_MILES = 20;
 
-const PHOTO_FOLDER_NAME = 'Pine Point Lead Photos';
+const PHOTO_FOLDER_NAME = &#x27;Pine Point Lead Photos&#x27;;
 
 const SERVICE_NAMES = {
-  removal: 'Tree Removal',
-  trimming: 'Trimming &amp; Pruning',
-  lot_clearing: 'Lot Clearing'
+  removal: &#x27;Tree Removal&#x27;,
+  trimming: &#x27;Trimming &amp; Pruning&#x27;,
+  lot_clearing: &#x27;Lot Clearing&#x27;
 };
 
 // Short PascalCase name used in folder + filename patterns.
 const SERVICE_SHORT = {
-  removal: 'Removal',
-  trimming: 'Trimming',
-  lot_clearing: 'LotClearing'
+  removal: &#x27;Removal&#x27;,
+  trimming: &#x27;Trimming&#x27;,
+  lot_clearing: &#x27;LotClearing&#x27;
 };
 
 const LABELS = {
   removal: {
-    treeCount:  { '1': '1 tree', '2-3': '2-3 trees', '4-6': '4-6 trees', '7+': '7 or more trees' },
-    treeHeight: { small: 'small (under 25 ft)', medium: 'medium (25-50 ft)', large: 'large (50-75 ft)', xlarge: 'very large (75+ ft)' },
-    hazards:    { none: 'open area', house: 'near house/structure', powerlines: 'near power lines', both: 'near house &amp; power lines' },
-    access:     { easy: 'easy truck access', limited: 'tight but possible', none: 'difficult / backyard' }
+    treeCount:  { &#x27;1&#x27;: &#x27;1 tree&#x27;, &#x27;2-3&#x27;: &#x27;2-3 trees&#x27;, &#x27;4-6&#x27;: &#x27;4-6 trees&#x27;, &#x27;7+&#x27;: &#x27;7 or more trees&#x27; },
+    treeHeight: { small: &#x27;small (under 25 ft)&#x27;, medium: &#x27;medium (25-50 ft)&#x27;, large: &#x27;large (50-75 ft)&#x27;, xlarge: &#x27;very large (75+ ft)&#x27; },
+    hazards:    { none: &#x27;open area&#x27;, house: &#x27;near house/structure&#x27;, powerlines: &#x27;near power lines&#x27;, both: &#x27;near house &amp; power lines&#x27; },
+    access:     { easy: &#x27;easy truck access&#x27;, limited: &#x27;tight but possible&#x27;, none: &#x27;difficult / backyard&#x27; }
   },
   trimming: {
-    treeCount:  { '1': '1 tree', '2-3': '2-3 trees', '4-6': '4-6 trees', '7+': '7 or more trees' },
-    pruneType:  { overhang: 'overhang clearing', shaping: 'shaping/thinning', deadwood: 'deadwood removal', clearance: 'clearance from structure/lines' },
-    treeHeight: { small: 'small (under 25 ft)', medium: 'medium (25-50 ft)', large: 'large (50-75 ft)', xlarge: 'very large (75+ ft)' },
-    access:     { easy: 'easy truck access', limited: 'tight but possible', none: 'difficult / backyard' }
+    treeCount:  { &#x27;1&#x27;: &#x27;1 tree&#x27;, &#x27;2-3&#x27;: &#x27;2-3 trees&#x27;, &#x27;4-6&#x27;: &#x27;4-6 trees&#x27;, &#x27;7+&#x27;: &#x27;7 or more trees&#x27; },
+    pruneType:  { overhang: &#x27;overhang clearing&#x27;, shaping: &#x27;shaping/thinning&#x27;, deadwood: &#x27;deadwood removal&#x27;, clearance: &#x27;clearance from structure/lines&#x27; },
+    treeHeight: { small: &#x27;small (under 25 ft)&#x27;, medium: &#x27;medium (25-50 ft)&#x27;, large: &#x27;large (50-75 ft)&#x27;, xlarge: &#x27;very large (75+ ft)&#x27; },
+    access:     { easy: &#x27;easy truck access&#x27;, limited: &#x27;tight but possible&#x27;, none: &#x27;difficult / backyard&#x27; }
   },
   lot_clearing: {
-    lotSize:    { small: 'small area (&lt;1/4 acre)', medium: '1/4-1/2 acre', large: '1/2-1 acre', xlarge: '1+ acres' },
-    lotDensity: { brush: 'brush/small trees', mixed: 'mix of brush and large trees', heavy: 'dense woods/hardwoods' },
-    access:     { easy: 'easy access for heavy equipment', limited: 'limited / tight', none: 'difficult — no clear route' },
-    endGoal:    { build: 'construction prep', yard: 'yard/lawn', thin: 'selective thinning' }
+    lotSize:    { small: &#x27;small area (&lt;1/4 acre)&#x27;, medium: &#x27;1/4-1/2 acre&#x27;, large: &#x27;1/2-1 acre&#x27;, xlarge: &#x27;1+ acres&#x27; },
+    lotDensity: { brush: &#x27;brush/small trees&#x27;, mixed: &#x27;mix of brush and large trees&#x27;, heavy: &#x27;dense woods/hardwoods&#x27; },
+    access:     { easy: &#x27;easy access for heavy equipment&#x27;, limited: &#x27;limited / tight&#x27;, none: &#x27;difficult — no clear route&#x27; },
+    endGoal:    { build: &#x27;construction prep&#x27;, yard: &#x27;yard/lawn&#x27;, thin: &#x27;selective thinning&#x27; }
   }
 };
 
 const KEY_LABELS = {
-  treeCount: 'Tree count',
-  treeHeight: 'Tree height',
-  hazards: 'Hazards',
-  access: 'Access',
-  pruneType: 'Prune type',
-  lotSize: 'Lot size',
-  lotDensity: 'Lot density',
-  endGoal: 'End goal'
+  treeCount: &#x27;Tree count&#x27;,
+  treeHeight: &#x27;Tree height&#x27;,
+  hazards: &#x27;Hazards&#x27;,
+  access: &#x27;Access&#x27;,
+  pruneType: &#x27;Prune type&#x27;,
+  lotSize: &#x27;Lot size&#x27;,
+  lotDensity: &#x27;Lot density&#x27;,
+  endGoal: &#x27;End goal&#x27;
 };
 
 // ============================================================
@@ -1569,9 +1569,9 @@ function doPost(e) {
     const data = JSON.parse(e.postData.contents);
     const ss = SpreadsheetApp.getActiveSpreadsheet();
 
-    if (data.formType === 'estimate_contact') {
+    if (data.formType === &#x27;estimate_contact&#x27;) {
       if (!isValidContact(data.contact, data.formType)) {
-        return jsonResponse({ error: 'invalid contact' });
+        return jsonResponse({ error: &#x27;invalid contact&#x27; });
       }
       if (data.contact) data.contact.phone = normalizePhone(data.contact.phone);
       data.estimateNumber = nextEstimateNumber();
@@ -1579,11 +1579,11 @@ function doPost(e) {
       data.photoLinks = savePhotosToDrive(data.photos, data.estimateNumber, data.service, (data.contact || {}).name);
       delete data.photos;
       writeEstimate(ss, data);
-      upsertSummary(ss, data, 'Lead');
+      upsertSummary(ss, data, &#x27;Lead&#x27;);
       queueLeadEmail(ss, data);
-    } else if (data.formType === 'schedule') {
+    } else if (data.formType === &#x27;schedule&#x27;) {
       if (!isValidContact(data.contact, data.formType)) {
-        return jsonResponse({ error: 'invalid contact' });
+        return jsonResponse({ error: &#x27;invalid contact&#x27; });
       }
       if (data.contact) data.contact.phone = normalizePhone(data.contact.phone);
       data.areaCheck = checkServiceArea((data.contact || {}).zip);
@@ -1600,7 +1600,7 @@ function doPost(e) {
         // Schedule arrived AFTER the lead email already went out (or the
         // pending row was already drained). Customer linkage still holds
         // via the matching Estimate # — flag the email so Jason knows
-        // it's the same lead, not a fresh one.
+        // it&#x27;s the same lead, not a fresh one.
         const prior = lookupRecentEstimate(ss, data.contact);
         if (prior) {
           data.estimateNumber = prior.estimateNumber;
@@ -1611,13 +1611,17 @@ function doPost(e) {
         }
       }
       writeSchedule(ss, data);
-      // Once they've scheduled a callback they're no longer a "lead awaiting
-      // follow-up" — remove them from the Estimate Leads tab so that tab
-      // really means "open leads to call." Full detail lives in Schedule
+      // Once they&#x27;ve scheduled a callback they&#x27;re no longer a &quot;lead awaiting
+      // follow-up&quot; — remove them from the Estimate Leads tab so that tab
+      // really means &quot;open leads to call.&quot; Full detail lives in Schedule
       // Requests + the All Leads summary.
       removeEstimateRow(ss, data.estimateNumber);
-      upsertSummary(ss, data, 'Callback');
+      upsertSummary(ss, data, &#x27;Callback&#x27;);
       sendCallbackEmail(data);
+    } else if (data.formType === &#x27;handoff_input&#x27; || data.formType === &#x27;handoff_test&#x27;) {
+      // Posted from the FITFO handoff page (fitfo-systems.github.io/pinepoint-handoff/).
+      // Just forward as an email — no sheet writes, no lead-capture machinery.
+      sendHandoffEmail(data);
     } else {
       writeUnknown(ss, data);
     }
@@ -1629,9 +1633,9 @@ function doPost(e) {
 }
 
 /**
- * Returns a fresh, monotonic-per-year estimate number like "26_00001".
+ * Returns a fresh, monotonic-per-year estimate number like &quot;26_00001&quot;.
  * Counter is stored in ScriptProperties and incremented under a script-level
- * lock so concurrent submissions can't collide on the same number.
+ * lock so concurrent submissions can&#x27;t collide on the same number.
  */
 function nextEstimateNumber() {
   const lock = LockService.getScriptLock();
@@ -1639,10 +1643,10 @@ function nextEstimateNumber() {
   try {
     const props = PropertiesService.getScriptProperties();
     const yyyy = String(new Date().getFullYear());
-    const key = 'estimate_counter_' + yyyy;
-    const next = parseInt(props.getProperty(key) || '0', 10) + 1;
+    const key = &#x27;estimate_counter_&#x27; + yyyy;
+    const next = parseInt(props.getProperty(key) || &#x27;0&#x27;, 10) + 1;
     props.setProperty(key, String(next));
-    return yyyy + '_' + String(next).padStart(5, '0');
+    return yyyy + &#x27;_&#x27; + String(next).padStart(5, &#x27;0&#x27;);
   } finally {
     lock.releaseLock();
   }
@@ -1650,9 +1654,9 @@ function nextEstimateNumber() {
 
 /**
  * Removes any Estimate Leads rows matching the given Estimate #. Called
- * after a schedule submission so a customer doesn't appear in both the
- * Estimate Leads and Schedule Requests tabs simultaneously — they've
- * upgraded from "lead" to "callback" and only belong in one place.
+ * after a schedule submission so a customer doesn&#x27;t appear in both the
+ * Estimate Leads and Schedule Requests tabs simultaneously — they&#x27;ve
+ * upgraded from &quot;lead&quot; to &quot;callback&quot; and only belong in one place.
  */
 function removeEstimateRow(ss, estimateNumber) {
   if (!estimateNumber) return;
@@ -1697,19 +1701,19 @@ function lookupRecentEstimate(ss, contact) {
  */
 /**
  * Defense-in-depth validation. ZIP is mandatory on the initial estimate
- * contact form, but the schedule modal doesn't collect ZIP — the client
+ * contact form, but the schedule modal doesn&#x27;t collect ZIP — the client
  * carries it forward from state.contact, but we still want schedule
- * submissions to succeed if it's missing for any reason.
+ * submissions to succeed if it&#x27;s missing for any reason.
  */
 function isValidContact(c, formType) {
   if (!c) return false;
-  const phoneDigits = String(c.phone || '').replace(/[^0-9]/g, '');
+  const phoneDigits = String(c.phone || &#x27;&#x27;).replace(/[^0-9]/g, &#x27;&#x27;);
   if (phoneDigits.length &lt; 10 || phoneDigits.length &gt; 15) return false;
   if (/^(\d)\1+$/.test(phoneDigits)) return false; // all same digit
   if (c.email &amp;&amp; !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.email)) return false;
 
-  const zip = String(c.zip || '').trim();
-  if (formType === 'estimate_contact') {
+  const zip = String(c.zip || &#x27;&#x27;).trim();
+  if (formType === &#x27;estimate_contact&#x27;) {
     if (!/^\d{5}(-\d{4})?$/.test(zip)) return false;
   } else if (zip) {
     // Schedule etc.: zip is optional, but if provided must be valid.
@@ -1720,56 +1724,56 @@ function isValidContact(c, formType) {
 
 /**
  * Normalize an inbound phone string to a consistent display format so
- * the sheet and email always show "(508) 555-1234" or "+1 (508) 555-1234"
+ * the sheet and email always show &quot;(508) 555-1234&quot; or &quot;+1 (508) 555-1234&quot;
  * regardless of what the user typed.
  */
 function normalizePhone(s) {
-  const digits = String(s || '').replace(/[^0-9]/g, '');
+  const digits = String(s || &#x27;&#x27;).replace(/[^0-9]/g, &#x27;&#x27;);
   if (digits.length === 10) {
-    return '(' + digits.slice(0, 3) + ') ' + digits.slice(3, 6) + '-' + digits.slice(6);
+    return &#x27;(&#x27; + digits.slice(0, 3) + &#x27;) &#x27; + digits.slice(3, 6) + &#x27;-&#x27; + digits.slice(6);
   }
-  if (digits.length === 11 &amp;&amp; digits[0] === '1') {
-    return '+1 (' + digits.slice(1, 4) + ') ' + digits.slice(4, 7) + '-' + digits.slice(7);
+  if (digits.length === 11 &amp;&amp; digits[0] === &#x27;1&#x27;) {
+    return &#x27;+1 (&#x27; + digits.slice(1, 4) + &#x27;) &#x27; + digits.slice(4, 7) + &#x27;-&#x27; + digits.slice(7);
   }
   if (digits.length &gt; 0) return digits;
-  return '';
+  return &#x27;&#x27;;
 }
 
 /**
- * Looks up a US ZIP via the free zippopotam.us API to confirm it's a real
+ * Looks up a US ZIP via the free zippopotam.us API to confirm it&#x27;s a real
  * USPS ZIP and to compute distance from our service center. Returns:
  *   { ok: true,  city, state, lat, lng, miles, withinServiceArea }
- *   { ok: false, reason: 'not_found' | 'http_error' | 'fetch_failed' }
+ *   { ok: false, reason: &#x27;not_found&#x27; | &#x27;http_error&#x27; | &#x27;fetch_failed&#x27; }
  *
  * Failure modes never block the submission — they just leave the
  * area-check empty in the email/sheet.
  */
 function checkServiceArea(zip) {
-  if (!zip) return { ok: false, reason: 'no_zip' };
-  const zip5 = String(zip).split('-')[0];
-  if (!/^\d{5}$/.test(zip5)) return { ok: false, reason: 'bad_format' };
+  if (!zip) return { ok: false, reason: &#x27;no_zip&#x27; };
+  const zip5 = String(zip).split(&#x27;-&#x27;)[0];
+  if (!/^\d{5}$/.test(zip5)) return { ok: false, reason: &#x27;bad_format&#x27; };
   try {
-    const resp = UrlFetchApp.fetch('https://api.zippopotam.us/us/' + zip5, { muteHttpExceptions: true });
+    const resp = UrlFetchApp.fetch(&#x27;https://api.zippopotam.us/us/&#x27; + zip5, { muteHttpExceptions: true });
     if (resp.getResponseCode() !== 200) {
-      return { ok: false, reason: 'not_found', status: resp.getResponseCode() };
+      return { ok: false, reason: &#x27;not_found&#x27;, status: resp.getResponseCode() };
     }
     const data = JSON.parse(resp.getContentText());
     const place = data &amp;&amp; data.places &amp;&amp; data.places[0];
-    if (!place) return { ok: false, reason: 'no_place' };
+    if (!place) return { ok: false, reason: &#x27;no_place&#x27; };
     const lat = parseFloat(place.latitude);
     const lng = parseFloat(place.longitude);
     const miles = haversineMiles(SERVICE_CENTER_LAT, SERVICE_CENTER_LNG, lat, lng);
     return {
       ok: true,
-      city: place['place name'] || '',
-      state: place['state abbreviation'] || '',
+      city: place[&#x27;place name&#x27;] || &#x27;&#x27;,
+      state: place[&#x27;state abbreviation&#x27;] || &#x27;&#x27;,
       lat: lat,
       lng: lng,
       miles: miles,
       withinServiceArea: miles &lt;= SERVICE_RADIUS_MILES
     };
   } catch (err) {
-    return { ok: false, reason: 'fetch_failed', error: String(err) };
+    return { ok: false, reason: &#x27;fetch_failed&#x27;, error: String(err) };
   }
 }
 
@@ -1785,7 +1789,7 @@ function haversineMiles(lat1, lng1, lat2, lng2) {
 }
 
 function doGet() {
-  return jsonResponse({ status: 'ready' });
+  return jsonResponse({ status: &#x27;ready&#x27; });
 }
 
 // ============================================================
@@ -1798,18 +1802,18 @@ function writeEstimate(ss, d) {
   const c = d.contact || {};
   const p = d.price || {};
   const ac = d.areaCheck || {};
-  const distance = (ac.ok &amp;&amp; typeof ac.miles === 'number') ? Number(ac.miles.toFixed(1)) : '';
-  const outside = ac.ok ? (ac.withinServiceArea ? '' : 'YES') : '';
+  const distance = (ac.ok &amp;&amp; typeof ac.miles === &#x27;number&#x27;) ? Number(ac.miles.toFixed(1)) : &#x27;&#x27;;
+  const outside = ac.ok ? (ac.withinServiceArea ? &#x27;&#x27; : &#x27;YES&#x27;) : &#x27;&#x27;;
   sheet.appendRow([
-    d.estimateNumber || '',
+    d.estimateNumber || &#x27;&#x27;,
     new Date(),
-    c.name || '', c.phone || '', c.email || '',
-    c.zip || '', ac.city || '', ac.state || '', distance, outside,
-    d.service || '',
-    a.treeCount || '', a.treeHeight || '', a.hazards || '', a.access || '',
-    a.pruneType || '', a.lotSize || '', a.lotDensity || '', a.endGoal || '',
-    p.low || '', p.typical || '', p.high || '',
-    c.notes || '', formatPhotoUrls(d.photoLinks), d.page || ''
+    c.name || &#x27;&#x27;, c.phone || &#x27;&#x27;, c.email || &#x27;&#x27;,
+    c.zip || &#x27;&#x27;, ac.city || &#x27;&#x27;, ac.state || &#x27;&#x27;, distance, outside,
+    d.service || &#x27;&#x27;,
+    a.treeCount || &#x27;&#x27;, a.treeHeight || &#x27;&#x27;, a.hazards || &#x27;&#x27;, a.access || &#x27;&#x27;,
+    a.pruneType || &#x27;&#x27;, a.lotSize || &#x27;&#x27;, a.lotDensity || &#x27;&#x27;, a.endGoal || &#x27;&#x27;,
+    p.low || &#x27;&#x27;, p.typical || &#x27;&#x27;, p.high || &#x27;&#x27;,
+    c.notes || &#x27;&#x27;, formatPhotoUrls(d.photoLinks), d.page || &#x27;&#x27;
   ]);
 }
 
@@ -1818,30 +1822,30 @@ function writeSchedule(ss, d) {
   const c = d.contact || {};
   const p = d.price || {};
   const ac = d.areaCheck || {};
-  const distance = (ac.ok &amp;&amp; typeof ac.miles === 'number') ? Number(ac.miles.toFixed(1)) : '';
-  const outside = ac.ok ? (ac.withinServiceArea ? '' : 'YES') : '';
+  const distance = (ac.ok &amp;&amp; typeof ac.miles === &#x27;number&#x27;) ? Number(ac.miles.toFixed(1)) : &#x27;&#x27;;
+  const outside = ac.ok ? (ac.withinServiceArea ? &#x27;&#x27; : &#x27;YES&#x27;) : &#x27;&#x27;;
   sheet.appendRow([
-    d.estimateNumber || '',
+    d.estimateNumber || &#x27;&#x27;,
     new Date(),
-    c.name || '', c.phone || '', c.email || '',
-    c.zip || '', ac.city || '', ac.state || '', distance, outside,
-    d.scheduledTime || '',
-    d.service || '', JSON.stringify(d.answers || {}),
-    p.typical || '',
-    d.scheduleNotes || '',
+    c.name || &#x27;&#x27;, c.phone || &#x27;&#x27;, c.email || &#x27;&#x27;,
+    c.zip || &#x27;&#x27;, ac.city || &#x27;&#x27;, ac.state || &#x27;&#x27;, distance, outside,
+    d.scheduledTime || &#x27;&#x27;,
+    d.service || &#x27;&#x27;, JSON.stringify(d.answers || {}),
+    p.typical || &#x27;&#x27;,
+    d.scheduleNotes || &#x27;&#x27;,
     formatPhotoUrls(d.photoLinks),
-    d.page || ''
+    d.page || &#x27;&#x27;
   ]);
 }
 
 function writeUnknown(ss, d) {
-  const sheet = getOrCreate(ss, { name: 'Other', headers: ['Timestamp', 'Raw'] });
+  const sheet = getOrCreate(ss, { name: &#x27;Other&#x27;, headers: [&#x27;Timestamp&#x27;, &#x27;Raw&#x27;] });
   sheet.appendRow([new Date(), JSON.stringify(d)]);
 }
 
 /**
- * Maintains the "All Leads" summary tab — one row per Estimate #.
- * Called with leadType "Lead" on estimate_contact and "Callback" on
+ * Maintains the &quot;All Leads&quot; summary tab — one row per Estimate #.
+ * Called with leadType &quot;Lead&quot; on estimate_contact and &quot;Callback&quot; on
  * schedule. If a row for this Estimate # already exists, updates it in
  * place (so a Lead row becomes a Callback row when the customer
  * schedules). Otherwise appends a new row.
@@ -1851,14 +1855,14 @@ function upsertSummary(ss, d, leadType) {
   const sheet = getOrCreate(ss, SHEETS.summary);
   const c = d.contact || {};
   const p = d.price || {};
-  const range = (p.low &amp;&amp; p.high) ? '$' + p.low + '–$' + p.high : '';
-  const jobType = SERVICE_NAMES[d.service] || d.service || '';
+  const range = (p.low &amp;&amp; p.high) ? &#x27;$&#x27; + p.low + &#x27;–$&#x27; + p.high : &#x27;&#x27;;
+  const jobType = SERVICE_NAMES[d.service] || d.service || &#x27;&#x27;;
   const row = [
     d.estimateNumber,
-    c.name || '',
-    c.phone || '',
-    c.email || '',
-    c.zip || '',
+    c.name || &#x27;&#x27;,
+    c.phone || &#x27;&#x27;,
+    c.email || &#x27;&#x27;,
+    c.zip || &#x27;&#x27;,
     leadType,
     jobType,
     range
@@ -1928,7 +1932,7 @@ function cancelPendingFor(ss, d) {
 
 /**
  * Called by the 1-minute time trigger installed by installTrigger().
- * Walks the pending queue and sends a "New Lead" email for any entry older
+ * Walks the pending queue and sends a &quot;New Lead&quot; email for any entry older
  * than EMAIL_DELAY_MINUTES *unless* a matching schedule row already exists
  * (which would mean the user did schedule — they just raced the network).
  */
@@ -1939,11 +1943,12 @@ function processPendingLeads() {
   const lastRow = sheet.getLastRow();
   if (lastRow &lt; 2) return;
 
-  // Build the set of phone/email keys that scheduled a callback recently.
-  // A schedule POST landing on the server BEFORE its matching estimate_contact
-  // POST (race triggered by client-side photo encoding latency) leaves nothing
-  // for cancelPendingFor() to delete; this safety net catches that case.
-  const scheduledKeys = collectRecentScheduleKeys(ss, EMAIL_DELAY_MINUTES + 5);
+  // Check ALL schedule rows — no time limit. If someone&#x27;s phone or email
+  // appears anywhere in Schedule Requests (regardless of when they scheduled),
+  // we never send a lead email for them. This covers the case where the person
+  // spends more than EMAIL_DELAY_MINUTES on the result screen before clicking
+  // &quot;Schedule a Follow-Up&quot; — the old time-bounded check would miss them.
+  const scheduledKeys = collectAllScheduleKeys(ss);
 
   const cutoff = new Date(Date.now() - EMAIL_DELAY_MINUTES * 60 * 1000);
   const rows = sheet.getRange(2, 1, lastRow - 1, 4).getValues();
@@ -1968,6 +1973,29 @@ function processPendingLeads() {
     }
     sheet.deleteRow(i + 2);
   }
+}
+
+/**
+ * Returns a Set of all normalized phone and email keys that appear in the
+ * Schedule Requests sheet — no time filter. Used by processPendingLeads to
+ * ensure a lead email is never sent once someone has scheduled, regardless
+ * of whether they scheduled before or after the EMAIL_DELAY_MINUTES window.
+ */
+function collectAllScheduleKeys(ss) {
+  const sheet = ss.getSheetByName(SHEETS.schedule.name);
+  const keys = new Set();
+  if (!sheet) return keys;
+  const lastRow = sheet.getLastRow();
+  if (lastRow &lt; 2) return keys;
+  // Schedule Requests columns (1-indexed): 1=Estimate#, 2=Timestamp, 3=Name, 4=Phone, 5=Email
+  const rows = sheet.getRange(2, 1, lastRow - 1, 5).getValues();
+  for (const r of rows) {
+    const pk = normalizeKey(r[3]);
+    const ek = normalizeKey(r[4]);
+    if (pk) keys.add(pk);
+    if (ek) keys.add(ek);
+  }
+  return keys;
 }
 
 function collectRecentScheduleKeys(ss, minutesBack) {
@@ -2001,32 +2029,32 @@ function collectRecentScheduleKeys(ss, minutesBack) {
 function sendLeadEmail(d) {
   const c = d.contact || {};
   const p = d.price || {};
-  const num = d.estimateNumber || '';
-  const service = SERVICE_NAMES[d.service] || d.service || '';
-  const subject = 'New Lead - ' + (service ? service + ' ' : '') + (c.name || 'Pine Point');
+  const num = d.estimateNumber || &#x27;&#x27;;
+  const service = SERVICE_NAMES[d.service] || d.service || &#x27;&#x27;;
+  const subject = &#x27;New Lead - &#x27; + (service ? service + &#x27; &#x27; : &#x27;&#x27;) + (c.name || &#x27;Pine Point&#x27;);
 
   const html = [
-    '&lt;div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;color:#222"&gt;',
-    '&lt;h2 style="margin:0 0 4px;color:#2D5A27"&gt;New Lead&lt;/h2&gt;',
-    num ? '&lt;p style="margin:0 0 4px;font-size:13px;color:#444"&gt;Estimate #: &lt;strong&gt;' + escapeHtml(num) + '&lt;/strong&gt;&lt;/p&gt;' : '',
-    '&lt;p style="margin:0 0 12px;color:#666;font-size:13px"&gt;' +
-      'Estimate submitted ' + EMAIL_DELAY_MINUTES + '+ minutes ago, no callback scheduled yet. ' +
-      'If they schedule one later, you\'ll get a follow-up email referencing this same Estimate #.&lt;/p&gt;',
+    &#x27;&lt;div style=&quot;font-family:Arial,Helvetica,sans-serif;max-width:600px;color:#222&quot;&gt;&#x27;,
+    &#x27;&lt;h2 style=&quot;margin:0 0 4px;color:#2D5A27&quot;&gt;New Lead&lt;/h2&gt;&#x27;,
+    num ? &#x27;&lt;p style=&quot;margin:0 0 4px;font-size:13px;color:#444&quot;&gt;Estimate #: &lt;strong&gt;&#x27; + escapeHtml(num) + &#x27;&lt;/strong&gt;&lt;/p&gt;&#x27; : &#x27;&#x27;,
+    &#x27;&lt;p style=&quot;margin:0 0 12px;color:#666;font-size:13px&quot;&gt;&#x27; +
+      &#x27;Estimate submitted &#x27; + EMAIL_DELAY_MINUTES + &#x27;+ minutes ago, no callback scheduled yet. &#x27; +
+      &#x27;If they schedule one later, you\&#x27;ll get a follow-up email referencing this same Estimate #.&lt;/p&gt;&#x27;,
     outsideAreaBanner(d.areaCheck),
-    htmlSection('Contact', contactRows(c, d.areaCheck)),
-    htmlSection('Job', [
-      ['Service', '&lt;strong&gt;' + escapeHtml(SERVICE_NAMES[d.service] || d.service || '') + '&lt;/strong&gt;']
+    htmlSection(&#x27;Contact&#x27;, contactRows(c, d.areaCheck)),
+    htmlSection(&#x27;Job&#x27;, [
+      [&#x27;Service&#x27;, &#x27;&lt;strong&gt;&#x27; + escapeHtml(SERVICE_NAMES[d.service] || d.service || &#x27;&#x27;) + &#x27;&lt;/strong&gt;&#x27;]
     ].concat(answerRows(d.service, d.answers))),
-    htmlSection('Estimated price', [
-      ['Low',     '$' + escapeHtml(p.low || '?')],
-      ['Typical', '&lt;strong&gt;$' + escapeHtml(p.typical || '?') + '&lt;/strong&gt;'],
-      ['High',    '$' + escapeHtml(p.high || '?')]
+    htmlSection(&#x27;Estimated price&#x27;, [
+      [&#x27;Low&#x27;,     &#x27;$&#x27; + escapeHtml(p.low || &#x27;?&#x27;)],
+      [&#x27;Typical&#x27;, &#x27;&lt;strong&gt;$&#x27; + escapeHtml(p.typical || &#x27;?&#x27;) + &#x27;&lt;/strong&gt;&#x27;],
+      [&#x27;High&#x27;,    &#x27;$&#x27; + escapeHtml(p.high || &#x27;?&#x27;)]
     ]),
-    c.notes ? htmlSection('Their notes', [['', escapeHtml(c.notes)]]) : '',
+    c.notes ? htmlSection(&#x27;Their notes&#x27;, [[&#x27;&#x27;, escapeHtml(c.notes)]]) : &#x27;&#x27;,
     formatPhotosHtml(d.photoLinks),
-    '&lt;p style="color:#888;font-size:12px;margin-top:24px"&gt;Source: ' + escapeHtml(d.page || '') + '&lt;/p&gt;',
-    '&lt;/div&gt;'
-  ].join('');
+    &#x27;&lt;p style=&quot;color:#888;font-size:12px;margin-top:24px&quot;&gt;Source: &#x27; + escapeHtml(d.page || &#x27;&#x27;) + &#x27;&lt;/p&gt;&#x27;,
+    &#x27;&lt;/div&gt;&#x27;
+  ].join(&#x27;&#x27;);
 
   sendHtmlEmail(subject, html, buildAttachments(d.photoLinks));
 }
@@ -2034,52 +2062,68 @@ function sendLeadEmail(d) {
 function sendCallbackEmail(d) {
   const c = d.contact || {};
   const p = d.price || {};
-  const num = d.estimateNumber || '';
-  const service = SERVICE_NAMES[d.service] || d.service || '';
-  const subject = 'Callback Requested - ' + (service ? service + ' ' : '') + (c.name || 'Pine Point');
+  const num = d.estimateNumber || &#x27;&#x27;;
+  const service = SERVICE_NAMES[d.service] || d.service || &#x27;&#x27;;
+
+  // Heading + subject reflect how the customer wants to be reached
+  const method = d.contactMethod || &#x27;phone_call&#x27;;
+  const methodHeading = method === &#x27;text&#x27;  ? &#x27;Followup Text Requested&#x27;
+                      : method === &#x27;email&#x27; ? &#x27;Followup Email Requested&#x27;
+                      :                     &#x27;Callback Requested&#x27;;
+  const subject = methodHeading + &#x27; - &#x27; + (service ? service + &#x27; &#x27; : &#x27;&#x27;) + (c.name || &#x27;Pine Point&#x27;);
+
+  // Contact reach-back row: show phone for call/text, email for email method
+  const reachLabel  = method === &#x27;email&#x27; ? &#x27;Reply to&#x27;    : &#x27;Call / text&#x27;;
+  const reachValue  = method === &#x27;email&#x27; ? emailLink(c.email) : phoneLink(c.phone);
+  const callerRows  = contactRows(c, d.areaCheck).concat([
+    [&#x27;Reach via&#x27;, &#x27;&lt;strong&gt;&#x27; + escapeHtml(methodHeading) + &#x27;&lt;/strong&gt;&#x27;],
+    [reachLabel,  reachValue],
+    // Best time only relevant for phone call
+    ...(method === &#x27;phone_call&#x27;
+      ? [[&#x27;Best time&#x27;, &#x27;&lt;strong&gt;&#x27; + escapeHtml(d.scheduledTime || &#x27;(any)&#x27;) + &#x27;&lt;/strong&gt;&#x27;]]
+      : [])
+  ]);
 
   const html = [
-    '&lt;div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;color:#222"&gt;',
-    '&lt;h2 style="margin:0 0 4px;color:#2D5A27"&gt;Callback Requested&lt;/h2&gt;',
-    num ? '&lt;p style="margin:0 0 12px;font-size:13px;color:#444"&gt;Estimate #: &lt;strong&gt;' + escapeHtml(num) + '&lt;/strong&gt;&lt;/p&gt;' : '&lt;div style="height:12px"&gt;&lt;/div&gt;',
+    &#x27;&lt;div style=&quot;font-family:Arial,Helvetica,sans-serif;max-width:600px;color:#222&quot;&gt;&#x27;,
+    &#x27;&lt;h2 style=&quot;margin:0 0 4px;color:#2D5A27&quot;&gt;&#x27; + escapeHtml(methodHeading) + &#x27;&lt;/h2&gt;&#x27;,
+    num ? &#x27;&lt;p style=&quot;margin:0 0 12px;font-size:13px;color:#444&quot;&gt;Estimate #: &lt;strong&gt;&#x27; + escapeHtml(num) + &#x27;&lt;/strong&gt;&lt;/p&gt;&#x27; : &#x27;&lt;div style=&quot;height:12px&quot;&gt;&lt;/div&gt;&#x27;,
     leadFollowupBanner(d),
     outsideAreaBanner(d.areaCheck),
-    htmlSection('Caller', contactRows(c, d.areaCheck).concat([
-      ['Best time', '&lt;strong&gt;' + escapeHtml(d.scheduledTime || '(any)') + '&lt;/strong&gt;']
-    ])),
-    htmlSection('Job', [
-      ['Service', '&lt;strong&gt;' + escapeHtml(SERVICE_NAMES[d.service] || d.service || '') + '&lt;/strong&gt;']
+    htmlSection(&#x27;Caller&#x27;, callerRows),
+    htmlSection(&#x27;Job&#x27;, [
+      [&#x27;Service&#x27;, &#x27;&lt;strong&gt;&#x27; + escapeHtml(SERVICE_NAMES[d.service] || d.service || &#x27;&#x27;) + &#x27;&lt;/strong&gt;&#x27;]
     ].concat(answerRows(d.service, d.answers))),
-    htmlSection('Estimate', [
-      ['Typical price', '&lt;strong&gt;$' + escapeHtml(p.typical || '?') + '&lt;/strong&gt;']
+    htmlSection(&#x27;Estimate&#x27;, [
+      [&#x27;Typical price&#x27;, &#x27;&lt;strong&gt;$&#x27; + escapeHtml(p.typical || &#x27;?&#x27;) + &#x27;&lt;/strong&gt;&#x27;]
     ]),
-    d.scheduleNotes ? htmlSection('Their note', [['', escapeHtml(d.scheduleNotes)]]) : '',
+    d.scheduleNotes ? htmlSection(&#x27;Their note&#x27;, [[&#x27;&#x27;, escapeHtml(d.scheduleNotes)]]) : &#x27;&#x27;,
     formatPhotosHtml(d.photoLinks),
-    '&lt;/div&gt;'
-  ].join('');
+    &#x27;&lt;/div&gt;&#x27;
+  ].join(&#x27;&#x27;);
 
   sendHtmlEmail(subject, html, buildAttachments(d.photoLinks));
 }
 
 /**
  * Builds the standard contact rows used in both lead and callback emails.
- * Pulls USPS city/state from areaCheck when available so the customer's
+ * Pulls USPS city/state from areaCheck when available so the customer&#x27;s
  * actual location is visible at a glance, with the typed town as a fallback.
  */
 function contactRows(c, areaCheck) {
   c = c || {};
   const usps = areaCheck &amp;&amp; areaCheck.ok ? areaCheck : null;
-  const cityState = usps ? (usps.city + ', ' + usps.state) : '';
-  const zip = c.zip || '';
-  const zipLine = zip + (cityState ? ' (' + cityState + ')' : '');
+  const cityState = usps ? (usps.city + &#x27;, &#x27; + usps.state) : &#x27;&#x27;;
+  const zip = c.zip || &#x27;&#x27;;
+  const zipLine = zip + (cityState ? &#x27; (&#x27; + cityState + &#x27;)&#x27; : &#x27;&#x27;);
   const rows = [
-    ['Name', escapeHtml(c.name || '(none)')],
-    ['Phone', phoneLink(c.phone)],
-    ['Email', emailLink(c.email)],
-    ['ZIP', escapeHtml(zipLine || '(none)')]
+    [&#x27;Name&#x27;, escapeHtml(c.name || &#x27;(none)&#x27;)],
+    [&#x27;Phone&#x27;, phoneLink(c.phone)],
+    [&#x27;Email&#x27;, emailLink(c.email)],
+    [&#x27;ZIP&#x27;, escapeHtml(zipLine || &#x27;(none)&#x27;)]
   ];
-  if (usps &amp;&amp; typeof usps.miles === 'number') {
-    rows.push(['Distance', escapeHtml(usps.miles.toFixed(1) + ' mi from Leicester')]);
+  if (usps &amp;&amp; typeof usps.miles === &#x27;number&#x27;) {
+    rows.push([&#x27;Distance&#x27;, escapeHtml(usps.miles.toFixed(1) + &#x27; mi from Leicester&#x27;)]);
   }
   return rows;
 }
@@ -2087,56 +2131,56 @@ function contactRows(c, areaCheck) {
 /**
  * Yellow info banner shown on callback emails when the lead email
  * already went out earlier — tells Jason this is the SAME customer
- * he's already been notified about, not a brand-new lead.
+ * he&#x27;s already been notified about, not a brand-new lead.
  */
 function leadFollowupBanner(d) {
-  if (!d.leadEmailAlreadySent) return '';
+  if (!d.leadEmailAlreadySent) return &#x27;&#x27;;
   const when = d.priorEstimateAt
-    ? Utilities.formatDate(new Date(d.priorEstimateAt), Session.getScriptTimeZone(), "MMM d, h:mm a")
-    : '';
-  const num = d.estimateNumber || '';
+    ? Utilities.formatDate(new Date(d.priorEstimateAt), Session.getScriptTimeZone(), &quot;MMM d, h:mm a&quot;)
+    : &#x27;&#x27;;
+  const num = d.estimateNumber || &#x27;&#x27;;
   return [
-    '&lt;div style="margin:0 0 16px;padding:10px 14px;background:#fff8d4;border:1px solid #d4ad1a;border-radius:4px;color:#5a4a00;font-size:14px"&gt;',
-    '&lt;strong&gt;ℹ Update on existing lead' + (num ? ' #' + escapeHtml(num) : '') + '.&lt;/strong&gt; ',
-    'A "New Lead" email was already sent for this customer',
-    when ? ' (estimate submitted ' + escapeHtml(when) + ')' : '',
-    '. They are now scheduling the callback.',
-    '&lt;/div&gt;'
-  ].join('');
+    &#x27;&lt;div style=&quot;margin:0 0 16px;padding:10px 14px;background:#fff8d4;border:1px solid #d4ad1a;border-radius:4px;color:#5a4a00;font-size:14px&quot;&gt;&#x27;,
+    &#x27;&lt;strong&gt;ℹ Update on existing lead&#x27; + (num ? &#x27; #&#x27; + escapeHtml(num) : &#x27;&#x27;) + &#x27;.&lt;/strong&gt; &#x27;,
+    &#x27;A &quot;New Lead&quot; email was already sent for this customer&#x27;,
+    when ? &#x27; (estimate submitted &#x27; + escapeHtml(when) + &#x27;)&#x27; : &#x27;&#x27;,
+    &#x27;. They are now scheduling the callback.&#x27;,
+    &#x27;&lt;/div&gt;&#x27;
+  ].join(&#x27;&#x27;);
 }
 
 /**
- * Returns an HTML banner if the submission's ZIP geocoded outside our
+ * Returns an HTML banner if the submission&#x27;s ZIP geocoded outside our
  * service radius. Empty string if the area check passed or never ran.
- * The customer never sees this — it's an internal flag to be discussed
+ * The customer never sees this — it&#x27;s an internal flag to be discussed
  * with Jason before deciding policy.
  */
 function outsideAreaBanner(areaCheck) {
-  if (!areaCheck || !areaCheck.ok) return '';
-  if (areaCheck.withinServiceArea) return '';
+  if (!areaCheck || !areaCheck.ok) return &#x27;&#x27;;
+  if (areaCheck.withinServiceArea) return &#x27;&#x27;;
   const miles = (areaCheck.miles || 0).toFixed(1);
   return [
-    '&lt;div style="margin:0 0 16px;padding:10px 14px;background:#fff5e6;border:1px solid #c85a28;border-radius:4px;color:#5a2c0d;font-size:14px"&gt;',
-    '&lt;strong&gt;⚠ Outside service area:&lt;/strong&gt; ',
-    escapeHtml(miles), ' mi from Leicester ',
-    '(service radius is ', String(SERVICE_RADIUS_MILES), ' mi).',
-    '&lt;/div&gt;'
-  ].join('');
+    &#x27;&lt;div style=&quot;margin:0 0 16px;padding:10px 14px;background:#fff5e6;border:1px solid #c85a28;border-radius:4px;color:#5a2c0d;font-size:14px&quot;&gt;&#x27;,
+    &#x27;&lt;strong&gt;⚠ Outside service area:&lt;/strong&gt; &#x27;,
+    escapeHtml(miles), &#x27; mi from Leicester &#x27;,
+    &#x27;(service radius is &#x27;, String(SERVICE_RADIUS_MILES), &#x27; mi).&#x27;,
+    &#x27;&lt;/div&gt;&#x27;
+  ].join(&#x27;&#x27;);
 }
 
 function htmlSection(title, rows) {
   const inner = rows.map(function (r) {
     const label = r[0]
-      ? '&lt;td style="padding:4px 12px 4px 0;color:#666;font-size:13px;vertical-align:top;white-space:nowrap"&gt;' + escapeHtml(r[0]) + ':&lt;/td&gt;'
-      : '&lt;td&gt;&lt;/td&gt;';
-    return '&lt;tr&gt;' + label + '&lt;td style="padding:4px 0;font-size:14px"&gt;' + r[1] + '&lt;/td&gt;&lt;/tr&gt;';
-  }).join('');
+      ? &#x27;&lt;td style=&quot;padding:4px 12px 4px 0;color:#666;font-size:13px;vertical-align:top;white-space:nowrap&quot;&gt;&#x27; + escapeHtml(r[0]) + &#x27;:&lt;/td&gt;&#x27;
+      : &#x27;&lt;td&gt;&lt;/td&gt;&#x27;;
+    return &#x27;&lt;tr&gt;&#x27; + label + &#x27;&lt;td style=&quot;padding:4px 0;font-size:14px&quot;&gt;&#x27; + r[1] + &#x27;&lt;/td&gt;&lt;/tr&gt;&#x27;;
+  }).join(&#x27;&#x27;);
   return [
-    '&lt;h3 style="margin:18px 0 6px;font-size:14px;letter-spacing:0.5px;text-transform:uppercase;color:#444"&gt;' + escapeHtml(title) + '&lt;/h3&gt;',
-    '&lt;table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse"&gt;',
+    &#x27;&lt;h3 style=&quot;margin:18px 0 6px;font-size:14px;letter-spacing:0.5px;text-transform:uppercase;color:#444&quot;&gt;&#x27; + escapeHtml(title) + &#x27;&lt;/h3&gt;&#x27;,
+    &#x27;&lt;table cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;border-collapse:collapse&quot;&gt;&#x27;,
     inner,
-    '&lt;/table&gt;'
-  ].join('');
+    &#x27;&lt;/table&gt;&#x27;
+  ].join(&#x27;&#x27;);
 }
 
 function answerRows(service, answers) {
@@ -2153,48 +2197,48 @@ function answerRows(service, answers) {
 }
 
 function formatPhotosHtml(links) {
-  if (!links || !links.length) return '';
+  if (!links || !links.length) return &#x27;&#x27;;
   const items = links.map(function (l) {
-    return '&lt;li style="margin:4px 0"&gt;&lt;a href="' + escapeHtml(l.url) + '" style="color:#2D5A27"&gt;' + escapeHtml(l.name) + '&lt;/a&gt;&lt;/li&gt;';
-  }).join('');
+    return &#x27;&lt;li style=&quot;margin:4px 0&quot;&gt;&lt;a href=&quot;&#x27; + escapeHtml(l.url) + &#x27;&quot; style=&quot;color:#2D5A27&quot;&gt;&#x27; + escapeHtml(l.name) + &#x27;&lt;/a&gt;&lt;/li&gt;&#x27;;
+  }).join(&#x27;&#x27;);
   return [
-    '&lt;h3 style="margin:18px 0 6px;font-size:14px;letter-spacing:0.5px;text-transform:uppercase;color:#444"&gt;Photos (' + links.length + ')&lt;/h3&gt;',
-    '&lt;p style="margin:4px 0;color:#666;font-size:12px"&gt;Attached below + Drive links:&lt;/p&gt;',
-    '&lt;ul style="margin:4px 0 0 18px;padding:0;font-size:14px"&gt;' + items + '&lt;/ul&gt;'
-  ].join('');
+    &#x27;&lt;h3 style=&quot;margin:18px 0 6px;font-size:14px;letter-spacing:0.5px;text-transform:uppercase;color:#444&quot;&gt;Photos (&#x27; + links.length + &#x27;)&lt;/h3&gt;&#x27;,
+    &#x27;&lt;p style=&quot;margin:4px 0;color:#666;font-size:12px&quot;&gt;Attached below + Drive links:&lt;/p&gt;&#x27;,
+    &#x27;&lt;ul style=&quot;margin:4px 0 0 18px;padding:0;font-size:14px&quot;&gt;&#x27; + items + &#x27;&lt;/ul&gt;&#x27;
+  ].join(&#x27;&#x27;);
 }
 
 function escapeHtml(s) {
-  return String(s == null ? '' : s).replace(/[&amp;&lt;&gt;"']/g, function (c) {
-    return { '&amp;': '&amp;amp;', '&lt;': '&amp;lt;', '&gt;': '&amp;gt;', '"': '&amp;quot;', "'": '&amp;#39;' }[c];
+  return String(s == null ? &#x27;&#x27; : s).replace(/[&amp;&lt;&gt;&quot;&#x27;]/g, function (c) {
+    return { &#x27;&amp;&#x27;: &#x27;&amp;amp;&#x27;, &#x27;&lt;&#x27;: &#x27;&amp;lt;&#x27;, &#x27;&gt;&#x27;: &#x27;&amp;gt;&#x27;, &#x27;&quot;&#x27;: &#x27;&amp;quot;&#x27;, &quot;&#x27;&quot;: &#x27;&amp;#39;&#x27; }[c];
   });
 }
 
 function phoneLink(p) {
-  if (!p) return '&lt;em style="color:#888"&gt;(none)&lt;/em&gt;';
-  const digits = String(p).replace(/[^0-9]/g, '');
+  if (!p) return &#x27;&lt;em style=&quot;color:#888&quot;&gt;(none)&lt;/em&gt;&#x27;;
+  const digits = String(p).replace(/[^0-9]/g, &#x27;&#x27;);
   if (!digits) return escapeHtml(p);
-  const tel = digits.length === 10 ? '+1' + digits : '+' + digits;
-  return '&lt;a href="tel:' + escapeHtml(tel) + '" style="color:#2D5A27;font-weight:600"&gt;' + escapeHtml(p) + '&lt;/a&gt;';
+  const tel = digits.length === 10 ? &#x27;+1&#x27; + digits : &#x27;+&#x27; + digits;
+  return &#x27;&lt;a href=&quot;tel:&#x27; + escapeHtml(tel) + &#x27;&quot; style=&quot;color:#2D5A27;font-weight:600&quot;&gt;&#x27; + escapeHtml(p) + &#x27;&lt;/a&gt;&#x27;;
 }
 
 function emailLink(e) {
-  if (!e) return '&lt;em style="color:#888"&gt;(none)&lt;/em&gt;';
-  return '&lt;a href="mailto:' + escapeHtml(e) + '" style="color:#2D5A27"&gt;' + escapeHtml(e) + '&lt;/a&gt;';
+  if (!e) return &#x27;&lt;em style=&quot;color:#888&quot;&gt;(none)&lt;/em&gt;&#x27;;
+  return &#x27;&lt;a href=&quot;mailto:&#x27; + escapeHtml(e) + &#x27;&quot; style=&quot;color:#2D5A27&quot;&gt;&#x27; + escapeHtml(e) + &#x27;&lt;/a&gt;&#x27;;
 }
 
 function htmlToText(html) {
   return String(html)
-    .replace(/&lt;\/(p|h[1-6]|li|tr|div)&gt;/gi, '\n')
-    .replace(/&lt;br\s*\/?&gt;(?!\n)/gi, '\n')
-    .replace(/&lt;[^&gt;]+&gt;/g, '')
-    .replace(/&amp;nbsp;/g, ' ')
-    .replace(/&amp;amp;/g, '&amp;')
-    .replace(/&amp;lt;/g, '&lt;')
-    .replace(/&amp;gt;/g, '&gt;')
-    .replace(/&amp;quot;/g, '"')
-    .replace(/&amp;#39;/g, "'")
-    .replace(/\n{3,}/g, '\n\n')
+    .replace(/&lt;\/(p|h[1-6]|li|tr|div)&gt;/gi, &#x27;\n&#x27;)
+    .replace(/&lt;br\s*\/?&gt;(?!\n)/gi, &#x27;\n&#x27;)
+    .replace(/&lt;[^&gt;]+&gt;/g, &#x27;&#x27;)
+    .replace(/&amp;nbsp;/g, &#x27; &#x27;)
+    .replace(/&amp;amp;/g, &#x27;&amp;&#x27;)
+    .replace(/&amp;lt;/g, &#x27;&lt;&#x27;)
+    .replace(/&amp;gt;/g, &#x27;&gt;&#x27;)
+    .replace(/&amp;quot;/g, &#x27;&quot;&#x27;)
+    .replace(/&amp;#39;/g, &quot;&#x27;&quot;)
+    .replace(/\n{3,}/g, &#x27;\n\n&#x27;)
     .trim();
 }
 
@@ -2228,11 +2272,11 @@ function buildAttachments(links) {
 }
 
 function humanizeKey(key) {
-  return key.replace(/([A-Z])/g, ' $1').replace(/^./, function (c) { return c.toUpperCase(); }).trim();
+  return key.replace(/([A-Z])/g, &#x27; $1&#x27;).replace(/^./, function (c) { return c.toUpperCase(); }).trim();
 }
 
 function normalizeKey(s) {
-  return (s || '').toString().toLowerCase().replace(/[^0-9a-z@.]/g, '');
+  return (s || &#x27;&#x27;).toString().toLowerCase().replace(/[^0-9a-z@.]/g, &#x27;&#x27;);
 }
 
 // ============================================================
@@ -2255,12 +2299,12 @@ function normalizeKey(s) {
 function savePhotosToDrive(photos, estimateNumber, service, customerName) {
   if (!photos || !photos.length) return [];
   const now = new Date();
-  const monthYear = formatMonthYear(now);             // "May_26"   — parent folder
-  const monthYearUpper = formatMonthYearUpper(now);   // "MAY26"    — folder name prefix
-  const safeService = SERVICE_SHORT[service] || 'Other';
-  const safeName = sanitizeName(customerName) || 'Anonymous';
-  const folderName = monthYearUpper + '_' + safeService + '_' + safeName +
-                     (estimateNumber ? '_' + estimateNumber : '');
+  const monthYear = formatMonthYear(now);             // &quot;May_26&quot;   — parent folder
+  const monthYearUpper = formatMonthYearUpper(now);   // &quot;MAY26&quot;    — folder name prefix
+  const safeService = SERVICE_SHORT[service] || &#x27;Other&#x27;;
+  const safeName = sanitizeName(customerName) || &#x27;Anonymous&#x27;;
+  const folderName = monthYearUpper + &#x27;_&#x27; + safeService + &#x27;_&#x27; + safeName +
+                     (estimateNumber ? &#x27;_&#x27; + estimateNumber : &#x27;&#x27;);
 
   const root = getOrCreatePhotoFolder();
   const monthFolder = getOrCreateChildFolder(root, monthYear);
@@ -2270,11 +2314,11 @@ function savePhotosToDrive(photos, estimateNumber, service, customerName) {
   for (let i = 0; i &lt; photos.length; i++) {
     const photo = photos[i];
     try {
-      const match = (photo.dataUrl || '').match(/^data:(.+?);base64,(.*)$/);
+      const match = (photo.dataUrl || &#x27;&#x27;).match(/^data:(.+?);base64,(.*)$/);
       if (!match) continue;
       const mimeType = match[1];
       const base64 = match[2];
-      const filename = (photo.name || ('photo-' + (i + 1) + '.jpg')).replace(/[\\/]/g, '_');
+      const filename = (photo.name || (&#x27;photo-&#x27; + (i + 1) + &#x27;.jpg&#x27;)).replace(/[\\/]/g, &#x27;_&#x27;);
       const blob = Utilities.newBlob(Utilities.base64Decode(base64), mimeType, filename);
       const file = estimateFolder.createFile(blob);
       file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
@@ -2287,17 +2331,17 @@ function savePhotosToDrive(photos, estimateNumber, service, customerName) {
 }
 
 function formatMonthYear(d) {
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return months[d.getMonth()] + '_' + String(d.getFullYear()).slice(2);
+  const months = [&#x27;Jan&#x27;, &#x27;Feb&#x27;, &#x27;Mar&#x27;, &#x27;Apr&#x27;, &#x27;May&#x27;, &#x27;Jun&#x27;, &#x27;Jul&#x27;, &#x27;Aug&#x27;, &#x27;Sep&#x27;, &#x27;Oct&#x27;, &#x27;Nov&#x27;, &#x27;Dec&#x27;];
+  return months[d.getMonth()] + &#x27;_&#x27; + String(d.getFullYear()).slice(2);
 }
 
 function formatMonthYearUpper(d) {
-  const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+  const months = [&#x27;JAN&#x27;, &#x27;FEB&#x27;, &#x27;MAR&#x27;, &#x27;APR&#x27;, &#x27;MAY&#x27;, &#x27;JUN&#x27;, &#x27;JUL&#x27;, &#x27;AUG&#x27;, &#x27;SEP&#x27;, &#x27;OCT&#x27;, &#x27;NOV&#x27;, &#x27;DEC&#x27;];
   return months[d.getMonth()] + String(d.getFullYear()).slice(2);
 }
 
 function sanitizeName(s) {
-  return (s || '').toString().replace(/[^a-zA-Z0-9]/g, '');
+  return (s || &#x27;&#x27;).toString().replace(/[^a-zA-Z0-9]/g, &#x27;&#x27;);
 }
 
 function getOrCreatePhotoFolder() {
@@ -2313,8 +2357,8 @@ function getOrCreateChildFolder(parent, name) {
 }
 
 function formatPhotoUrls(links) {
-  if (!links || !links.length) return '';
-  return links.map(function (l) { return l.url; }).join('\n');
+  if (!links || !links.length) return &#x27;&#x27;;
+  return links.map(function (l) { return l.url; }).join(&#x27;\n&#x27;);
 }
 
 // ============================================================
@@ -2327,12 +2371,50 @@ function getOrCreate(ss, def) {
     s = ss.insertSheet(def.name);
     s.appendRow(def.headers);
     s.setFrozenRows(1);
-    s.getRange(1, 1, 1, def.headers.length).setFontWeight('bold');
+    s.getRange(1, 1, 1, def.headers.length).setFontWeight(&#x27;bold&#x27;);
     if (def.hidden) s.hideSheet();
   } else if (def.hidden &amp;&amp; !s.isSheetHidden()) {
     s.hideSheet();
   }
   return s;
+}
+
+/**
+ * Forwards a handoff-page submission as a plain email. Subject + body
+ * come from the form fields; no sheet writes, no lead pipeline.
+ *
+ * Sent to fitfo@fitfosystems.com explicitly so it lands at the FITFO
+ * inbox regardless of which Google account this script is deployed
+ * under.
+ */
+function sendHandoffEmail(data) {
+  const HANDOFF_NOTIFY = &#x27;fitfo@fitfosystems.com&#x27;;
+  const subject = data._subject || (&#x27;[Pine Point handoff] &#x27; + (data.formType || &#x27;note&#x27;));
+  const lines = [];
+  if (data.message) lines.push(String(data.message));
+  if (data.kind) lines.push(&#x27;&#x27;, &#x27;---&#x27;, &#x27;Kind: &#x27; + data.kind);
+  if (data.page) lines.push(&#x27;Page: &#x27; + data.page);
+  if (data.ok_count != null || data.issue_count != null) {
+    lines.push(&#x27;OK: &#x27; + (data.ok_count || 0) + &#x27;, Issues: &#x27; + (data.issue_count || 0) + &#x27;, Untested: &#x27; + (data.untested_count || 0));
+  }
+  const emailOpts = {};
+  if (data.invoice_attachments) {
+    try {
+      const files = JSON.parse(data.invoice_attachments);
+      if (Array.isArray(files) &amp;&amp; files.length) {
+        emailOpts.attachments = files.map(f =&gt;
+          Utilities.newBlob(Utilities.base64Decode(f.data_base64), f.mimeType || &#x27;application/octet-stream&#x27;, f.filename)
+        );
+      }
+    } catch (e) {
+      lines.push(&#x27;(Note: invoice attachment decode failed — &#x27; + String(e) + &#x27;)&#x27;);
+    }
+  }
+  try {
+    MailApp.sendEmail(HANDOFF_NOTIFY, subject, lines.join(&#x27;\n&#x27;) || &#x27;(empty body)&#x27;, emailOpts);
+  } catch (e) {
+    // Don&#x27;t crash the request if email fails — POSTer doesn&#x27;t need to know.
+  }
 }
 
 function jsonResponse(obj) {
@@ -2352,16 +2434,16 @@ function jsonResponse(obj) {
 function installTrigger() {
   const triggers = ScriptApp.getProjectTriggers();
   for (const t of triggers) {
-    if (t.getHandlerFunction() === 'processPendingLeads') {
+    if (t.getHandlerFunction() === &#x27;processPendingLeads&#x27;) {
       ScriptApp.deleteTrigger(t);
     }
   }
-  ScriptApp.newTrigger('processPendingLeads')
+  ScriptApp.newTrigger(&#x27;processPendingLeads&#x27;)
     .timeBased()
     .everyMinutes(1)
     .create();
-  console.log('Trigger installed — pending lead emails are sent ' +
-    EMAIL_DELAY_MINUTES + ' minutes after submission unless cancelled by a schedule.');
+  console.log(&#x27;Trigger installed — pending lead emails are sent &#x27; +
+    EMAIL_DELAY_MINUTES + &#x27; minutes after submission unless cancelled by a schedule.&#x27;);
 }
 </code></pre>
             </div>

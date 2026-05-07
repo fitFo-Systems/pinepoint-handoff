@@ -1585,9 +1585,10 @@
               <pre id="script-source" class="script-source"><code>/**
  * Pine Point — Lead Capture Endpoint
  *
- * Receives JSON POSTs from pinepointtrees.com (estimate.html):
+ * Receives JSON POSTs from pinepointtrees.com:
  *   - formType: &quot;estimate_contact&quot; — user submitted contact form on the estimate page
  *   - formType: &quot;schedule&quot;         — user clicked &quot;Schedule a Follow-Up&quot; after seeing price
+ *   - formType: &quot;wood_signup&quot;      — user signed up for free chips/log-length firewood on wood-products.html
  *
  * Email behavior — exactly ONE email per user journey:
  *   - Estimate filled, no schedule within EMAIL_DELAY_MINUTES → &quot;New Lead&quot; email
@@ -1646,6 +1647,14 @@ const SHEETS = {
     name: &#x27;_Pending Lead Emails&#x27;,
     headers: [&#x27;Queued At&#x27;, &#x27;Phone Key&#x27;, &#x27;Email Key&#x27;, &#x27;Payload JSON&#x27;],
     hidden: true  // internal queue used by the script — not for Jason to look at
+  },
+  wood_signup: {
+    name: &#x27;Wood Signups&#x27;,
+    headers: [
+      &#x27;Timestamp&#x27;, &#x27;Name&#x27;, &#x27;Phone&#x27;, &#x27;Email&#x27;, &#x27;ZIP&#x27;,
+      &#x27;City&#x27;, &#x27;State&#x27;, &#x27;Distance (mi)&#x27;, &#x27;Outside Area&#x27;,
+      &#x27;Product&#x27;, &#x27;Wood Mix&#x27;, &#x27;Notes&#x27;, &#x27;Page&#x27;
+    ]
   }
 };
 
@@ -1759,6 +1768,14 @@ function doPost(e) {
       removeEstimateRow(ss, data.estimateNumber);
       upsertSummary(ss, data, &#x27;Callback&#x27;);
       sendCallbackEmail(data);
+    } else if (data.formType === &#x27;wood_signup&#x27;) {
+      if (!isValidContact(data.contact, data.formType)) {
+        return jsonResponse({ error: &#x27;invalid contact&#x27; });
+      }
+      if (data.contact) data.contact.phone = normalizePhone(data.contact.phone);
+      data.areaCheck = checkServiceArea((data.contact || {}).zip);
+      writeWoodSignup(ss, data);
+      sendWoodSignupEmail(data);
     } else if (data.formType === &#x27;handoff_input&#x27; || data.formType === &#x27;handoff_test&#x27;) {
       // Posted from the FITFO handoff page (fitfo-systems.github.io/pinepoint-handoff/).
       // Just forward as an email — no sheet writes, no lead-capture machinery.
@@ -1854,7 +1871,7 @@ function isValidContact(c, formType) {
   if (c.email &amp;&amp; !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.email)) return false;
 
   const zip = String(c.zip || &#x27;&#x27;).trim();
-  if (formType === &#x27;estimate_contact&#x27;) {
+  if (formType === &#x27;estimate_contact&#x27; || formType === &#x27;wood_signup&#x27;) {
     if (!/^\d{5}(-\d{4})?$/.test(zip)) return false;
   } else if (zip) {
     // Schedule etc.: zip is optional, but if provided must be valid.
@@ -2539,6 +2556,76 @@ function getOrCreate(ss, def) {
  * inbox regardless of which Google account this script is deployed
  * under.
  */
+/**
+ * Writes a wood signup row to the dedicated &quot;Wood Signups&quot; tab.
+ * Mirrors the schedule/estimate writers for consistency.
+ */
+function writeWoodSignup(ss, d) {
+  const sheet = getOrCreate(ss, SHEETS.wood_signup);
+  const c = d.contact || {};
+  const ac = d.areaCheck || {};
+  const distance = (ac.ok &amp;&amp; typeof ac.miles === &#x27;number&#x27;) ? Number(ac.miles.toFixed(1)) : &#x27;&#x27;;
+  const outside = ac.ok ? (ac.withinServiceArea ? &#x27;&#x27; : &#x27;YES&#x27;) : &#x27;&#x27;;
+  const productLabel = {
+    chips: &#x27;Wood chips&#x27;,
+    logs:  &#x27;Log-length firewood&#x27;,
+    both:  &#x27;Chips + log-length firewood&#x27;
+  }[d.productType] || d.productType || &#x27;&#x27;;
+  const mixLabel = {
+    mixed:         &#x27;Hardwood + softwood mix&#x27;,
+    hardwood_only: &#x27;Hardwood only&#x27;
+  }[d.woodMix] || &#x27;&#x27;;
+  sheet.appendRow([
+    new Date(),
+    c.name || &#x27;&#x27;, c.phone || &#x27;&#x27;, c.email || &#x27;&#x27;,
+    c.zip || &#x27;&#x27;, ac.city || &#x27;&#x27;, ac.state || &#x27;&#x27;, distance, outside,
+    productLabel,
+    mixLabel,
+    d.notes || &#x27;&#x27;,
+    d.page || &#x27;&#x27;
+  ]);
+}
+
+/**
+ * Sends Jason an email alert when someone signs up for free wood.
+ * Subject reflects the product type so he can scan the inbox.
+ */
+function sendWoodSignupEmail(d) {
+  const c = d.contact || {};
+  const productLabel = {
+    chips: &#x27;Chips&#x27;,
+    logs:  &#x27;Logs&#x27;,
+    both:  &#x27;Chips + Logs&#x27;
+  }[d.productType] || &#x27;Wood&#x27;;
+  const subject = &#x27;New wood signup - &#x27; + productLabel + &#x27; - &#x27; + (c.name || &#x27;Pine Point&#x27;);
+
+  const productDisplay = {
+    chips: &#x27;Wood chips&#x27;,
+    logs:  &#x27;Log-length firewood&#x27;,
+    both:  &#x27;Both (chips + log-length firewood)&#x27;
+  }[d.productType] || d.productType || &#x27;&#x27;;
+
+  const mixDisplay = (d.productType === &#x27;chips&#x27;)
+    ? &#x27;n/a (chips only)&#x27;
+    : ({ mixed: &#x27;Hardwood + softwood mix&#x27;, hardwood_only: &#x27;Hardwood only&#x27; }[d.woodMix] || &#x27;(not specified)&#x27;);
+
+  const html = [
+    &#x27;&lt;div style=&quot;font-family:Arial,Helvetica,sans-serif;max-width:600px;color:#222&quot;&gt;&#x27;,
+    &#x27;&lt;h2 style=&quot;margin:0 0 4px;color:#2D5A27&quot;&gt;New Wood Signup&lt;/h2&gt;&#x27;,
+    &#x27;&lt;p style=&quot;margin:0 0 12px;font-size:13px;color:#444&quot;&gt;Free chips / log-length firewood request from pinepointtrees.com.&lt;/p&gt;&#x27;,
+    outsideAreaBanner(d.areaCheck),
+    htmlSection(&#x27;Caller&#x27;, contactRows(c, d.areaCheck)),
+    htmlSection(&#x27;Wants&#x27;, [
+      [&#x27;Product&#x27;, &#x27;&lt;strong&gt;&#x27; + escapeHtml(productDisplay) + &#x27;&lt;/strong&gt;&#x27;],
+      [&#x27;Wood mix&#x27;, escapeHtml(mixDisplay)]
+    ]),
+    d.notes ? htmlSection(&#x27;Their note&#x27;, [[&#x27;&#x27;, escapeHtml(d.notes)]]) : &#x27;&#x27;,
+    &#x27;&lt;/div&gt;&#x27;
+  ].join(&#x27;&#x27;);
+
+  sendHtmlEmail(subject, html);
+}
+
 function sendHandoffEmail(data) {
   const HANDOFF_NOTIFY = &#x27;fitfo@fitfosystems.com&#x27;;
   const subject = data._subject || (&#x27;[Pine Point handoff] &#x27; + (data.formType || &#x27;note&#x27;));

@@ -1247,6 +1247,7 @@
       <li><a href="#test" data-section="test">Test everything</a></li>
       <li><a href="#need" data-section="need">What we need from you</a></li>
       <li><a href="#latest" data-section="latest">Latest follow-ups</a></li>
+      <li><a href="#deferred" data-section="deferred">Deferred for next phase</a></li>
     </ul>
   </aside>
 
@@ -3059,7 +3060,7 @@ function installTrigger() {
       <h2>What we need from you</h2>
 
       <div class="section-progress">
-        <span class="section-progress__label">Items addressed (this section + "Latest follow-ups" below): <span id="need-progress-text">0 / 13</span></span>
+        <span class="section-progress__label">Items addressed (this section + "Latest follow-ups" + "Deferred for next phase"): <span id="need-progress-text">0 / 13</span></span>
         <div class="section-progress__bar"><div class="section-progress__fill" id="need-progress-fill"></div></div>
       </div>
 
@@ -3266,7 +3267,7 @@ function installTrigger() {
         </div>
         <div class="card-reply">
           <label class="card-reply__label" for="reply-small-items">Your reply</label>
-          <textarea class="card-reply__textarea" id="reply-small-items" data-reply-id="need-small-items" placeholder="Anything else for this round, or jump to the Latest follow-ups section below."></textarea>
+          <textarea class="card-reply__textarea" id="reply-small-items" data-reply-id="need-small-items" placeholder="Anything else for this round, or jump to the Latest follow-ups / Deferred sections below."></textarea>
           <div class="card-reply__actions">
             <button class="card-check">Mark addressed</button>
             <span class="card-reply__hint">Saved as you type. Submit at the bottom of this section sends everything in one go.</span>
@@ -3329,7 +3330,7 @@ function installTrigger() {
 
       <div class="test-summary" id="need-summary">
         <div class="test-summary__counts">
-          <span class="ok-count"><strong id="need-filled-count">0</strong> cards have notes (across this section + "Latest follow-ups")</span>
+          <span class="ok-count"><strong id="need-filled-count">0</strong> cards have notes (across this section + "Latest follow-ups" + "Deferred for next phase")</span>
         </div>
         <p style="color:var(--off-white);font-size:0.95rem;margin:0 0 14px">Hit submit anytime — partial replies are fine. Each submission is timestamped and shown under the card you replied to. This single submit covers all open discussion cards on the page.</p>
         <div class="test-summary__actions">
@@ -3339,9 +3340,9 @@ function installTrigger() {
       </div>
     </section>
 
-    <section id="latest" data-keywords="crew tool admin login auth google sign-in token deferred next phase v2 features queue future">
+    <section id="latest" data-keywords="crew tool admin login auth google sign-in token">
       <h2>Latest follow-ups</h2>
-      <p>New decisions and discussion items since v1 shipped — a mix of fresh asks (crew tool login model) and bigger features we've intentionally pushed to a later round so v1 ships clean. None of these are blockers; reply to whichever you have an opinion on, skip the rest. Type replies inline (they auto-save in your browser). The <strong>"Submit input" button at the bottom of "What we need from you"</strong> just above sends everything in one batch.</p>
+      <p>New decisions we need from you, after v1 shipped. Type replies inline (they auto-save in your browser). The <strong>"Submit input" button at the bottom of "What we need from you"</strong> just above sends every reply on the page in one batch — including any from the "Deferred for next phase" section below.</p>
 
       <div class="card card--checkable" data-need-id="fu-crew-auth" data-card-status="followup">
         <h3>9. Crew estimate tool — login model <span class="card-status card-status--followup">Followup Requested</span></h3>
@@ -3386,6 +3387,11 @@ function installTrigger() {
           <div class="card-reply__history" data-history-empty="true"></div>
         </div>
       </div>
+    </section>
+
+    <section id="deferred" data-keywords="deferred next phase v2 features queue future photo upload signature maintenance reminders reporting dashboard">
+      <h2>Deferred for next phase</h2>
+      <p>Features we've talked about and intentionally pushed to a later round so v1 ships clean. None of these are blockers — they're conversation starters when you're ready. Reply to whichever you have an opinion on, skip the rest. The <strong>"Submit input" button at the bottom of "What we need from you"</strong> sends everything on the page in one batch.</p>
 
       <div class="card card--checkable" data-need-id="def-photo-upload" data-card-status="followup">
         <h3>D1. Self-serve photo upload <span class="card-status card-status--followup">Discuss</span></h3>
@@ -3628,10 +3634,10 @@ function installTrigger() {
   });
 
   // === Need-cards (What we need from you) — checkable + section progress ===
-  // Includes the latest follow-ups section so their "Mark addressed" buttons
-  // and post-submit auto-mark behavior share the same plumbing.
+  // Includes Latest follow-ups and Deferred sections so their "Mark
+  // addressed" buttons + post-submit auto-mark behavior share the same plumbing.
   const STORAGE_KEY_NEED = 'pinepoint.handoff.needDone.v1';
-  const needCards = Array.from(document.querySelectorAll('#need .card--checkable, #latest .card--checkable'));
+  const needCards = Array.from(document.querySelectorAll('#need .card--checkable, #latest .card--checkable, #deferred .card--checkable'));
   const needProgressFill = document.getElementById('need-progress-fill');
   const needProgressText = document.getElementById('need-progress-text');
   let needDoneSet = new Set();
@@ -3972,10 +3978,10 @@ function installTrigger() {
     wrap.innerHTML = '<div class="card-reply__history-title">Sent so far</div>' + posts;
   }
 
-  // Hydrate textareas + per-card history on load. Includes the "Latest
-  // follow-ups" section so all open discussion cards share the master
-  // submit button at the bottom of "need".
-  const needCheckableCards = Array.from(document.querySelectorAll('#need .card--checkable, #latest .card--checkable'));
+  // Hydrate textareas + per-card history on load. Includes Latest
+  // follow-ups and Deferred sections so every open discussion card
+  // shares the master submit button at the bottom of "need".
+  const needCheckableCards = Array.from(document.querySelectorAll('#need .card--checkable, #latest .card--checkable, #deferred .card--checkable'));
   needCheckableCards.forEach(card => {
     const ta = card.querySelector('.card-reply__textarea');
     if (ta) {

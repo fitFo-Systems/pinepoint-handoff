@@ -1246,6 +1246,7 @@
       <li><a href="#setup" data-section="setup">Setting up notifications</a></li>
       <li><a href="#test" data-section="test">Test everything</a></li>
       <li><a href="#need" data-section="need">What we need from you</a></li>
+      <li><a href="#latest" data-section="latest">Latest follow-ups</a></li>
     </ul>
   </aside>
 
@@ -3058,7 +3059,7 @@ function installTrigger() {
       <h2>What we need from you</h2>
 
       <div class="section-progress">
-        <span class="section-progress__label">Items addressed: <span id="need-progress-text">0 / 8</span></span>
+        <span class="section-progress__label">Items addressed (this section + "Latest follow-ups" below): <span id="need-progress-text">0 / 13</span></span>
         <div class="section-progress__bar"><div class="section-progress__fill" id="need-progress-fill"></div></div>
       </div>
 
@@ -3090,10 +3091,15 @@ function installTrigger() {
             <span class="convo-label convo-label--fitfo">FITFO</span>
             <p>Confirmed — $1,400 median for large trees when wood is left on property. Wood removal pricing varies by job — <strong>need your removal price range</strong> before wiring into the estimator. 9" diameter descriptor for large trees: will add once you confirm placement. Also — if anything above looks off or we misread your intent anywhere, call it out here and we'll correct it before moving forward.</p>
           </div>
+          <div class="convo-msg">
+            <span class="convo-label convo-label--fitfo">FITFO</span>
+            <p>Pricing model is fully calibrated. Pruning typical: medium $500, large $1,400, very large $2,500. $750 floor on pruning Low. Every price rounds to the nearest $50. New "Leave as is" option added as the 4th lot-clearing end goal. Yard or lawn small lots get a $2,500 add-on for loam/seed/straw; medium and large yard jobs go to "Call for pricing." Wood hauling rule clarified everywhere (9 inch and larger stays, smaller wood chipped). Evergreen 10% surcharge note added to the estimator disclaimer.</p>
+            <p>Generated a <strong>CSV of all 528 estimate combinations</strong> with low/typical/high prices for each. Sending it over for your review — open it in Sheets or Excel, scan it, and tell us if anything looks off. <strong>Once you sign off (or send back tweaks), this card flips to Complete.</strong></p>
+          </div>
         </div>
         <div class="card-reply">
           <label class="card-reply__label" for="reply-pricing">Your reply</label>
-          <textarea class="card-reply__textarea" id="reply-pricing" data-reply-id="need-pricing" placeholder="Wood removal price range when hauling? Confirm 9&quot; diameter placement?"></textarea>
+          <textarea class="card-reply__textarea" id="reply-pricing" data-reply-id="need-pricing" placeholder="CSV looks good — or list rows that need adjusting"></textarea>
           <div class="card-reply__actions">
             <button class="card-check">Mark addressed</button>
             <span class="card-reply__hint">Saved as you type. Submit at the bottom sends everything in one go.</span>
@@ -3233,8 +3239,8 @@ function installTrigger() {
         </div>
       </div>
 
-      <div class="card card--checkable" data-need-id="need-small-items" data-card-status="followup">
-        <h3>6. Open small items <span class="card-status card-status--followup">Followup Requested</span></h3>
+      <div class="card card--checkable" data-need-id="need-small-items" data-card-status="complete">
+        <h3>6. Open small items <span class="card-status card-status--complete">Complete</span></h3>
         <ul>
           <li><strong>Better photos?</strong> Got any sharper before/afters or specific job shots you'd want swapped in?</li>
           <li><strong>Add your personal cell</strong> alongside the main 774-262-2145?</li>
@@ -3253,10 +3259,14 @@ function installTrigger() {
             <span class="convo-label convo-label--fitfo">FITFO</span>
             <p>Send photos to <strong>fitfo@fitfosystems.com</strong> — we'll swap them in on the next update. The gallery carousel is already built and ready. For future self-service photo management, an admin upload page is queued for a later stage.</p>
           </div>
+          <div class="convo-msg">
+            <span class="convo-label convo-label--fitfo">FITFO</span>
+            <p><span class="convo-done">✓ Done</span> — gallery refreshed with three new before/after pairs (red shed leaning tree, dead pine in yard, two pines hiding the white house). The Lot Clearing transformation timeline replaced with the Spencer MA project: 4 photos plus a short excavator video that auto-loops. Sutton and Millbury added to the service map. Photo workflow on your side stays manual (email to fitfo@fitfosystems.com) until the self-serve upload tool ships — see "Deferred for next phase" below.</p>
+          </div>
         </div>
         <div class="card-reply">
           <label class="card-reply__label" for="reply-small-items">Your reply</label>
-          <textarea class="card-reply__textarea" id="reply-small-items" data-reply-id="need-small-items" placeholder="Any of the three above — or all of them — your call."></textarea>
+          <textarea class="card-reply__textarea" id="reply-small-items" data-reply-id="need-small-items" placeholder="Anything else for this round, or jump to the Latest follow-ups section below."></textarea>
           <div class="card-reply__actions">
             <button class="card-check">Mark addressed</button>
             <span class="card-reply__hint">Saved as you type. Submit at the bottom of this section sends everything in one go.</span>
@@ -3319,14 +3329,135 @@ function installTrigger() {
 
       <div class="test-summary" id="need-summary">
         <div class="test-summary__counts">
-          <span class="ok-count"><strong id="need-filled-count">0</strong> of 8 cards have notes</span>
+          <span class="ok-count"><strong id="need-filled-count">0</strong> cards have notes (across this section + "Latest follow-ups")</span>
         </div>
-        <p style="color:var(--off-white);font-size:0.95rem;margin:0 0 14px">Hit submit anytime — partial replies are fine. Each submission is timestamped and shown under the card you replied to.</p>
+        <p style="color:var(--off-white);font-size:0.95rem;margin:0 0 14px">Hit submit anytime — partial replies are fine. Each submission is timestamped and shown under the card you replied to. This single submit covers all open discussion cards on the page.</p>
         <div class="test-summary__actions">
           <button type="button" class="test-submit" id="need-submit" disabled>Submit input</button>
           <span class="test-summary__hint" id="need-submit-hint">Type anything to enable. Drafts auto-save to your browser as you go.</span>
         </div>
       </div>
+    </section>
+
+    <section id="latest" data-keywords="crew tool admin login auth google sign-in token deferred next phase v2 features queue future">
+      <h2>Latest follow-ups</h2>
+      <p>New decisions and discussion items since v1 shipped — a mix of fresh asks (crew tool login model) and bigger features we've intentionally pushed to a later round so v1 ships clean. None of these are blockers; reply to whichever you have an opinion on, skip the rest. Type replies inline (they auto-save in your browser). The <strong>"Submit input" button at the bottom of "What we need from you"</strong> just above sends everything in one batch.</p>
+
+      <div class="card card--checkable" data-need-id="fu-crew-auth" data-card-status="followup">
+        <h3>9. Crew estimate tool — login model <span class="card-status card-status--followup">Followup Requested</span></h3>
+        <p>We're building a private <code>/crew</code> tool so you and your guy can pull up a customer lead, confirm details, type the address, list the trees worked on, set a final price, and email a quote/invoice PDF — all from a phone. Question is how we lock it down so randoms can't open it.</p>
+
+        <p style="margin-top:14px"><strong>Option A — Long-token URL (simpler)</strong></p>
+        <p>The URL contains a long random string like <code>/crew?t=8a4f9b3e2c1d…</code>. Anyone holding the URL has full access. No login, no Google account needed.</p>
+        <ul>
+          <li><strong>Pros:</strong> simplest to set up; nothing for you or your guy to log into.</li>
+          <li><strong>Cons — places the URL can leak:</strong>
+            <ul>
+              <li>Browser history (anyone with the phone can pull it)</li>
+              <li>Screenshots / screen-share</li>
+              <li>Bookmarks synced across devices</li>
+              <li>Texted around to a new crew member</li>
+              <li>Server logs / analytics</li>
+            </ul>
+          </li>
+          <li>If the URL leaks, the only fix is rotating the token — everyone needs the new URL on their phone again.</li>
+          <li>No identity tied to actions — can't tell who created which quote.</li>
+          <li>Worst-case if leaked: someone sees customer names / phones / addresses / quote totals. No payment data, no destructive actions.</li>
+        </ul>
+
+        <p style="margin-top:14px"><strong>Option B — Google sign-in (FITFO recommends)</strong></p>
+        <ul>
+          <li>You and your guy sign in with the same Google accounts you already use for the lead Sheet.</li>
+          <li>Identity tied to every action — full audit trail of who created or edited each quote.</li>
+          <li>Two-factor on the Google account = two-factor on the tool. Free.</li>
+          <li>Revoke per person — if a guy leaves, drop his email from the whitelist and he's locked out instantly.</li>
+          <li>No URL to leak.</li>
+        </ul>
+
+        <p style="margin-top:14px"><strong>Our take:</strong> Option B. Same Google login you already use, plus a hard audit trail of who quoted what. Confirm and we'll wire it up.</p>
+
+        <div class="card-reply">
+          <label class="card-reply__label" for="reply-crew-auth">Your reply</label>
+          <textarea class="card-reply__textarea" id="reply-crew-auth" data-reply-id="fu-crew-auth" placeholder="A or B — and the email addresses for whoever needs access"></textarea>
+          <div class="card-reply__actions">
+            <button class="card-check">Mark addressed</button>
+            <span class="card-reply__hint">Saved as you type. Submit at the bottom of this section sends it.</span>
+          </div>
+          <div class="card-reply__history" data-history-empty="true"></div>
+        </div>
+      </div>
+
+      <div class="card card--checkable" data-need-id="def-photo-upload" data-card-status="followup">
+        <h3>D1. Self-serve photo upload <span class="card-status card-status--followup">Discuss</span></h3>
+        <p><strong>What it is:</strong> a private upload page where you drop new before/after photos, replace gallery photos, or swap a service-card image — without emailing anything to FITFO. Think of it as a Dropbox folder that auto-publishes to the site.</p>
+        <p><strong>Why it matters to you:</strong> you've said this directly — eliminate FITFO as the bottleneck for photos. Once it ships, every job's photos are minutes from being live, not days.</p>
+        <p><strong>What it'd take:</strong> upload page wired to the same Google Drive folder we already use for lead photos. New photos get a label (gallery / before-after / service card / lot clearing timeline). Replacing an existing photo = drag a new file onto its row. Lives behind the same login as the crew tool.</p>
+        <div class="card-reply">
+          <label class="card-reply__label" for="reply-def-photo-upload">Your thoughts</label>
+          <textarea class="card-reply__textarea" id="reply-def-photo-upload" data-reply-id="def-photo-upload" placeholder="What's the priority on this for you?"></textarea>
+          <div class="card-reply__actions">
+            <button class="card-check">Mark addressed</button>
+            <span class="card-reply__hint">Saved as you type.</span>
+          </div>
+          <div class="card-reply__history" data-history-empty="true"></div>
+        </div>
+      </div>
+
+      <div class="card card--checkable" data-need-id="def-on-screen-sign" data-card-status="followup">
+        <h3>D2. On-screen customer signature <span class="card-status card-status--followup">Discuss</span></h3>
+        <p><strong>What it is:</strong> instead of a paper signature line on the printed quote, the customer signs with their finger on your phone or tablet before you leave the site. Signature gets saved into the quote PDF automatically.</p>
+        <p><strong>Why it matters:</strong> no scanning, no chasing signed copies after the visit. Every authorized job has a signed PDF in your Drive instantly.</p>
+        <p><strong>What it'd take:</strong> add a "Get signature" step to the crew tool. Customer signs, signature image embeds into the PDF, you both get the signed copy by email. Keeps the existing paper option as a fallback.</p>
+        <p><strong>Question for you:</strong> would your customers actually want to sign on a phone? Or do most of them prefer paper / pen? If paper still works fine for you, this is low priority.</p>
+        <div class="card-reply">
+          <label class="card-reply__label" for="reply-def-on-screen-sign">Your thoughts</label>
+          <textarea class="card-reply__textarea" id="reply-def-on-screen-sign" data-reply-id="def-on-screen-sign" placeholder="Worth it, or stick with paper?"></textarea>
+          <div class="card-reply__actions">
+            <button class="card-check">Mark addressed</button>
+            <span class="card-reply__hint">Saved as you type.</span>
+          </div>
+          <div class="card-reply__history" data-history-empty="true"></div>
+        </div>
+      </div>
+
+      <div class="card card--checkable" data-need-id="def-maint-reminders" data-card-status="followup">
+        <h3>D3. Yearly maintenance reminders <span class="card-status card-status--followup">Discuss</span></h3>
+        <p><strong>What it is:</strong> an auto-email that goes out to past customers ~12 months after a job. Something like: "Hey from Pine Point — it's been a year since we worked at your place. Want us to swing by and check the trees? Free estimate as always." Click-through scheduling link.</p>
+        <p><strong>Why it matters:</strong> repeat customers are the cheapest leads you'll ever get. A simple yearly nudge can turn a one-time job into a returning customer with zero ad spend.</p>
+        <p><strong>What it'd take:</strong> Apps Script picks past leads marked "Done," waits ~365 days, sends a friendly reminder email with a "Get a free check-up" button that pre-fills your existing estimate flow.</p>
+        <p><strong>Question for you:</strong> good idea, or feels too pushy for your customer base? Some shops feel this is salesy, others swear by it.</p>
+        <div class="card-reply">
+          <label class="card-reply__label" for="reply-def-maint-reminders">Your thoughts</label>
+          <textarea class="card-reply__textarea" id="reply-def-maint-reminders" data-reply-id="def-maint-reminders" placeholder="Ok / not for me / would prefer X cadence"></textarea>
+          <div class="card-reply__actions">
+            <button class="card-check">Mark addressed</button>
+            <span class="card-reply__hint">Saved as you type.</span>
+          </div>
+          <div class="card-reply__history" data-history-empty="true"></div>
+        </div>
+      </div>
+
+      <div class="card card--checkable" data-need-id="def-reporting" data-card-status="followup">
+        <h3>D4. Reporting dashboard <span class="card-status card-status--followup">Discuss</span></h3>
+        <p><strong>What it is:</strong> one page that pulls from your Sheet and shows: jobs per month, revenue trend, top services, conversion rate from estimate → callback → done, where leads are coming from (homepage, estimate tool, ad sources). All charts, no spreadsheet wrangling.</p>
+        <p><strong>Why it matters:</strong> at a glance you'd see if business is up or down, which services to push, which towns produce the most revenue, where money is being made.</p>
+        <p><strong>What it'd take:</strong> reads your existing Sheet, builds the charts on the fly. No new data entry on your part. Lives behind the same login as the crew tool.</p>
+        <p><strong>Question for you:</strong> would you actually open this regularly, or is the Sheet enough? Some owners live in dashboards, others just want raw numbers in rows.</p>
+        <div class="card-reply">
+          <label class="card-reply__label" for="reply-def-reporting">Your thoughts</label>
+          <textarea class="card-reply__textarea" id="reply-def-reporting" data-reply-id="def-reporting" placeholder="Would use it / wouldn't open it / which numbers matter most"></textarea>
+          <div class="card-reply__actions">
+            <button class="card-check">Mark addressed</button>
+            <span class="card-reply__hint">Saved as you type.</span>
+          </div>
+          <div class="card-reply__history" data-history-empty="true"></div>
+        </div>
+      </div>
+
+      <p style="color:var(--off-white);font-size:0.95rem;margin-top:24px">
+        <strong>Also queued (smaller decisions for when bigger features land):</strong>
+        multi-line itemization on quote PDFs, online payment links (Stripe), offline mode for the crew tool when a job site has no signal, Google Calendar push for confirmed jobs, photos uploaded by the crew from the field that auto-attach to the invoice.
+      </p>
     </section>
 
   </main>
@@ -3497,8 +3628,10 @@ function installTrigger() {
   });
 
   // === Need-cards (What we need from you) — checkable + section progress ===
+  // Includes the latest follow-ups section so their "Mark addressed" buttons
+  // and post-submit auto-mark behavior share the same plumbing.
   const STORAGE_KEY_NEED = 'pinepoint.handoff.needDone.v1';
-  const needCards = Array.from(document.querySelectorAll('#need .card--checkable'));
+  const needCards = Array.from(document.querySelectorAll('#need .card--checkable, #latest .card--checkable'));
   const needProgressFill = document.getElementById('need-progress-fill');
   const needProgressText = document.getElementById('need-progress-text');
   let needDoneSet = new Set();
@@ -3839,8 +3972,10 @@ function installTrigger() {
     wrap.innerHTML = '<div class="card-reply__history-title">Sent so far</div>' + posts;
   }
 
-  // Hydrate textareas + per-card history on load.
-  const needCheckableCards = Array.from(document.querySelectorAll('#need .card--checkable'));
+  // Hydrate textareas + per-card history on load. Includes the "Latest
+  // follow-ups" section so all open discussion cards share the master
+  // submit button at the bottom of "need".
+  const needCheckableCards = Array.from(document.querySelectorAll('#need .card--checkable, #latest .card--checkable'));
   needCheckableCards.forEach(card => {
     const ta = card.querySelector('.card-reply__textarea');
     if (ta) {

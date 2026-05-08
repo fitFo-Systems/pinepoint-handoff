@@ -3252,15 +3252,20 @@ function sendQuotePdfEmail(quote, pdfFileId, mode, options) {
   const subject = subjectPrefix + &#x27; — &#x27; + (isInvoice ? &#x27;Invoice &#x27; : &#x27;Quote &#x27;) + (quote.quoteNumber || &#x27;&#x27;);
 
   const cust = (quote.customer &amp;&amp; quote.customer.name) || &#x27;there&#x27;;
-  const customerNoteHtml = quote.customerNote ? &#x27;&lt;p style=&quot;margin:0 0 12px 0&quot;&gt;&#x27; + escapeHtml(quote.customerNote) + &#x27;&lt;/p&gt;&#x27; : &#x27;&#x27;;
-  const greeting = isInvoice
-    ? &#x27;Hi &#x27; + escapeHtml(cust) + &#x27;,&lt;br&gt;&lt;br&gt;Attached is the invoice for the work we completed. Thanks for choosing Pine Point.&#x27;
-    : &#x27;Hi &#x27; + escapeHtml(cust) + &#x27;,&lt;br&gt;&lt;br&gt;Attached is the &#x27; + docLabel + &#x27; for the tree work we discussed. Let me know if anything looks off — otherwise sign and send back when you\&#x27;re ready.&#x27;;
+  const greetingLine = &#x27;Hi &#x27; + escapeHtml(cust) + &#x27;,&#x27;;
+  const bodyLine = isInvoice
+    ? &#x27;Attached is the invoice for the work we completed. Thanks for choosing Pine Point.&#x27;
+    : &#x27;Attached is the &#x27; + docLabel + &#x27; for the tree work we discussed. Let me know if anything looks off — otherwise sign and send back when you\&#x27;re ready.&#x27;;
+  const customerNoteHtml = quote.customerNote
+    ? &#x27;&lt;p style=&quot;margin:0 0 12px 0&quot;&gt;&#x27; + escapeHtml(quote.customerNote) + &#x27;&lt;/p&gt;&#x27;
+    : &#x27;&#x27;;
 
+  // Order: greeting → optional personal note → standard body → sign-off
   const html = [
     &#x27;&lt;div style=&quot;font-family:Arial,Helvetica,sans-serif;max-width:560px;color:#222&quot;&gt;&#x27;,
+    &#x27;&lt;p style=&quot;margin:0 0 12px 0&quot;&gt;&#x27; + greetingLine + &#x27;&lt;/p&gt;&#x27;,
     customerNoteHtml,
-    &#x27;&lt;p style=&quot;margin:0 0 12px 0&quot;&gt;&#x27; + greeting + &#x27;&lt;/p&gt;&#x27;,
+    &#x27;&lt;p style=&quot;margin:0 0 12px 0&quot;&gt;&#x27; + bodyLine + &#x27;&lt;/p&gt;&#x27;,
     &#x27;&lt;p style=&quot;margin:0 0 4px 0&quot;&gt;— Jason, Pine Point Tree Service&lt;/p&gt;&#x27;,
     &#x27;&lt;p style=&quot;margin:0;color:#444&quot;&gt;(774) 262-2145&lt;/p&gt;&#x27;,
     &#x27;&lt;/div&gt;&#x27;

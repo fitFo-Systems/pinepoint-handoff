@@ -3090,11 +3090,11 @@ function buildQuoteTemplateDoc_() {
 
   infoCell.clear();
   const companyTitle = infoCell.appendParagraph(&#x27;Pine Point Tree Service LLC&#x27;);
-  companyTitle.setBold(true).setFontSize(16).setForegroundColor(&#x27;#1c1c1c&#x27;);
+  companyTitle.setBold(true).setFontSize(16).setForegroundColor(&#x27;#1C1C1C&#x27;);
   const addr1 = infoCell.appendParagraph(&#x27;710 Whittemore St   (774) 262-2145&#x27;);
-  addr1.setFontSize(10).setForegroundColor(&#x27;#444&#x27;);
+  addr1.setFontSize(10).setForegroundColor(&#x27;#444444&#x27;);
   const addr2 = infoCell.appendParagraph(&#x27;Leicester, MA 01524   pinepointtreeservice@gmail.com&#x27;);
-  addr2.setFontSize(10).setForegroundColor(&#x27;#444&#x27;);
+  addr2.setFontSize(10).setForegroundColor(&#x27;#444444&#x27;);
 
   body.appendParagraph(&#x27; &#x27;).setFontSize(8);
 
@@ -3105,7 +3105,7 @@ function buildQuoteTemplateDoc_() {
   const numCell  = topTable.getCell(0, 1);
   custCell.clear();
   custCell.appendParagraph(&#x27;{{customer_name}}&#x27;).setBold(true).setFontSize(11);
-  custCell.appendParagraph(&#x27;{{customer_address}}&#x27;).setFontSize(11).setForegroundColor(&#x27;#222&#x27;);
+  custCell.appendParagraph(&#x27;{{customer_address}}&#x27;).setFontSize(11).setForegroundColor(&#x27;#222222&#x27;);
 
   numCell.clear();
   // Green badge with quote/invoice number
@@ -3160,7 +3160,7 @@ function buildQuoteTemplateDoc_() {
 
   // --- Optional customer note (replaced or stripped per-quote) ---
   const noteSep = body.appendParagraph(&#x27;{{customer_note_block}}&#x27;);
-  noteSep.setFontSize(10).setForegroundColor(&#x27;#222&#x27;).setItalic(true);
+  noteSep.setFontSize(10).setForegroundColor(&#x27;#222222&#x27;).setItalic(true);
 
   body.appendParagraph(&#x27; &#x27;).setFontSize(6);
 
@@ -3168,7 +3168,7 @@ function buildQuoteTemplateDoc_() {
   const authP = body.appendParagraph(
     &#x27;Authorization: By signing below, the customer authorizes the work described in this proposal to be performed. Payment is due upon completion of the work.&#x27;
   );
-  authP.setFontSize(10).setForegroundColor(&#x27;#222&#x27;).setBold(false);
+  authP.setFontSize(10).setForegroundColor(&#x27;#222222&#x27;).setBold(false);
 
   body.appendParagraph(&#x27; &#x27;).setFontSize(8);
 

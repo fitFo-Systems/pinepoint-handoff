@@ -1665,10 +1665,22 @@ const SHEETS = {
       &#x27;Service&#x27;, &#x27;Trees JSON&#x27;, &#x27;Description&#x27;, &#x27;Total&#x27;,
       &#x27;Customer Est. Low&#x27;, &#x27;Customer Est. Typical&#x27;, &#x27;Customer Est. High&#x27;,
       &#x27;Created At&#x27;, &#x27;Sent At&#x27;, &#x27;Completed At&#x27;, &#x27;Invoiced At&#x27;,
-      &#x27;Created By&#x27;, &#x27;Notes&#x27;
+      &#x27;Created By&#x27;, &#x27;Notes&#x27;,
+      &#x27;Customer Note&#x27;, &#x27;PDF Url&#x27;
     ]
   }
 };
+
+// Public URL for the Pine Point logo, used by installQuoteTemplate to
+// fetch the image and embed it into the Doc template once.
+const LOGO_URL = &#x27;https://pinepointtrees.com/images/logo-pinepoint-black.png&#x27;;
+
+// Where generated quote/invoice PDFs land. Created on first run.
+const QUOTES_FOLDER_NAME = &#x27;Pine Point Quotes&#x27;;
+
+// Reply-to address on customer-bound emails (the From address is
+// always the script owner&#x27;s Gmail).
+const REPLY_TO_EMAIL = &#x27;pinepointtreeservice@gmail.com&#x27;;
 
 // Pine Point&#x27;s service center (Leicester, MA) and operating radius.
 const SERVICE_CENTER_LAT = 42.2459;
@@ -1786,6 +1798,12 @@ function doPost(e) {
     } else if (data.formType === &#x27;crew_create_lead&#x27;) {
       if (!isCrewAuthorized(data.token)) return jsonResponse({ error: &#x27;unauthorized&#x27; });
       return jsonResponse(createCrewLead(ss, data));
+    } else if (data.formType === &#x27;crew_send_quote&#x27;) {
+      if (!isCrewAuthorized(data.token)) return jsonResponse({ error: &#x27;unauthorized&#x27; });
+      return jsonResponse(handleCrewSendQuote(ss, data));
+    } else if (data.formType === &#x27;crew_mark_complete&#x27;) {
+      if (!isCrewAuthorized(data.token)) return jsonResponse({ error: &#x27;unauthorized&#x27; });
+      return jsonResponse(handleCrewMarkComplete(ss, data));
     } else if (data.formType === &#x27;wood_signup&#x27;) {
       if (!isValidContact(data.contact, data.formType)) {
         return jsonResponse({ error: &#x27;invalid contact&#x27; });
@@ -2818,7 +2836,9 @@ function readLatestQuoteByEstimate(ss, estimateNumber) {
         completedAt:  rows[i][17],
         invoicedAt:   rows[i][18],
         createdBy:    rows[i][19],
-        notes:        rows[i][20]
+        notes:        rows[i][20],
+        customerNote: rows[i][21] || &#x27;&#x27;,
+        pdfUrl:       rows[i][22] || &#x27;&#x27;
       };
     }
   }
@@ -2863,7 +2883,7 @@ function saveCrewQuote(ss, data) {
     const row = [
       quoteNumber,
       q.estimateNumber,
-      &#x27;Draft&#x27;,
+      (existing &amp;&amp; existing.status) || &#x27;Draft&#x27;,
       c.name || &#x27;&#x27;,
       c.address || &#x27;&#x27;,
       c.phone || &#x27;&#x27;,
@@ -2881,7 +2901,9 @@ function saveCrewQuote(ss, data) {
       existing &amp;&amp; existing.completedAt ? existing.completedAt : &#x27;&#x27;,
       existing &amp;&amp; existing.invoicedAt ? existing.invoicedAt : &#x27;&#x27;,
       data.user || existing &amp;&amp; existing.createdBy || &#x27;&#x27;,
-      q.notes || &#x27;&#x27;
+      q.notes || &#x27;&#x27;,
+      q.customerNote || &#x27;&#x27;,
+      existing &amp;&amp; existing.pdfUrl ? existing.pdfUrl : &#x27;&#x27;
     ];
 
     if (existing) {
@@ -2982,6 +3004,368 @@ function createCrewLead(ss, data) {
     c.address || &#x27;&#x27;
   ]);
   return { ok: true, estimateNumber: estimateNumber };
+}
+
+// ============================================================
+// Quote / Invoice PDF generation
+// ============================================================
+
+/**
+ * Returns the Drive folder where generated PDFs land. Created once
+ * on first call, then reused.
+ */
+function getOrCreateQuoteFolder() {
+  const it = DriveApp.getFoldersByName(QUOTES_FOLDER_NAME);
+  if (it.hasNext()) return it.next();
+  return DriveApp.createFolder(QUOTES_FOLDER_NAME);
+}
+
+/**
+ * One-time setup. Builds the Quote/Invoice template Doc with
+ * placeholders Apps Script can replace per-quote. After install,
+ * Jason can edit the Doc visually in Google Docs anytime — placeholder
+ * tokens stay intact; layout / fonts / canned paragraphs are his.
+ *
+ * Run once from the Apps Script editor: Run -&gt; installQuoteTemplate.
+ * Re-running surfaces the existing template ID without rebuilding.
+ * Use rebuildQuoteTemplate() to wipe the existing one and start fresh.
+ */
+function installQuoteTemplate() {
+  const props = PropertiesService.getScriptProperties();
+  const existing = props.getProperty(&#x27;quote_template_doc_id&#x27;);
+  if (existing) {
+    try {
+      DriveApp.getFileById(existing);  // verify it still exists
+      console.log(&#x27;Quote template already installed at:&#x27;);
+      console.log(&#x27;https://docs.google.com/document/d/&#x27; + existing + &#x27;/edit&#x27;);
+      return existing;
+    } catch (e) {
+      // Template was deleted; fall through and rebuild.
+    }
+  }
+  const id = buildQuoteTemplateDoc_();
+  props.setProperty(&#x27;quote_template_doc_id&#x27;, id);
+  console.log(&#x27;Quote template installed:&#x27;);
+  console.log(&#x27;https://docs.google.com/document/d/&#x27; + id + &#x27;/edit&#x27;);
+  return id;
+}
+
+function rebuildQuoteTemplate() {
+  const props = PropertiesService.getScriptProperties();
+  const existing = props.getProperty(&#x27;quote_template_doc_id&#x27;);
+  if (existing) {
+    try { DriveApp.getFileById(existing).setTrashed(true); } catch (e) {}
+  }
+  const id = buildQuoteTemplateDoc_();
+  props.setProperty(&#x27;quote_template_doc_id&#x27;, id);
+  console.log(&#x27;Template rebuilt: https://docs.google.com/document/d/&#x27; + id + &#x27;/edit&#x27;);
+  return id;
+}
+
+function buildQuoteTemplateDoc_() {
+  const doc = DocumentApp.create(&#x27;Pine Point Quote Template&#x27;);
+  const body = doc.getBody();
+  body.setMarginTop(36).setMarginBottom(36).setMarginLeft(54).setMarginRight(54);
+  // Clear default empty paragraph so we don&#x27;t leave a stray blank line at top.
+  body.clear();
+
+  // --- HEADER: logo (left) + company info (right) in a 2-col table ---
+  let logoBlob = null;
+  try {
+    logoBlob = UrlFetchApp.fetch(LOGO_URL).getBlob().setName(&#x27;PinePointLogo.png&#x27;);
+  } catch (e) {
+    logoBlob = null;  // graceful fallback to text-only header if fetch fails
+  }
+  const headerTable = body.appendTable([[&#x27;&#x27;, &#x27;&#x27;]]);
+  headerTable.setBorderWidth(0);
+  const logoCell = headerTable.getCell(0, 0);
+  const infoCell = headerTable.getCell(0, 1);
+  logoCell.setWidth(120);
+  logoCell.clear();
+  if (logoBlob) {
+    logoCell.appendImage(logoBlob).setWidth(110).setHeight(110);
+  } else {
+    logoCell.appendParagraph(&#x27;PINE POINT&#x27;).setBold(true);
+  }
+
+  infoCell.clear();
+  const companyTitle = infoCell.appendParagraph(&#x27;Pine Point Tree Service LLC&#x27;);
+  companyTitle.setBold(true).setFontSize(16).setForegroundColor(&#x27;#1c1c1c&#x27;);
+  const addr1 = infoCell.appendParagraph(&#x27;710 Whittemore St   (774) 262-2145&#x27;);
+  addr1.setFontSize(10).setForegroundColor(&#x27;#444&#x27;);
+  const addr2 = infoCell.appendParagraph(&#x27;Leicester, MA 01524   pinepointtreeservice@gmail.com&#x27;);
+  addr2.setFontSize(10).setForegroundColor(&#x27;#444&#x27;);
+
+  body.appendParagraph(&#x27; &#x27;).setFontSize(8);
+
+  // --- Customer address (left) + Quote/Invoice number badge (right) ---
+  const topTable = body.appendTable([[&#x27;&#x27;, &#x27;&#x27;]]);
+  topTable.setBorderWidth(0);
+  const custCell = topTable.getCell(0, 0);
+  const numCell  = topTable.getCell(0, 1);
+  custCell.clear();
+  custCell.appendParagraph(&#x27;{{customer_name}}&#x27;).setBold(true).setFontSize(11);
+  custCell.appendParagraph(&#x27;{{customer_address}}&#x27;).setFontSize(11).setForegroundColor(&#x27;#222&#x27;);
+
+  numCell.clear();
+  // Green badge with quote/invoice number
+  const badge = numCell.appendParagraph(&#x27;{{header_label}}{{quote_number}}&#x27;);
+  badge.setBold(true).setFontSize(13).setForegroundColor(&#x27;#FFFFFF&#x27;);
+  badge.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+  numCell.setBackgroundColor(&#x27;#2D5A27&#x27;);
+  numCell.setPaddingTop(8).setPaddingBottom(8);
+
+  body.appendParagraph(&#x27; &#x27;).setFontSize(8);
+
+  // Issue date row
+  const issueTable = body.appendTable([[&#x27;Issue Date&#x27;, &#x27;{{issue_date}}&#x27;]]);
+  issueTable.setBorderWidth(0);
+  const issLabelCell = issueTable.getCell(0, 0);
+  const issValueCell = issueTable.getCell(0, 1);
+  issLabelCell.editAsText().setBold(true);
+  issValueCell.editAsText().setBold(false);
+  issLabelCell.setWidth(120);
+
+  body.appendParagraph(&#x27; &#x27;).setFontSize(8);
+
+  // --- Line item table: SERVICE | DESCRIPTION | TOTAL ---
+  const lineTable = body.appendTable([
+    [&#x27;SERVICE&#x27;, &#x27;DESCRIPTION&#x27;, &#x27;TOTAL&#x27;],
+    [&#x27;TREE WORK&#x27;, &#x27;{{description}}&#x27;, &#x27;{{total}}&#x27;]
+  ]);
+  // Header row styling
+  for (let c = 0; c &lt; 3; c++) {
+    const hcell = lineTable.getCell(0, c);
+    hcell.setBackgroundColor(&#x27;#2D5A27&#x27;);
+    hcell.editAsText().setBold(true).setForegroundColor(&#x27;#FFFFFF&#x27;).setFontSize(10);
+  }
+  lineTable.getCell(0, 0).setWidth(110);
+  lineTable.getCell(0, 2).setWidth(85);
+  lineTable.getCell(1, 0).editAsText().setBold(true).setFontSize(11);
+  lineTable.getCell(1, 1).editAsText().setFontSize(10);
+  lineTable.getCell(1, 2).editAsText().setBold(true).setFontSize(11);
+  lineTable.getCell(1, 2).setBackgroundColor(&#x27;#FFFFFF&#x27;);
+  lineTable.getCell(1, 2).getChild(0).asParagraph().setAlignment(DocumentApp.HorizontalAlignment.RIGHT);
+
+  body.appendParagraph(&#x27; &#x27;).setFontSize(6);
+
+  // --- Total row ---
+  const totalTable = body.appendTable([[&#x27;Total&#x27;, &#x27;{{total}}&#x27;]]);
+  totalTable.setBorderWidth(0);
+  totalTable.getCell(0, 0).editAsText().setBold(true).setFontSize(11);
+  totalTable.getCell(0, 1).editAsText().setBold(true).setFontSize(12);
+  totalTable.getCell(0, 1).getChild(0).asParagraph().setAlignment(DocumentApp.HorizontalAlignment.RIGHT);
+
+  body.appendParagraph(&#x27; &#x27;).setFontSize(8);
+
+  // --- Optional customer note (replaced or stripped per-quote) ---
+  const noteSep = body.appendParagraph(&#x27;{{customer_note_block}}&#x27;);
+  noteSep.setFontSize(10).setForegroundColor(&#x27;#222&#x27;).setItalic(true);
+
+  body.appendParagraph(&#x27; &#x27;).setFontSize(6);
+
+  // --- Authorization paragraph (canned — Jason can edit this in Docs anytime) ---
+  const authP = body.appendParagraph(
+    &#x27;Authorization: By signing below, the customer authorizes the work described in this proposal to be performed. Payment is due upon completion of the work.&#x27;
+  );
+  authP.setFontSize(10).setForegroundColor(&#x27;#222&#x27;).setBold(false);
+
+  body.appendParagraph(&#x27; &#x27;).setFontSize(8);
+
+  // --- Signature line ---
+  body.appendParagraph(&#x27;Customer Signature: ____________________________   Date: ____________&#x27;)
+      .setFontSize(11).setBold(true);
+
+  doc.saveAndClose();
+  return doc.getId();
+}
+
+/**
+ * Renders a quote into a PDF: copy template, replace placeholders,
+ * export PDF, save in the Quotes folder, set sharing so the URL is
+ * viewable by anyone with the link, return the URL set.
+ *
+ * options.asInvoice (bool) — flips the header label from Quote to Invoice.
+ */
+function generateQuotePdf(quote, options) {
+  options = options || {};
+  const props = PropertiesService.getScriptProperties();
+  const templateId = props.getProperty(&#x27;quote_template_doc_id&#x27;);
+  if (!templateId) throw new Error(&#x27;Quote template missing — run installQuoteTemplate() once.&#x27;);
+
+  const headerLabel = options.asInvoice ? &#x27;Invoice #&#x27; : &#x27;Quote #&#x27;;
+  const tz = Session.getScriptTimeZone();
+  const issueDate = Utilities.formatDate(new Date(), tz, &#x27;EEEE, MMMM d, yyyy&#x27;);
+  const totalNum = Number(quote.total) || 0;
+  const totalText = &#x27;$&#x27; + totalNum.toLocaleString(&#x27;en-US&#x27;);
+  const noteBlock = quote.customerNote ? quote.customerNote : &#x27;&#x27;;
+
+  // Copy the template into a temp doc.
+  const templateFile = DriveApp.getFileById(templateId);
+  const tempCopy = templateFile.makeCopy(&#x27;temp_quote_&#x27; + Date.now());
+  const tempId = tempCopy.getId();
+  try {
+    const tempDoc = DocumentApp.openById(tempId);
+    const tempBody = tempDoc.getBody();
+    tempBody.replaceText(&#x27;{{header_label}}&#x27;, headerLabel);
+    tempBody.replaceText(&#x27;{{quote_number}}&#x27;, quote.quoteNumber || &#x27;&#x27;);
+    tempBody.replaceText(&#x27;{{customer_name}}&#x27;, quote.customer &amp;&amp; quote.customer.name ? quote.customer.name : &#x27;&#x27;);
+    tempBody.replaceText(&#x27;{{customer_address}}&#x27;, quote.customer &amp;&amp; quote.customer.address ? quote.customer.address : &#x27;&#x27;);
+    tempBody.replaceText(&#x27;{{issue_date}}&#x27;, issueDate);
+    tempBody.replaceText(&#x27;{{description}}&#x27;, quote.description || &#x27;&#x27;);
+    tempBody.replaceText(&#x27;{{total}}&#x27;, totalText);
+    tempBody.replaceText(&#x27;{{customer_note_block}}&#x27;, noteBlock);
+    tempDoc.saveAndClose();
+
+    const pdfBlob = DriveApp.getFileById(tempId).getAs(&#x27;application/pdf&#x27;);
+    const cleanName = (quote.customer &amp;&amp; quote.customer.name ? quote.customer.name : &#x27;customer&#x27;).replace(/[^\w\s\-]/g, &#x27;&#x27;).trim();
+    const filename = (options.asInvoice ? &#x27;Invoice_&#x27; : &#x27;Quote_&#x27;) + (quote.quoteNumber || &#x27;&#x27;) + &#x27;_&#x27; + cleanName.replace(/\s+/g, &#x27;_&#x27;) + &#x27;.pdf&#x27;;
+    pdfBlob.setName(filename);
+
+    const folder = getOrCreateQuoteFolder();
+    const pdfFile = folder.createFile(pdfBlob);
+    pdfFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+    return {
+      url: pdfFile.getUrl(),
+      embedUrl: &#x27;https://drive.google.com/file/d/&#x27; + pdfFile.getId() + &#x27;/preview&#x27;,
+      downloadUrl: &#x27;https://drive.google.com/uc?export=download&amp;id=&#x27; + pdfFile.getId(),
+      fileId: pdfFile.getId(),
+      filename: filename
+    };
+  } finally {
+    // Always trash the temp Doc copy.
+    try { DriveApp.getFileById(tempId).setTrashed(true); } catch (e) {}
+  }
+}
+
+/**
+ * Sends the quote/invoice PDF by email. mode &#x27;customer&#x27; goes to the
+ * customer; mode &#x27;preview&#x27; goes to the script owner so Jason can
+ * review before sending.
+ */
+function sendQuotePdfEmail(quote, pdfFileId, mode, options) {
+  options = options || {};
+  const isInvoice = !!options.asInvoice;
+  const docLabel = isInvoice ? &#x27;invoice&#x27; : &#x27;quote&#x27;;
+  const subjectPrefix = isInvoice ? &#x27;Pine Point Tree Service invoice&#x27; : &#x27;Pine Point Tree Service quote&#x27;;
+  const subject = subjectPrefix + &#x27; — &#x27; + (isInvoice ? &#x27;Invoice &#x27; : &#x27;Quote &#x27;) + (quote.quoteNumber || &#x27;&#x27;);
+
+  const cust = (quote.customer &amp;&amp; quote.customer.name) || &#x27;there&#x27;;
+  const customerNoteHtml = quote.customerNote ? &#x27;&lt;p style=&quot;margin:0 0 12px 0&quot;&gt;&#x27; + escapeHtml(quote.customerNote) + &#x27;&lt;/p&gt;&#x27; : &#x27;&#x27;;
+  const greeting = isInvoice
+    ? &#x27;Hi &#x27; + escapeHtml(cust) + &#x27;,&lt;br&gt;&lt;br&gt;Attached is the invoice for the work we completed. Thanks for choosing Pine Point.&#x27;
+    : &#x27;Hi &#x27; + escapeHtml(cust) + &#x27;,&lt;br&gt;&lt;br&gt;Attached is the &#x27; + docLabel + &#x27; for the tree work we discussed. Let me know if anything looks off — otherwise sign and send back when you\&#x27;re ready.&#x27;;
+
+  const html = [
+    &#x27;&lt;div style=&quot;font-family:Arial,Helvetica,sans-serif;max-width:560px;color:#222&quot;&gt;&#x27;,
+    customerNoteHtml,
+    &#x27;&lt;p style=&quot;margin:0 0 12px 0&quot;&gt;&#x27; + greeting + &#x27;&lt;/p&gt;&#x27;,
+    &#x27;&lt;p style=&quot;margin:0 0 4px 0&quot;&gt;— Jason, Pine Point Tree Service&lt;/p&gt;&#x27;,
+    &#x27;&lt;p style=&quot;margin:0;color:#444&quot;&gt;(774) 262-2145&lt;/p&gt;&#x27;,
+    &#x27;&lt;/div&gt;&#x27;
+  ].join(&#x27;&#x27;);
+
+  const pdfBlob = DriveApp.getFileById(pdfFileId).getBlob();
+  const recipient = (mode === &#x27;customer&#x27;)
+    ? (quote.customer &amp;&amp; quote.customer.email ? quote.customer.email : &#x27;&#x27;)
+    : Session.getEffectiveUser().getEmail();
+  if (!recipient) return { error: &#x27;no recipient (customer email missing?)&#x27; };
+
+  try {
+    MailApp.sendEmail({
+      to: recipient,
+      subject: subject,
+      htmlBody: html,
+      replyTo: REPLY_TO_EMAIL,
+      name: &#x27;Pine Point Tree Service&#x27;,
+      attachments: [pdfBlob]
+    });
+    return { ok: true, sentTo: recipient };
+  } catch (e) {
+    return { error: String(e) };
+  }
+}
+
+/**
+ * doPost handler for crew_send_quote — generates the PDF if missing
+ * and emails per the requested mode (customer | preview). Caller
+ * gets back { ok, pdfUrl, embedUrl, sentTo }.
+ *
+ * If options.asInvoice is true, this is the post-job send.
+ */
+function handleCrewSendQuote(ss, data) {
+  if (!data.estimateNumber) return { error: &#x27;missing estimateNumber&#x27; };
+  const existing = readLatestQuoteByEstimate(ss, data.estimateNumber);
+  if (!existing) return { error: &#x27;no quote saved for this lead yet&#x27; };
+
+  const asInvoice = !!data.asInvoice;
+  const pdf = generateQuotePdf(existing, { asInvoice: asInvoice });
+  let sendResult = null;
+  if (data.mode === &#x27;customer&#x27; || data.mode === &#x27;preview&#x27;) {
+    sendResult = sendQuotePdfEmail(existing, pdf.fileId, data.mode, { asInvoice: asInvoice });
+  }
+
+  // Update the Quotes row with the latest PDF URL, status, and timestamps.
+  const sheet = ss.getSheetByName(SHEETS.quotes.name);
+  if (sheet &amp;&amp; sheet.getLastRow() &gt;= 2) {
+    const ids = sheet.getRange(2, 1, sheet.getLastRow() - 1, 1).getValues();
+    for (let i = 0; i &lt; ids.length; i++) {
+      if (ids[i][0] === existing.quoteNumber) {
+        const row = i + 2;
+        // Column 23 = PDF Url
+        sheet.getRange(row, 23).setValue(pdf.url);
+        // Status flips on a real send to customer
+        if (data.mode === &#x27;customer&#x27;) {
+          if (asInvoice) {
+            sheet.getRange(row, 3).setValue(&#x27;Invoiced&#x27;);
+            sheet.getRange(row, 19).setValue(new Date());  // Invoiced At
+          } else {
+            sheet.getRange(row, 3).setValue(&#x27;Sent&#x27;);
+            sheet.getRange(row, 17).setValue(new Date());  // Sent At
+          }
+        }
+        break;
+      }
+    }
+  }
+
+  return {
+    ok: true,
+    pdfUrl: pdf.url,
+    embedUrl: pdf.embedUrl,
+    fileId: pdf.fileId,
+    sent: !!(sendResult &amp;&amp; sendResult.ok),
+    sentTo: sendResult ? sendResult.sentTo : &#x27;&#x27;,
+    sendError: sendResult &amp;&amp; sendResult.error ? sendResult.error : &#x27;&#x27;
+  };
+}
+
+/**
+ * doPost handler for crew_mark_complete — flips a quote&#x27;s status to
+ * Job Done and stamps Completed At. The next &quot;send invoice&quot; call
+ * generates the PDF with the Invoice header and updates status to
+ * Invoiced.
+ */
+function handleCrewMarkComplete(ss, data) {
+  if (!data.estimateNumber) return { error: &#x27;missing estimateNumber&#x27; };
+  const existing = readLatestQuoteByEstimate(ss, data.estimateNumber);
+  if (!existing) return { error: &#x27;no quote saved for this lead&#x27; };
+
+  const sheet = ss.getSheetByName(SHEETS.quotes.name);
+  if (!sheet) return { error: &#x27;Quotes sheet missing&#x27; };
+  const lastRow = sheet.getLastRow();
+  if (lastRow &lt; 2) return { error: &#x27;no rows&#x27; };
+  const ids = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+  for (let i = 0; i &lt; ids.length; i++) {
+    if (ids[i][0] === existing.quoteNumber) {
+      const row = i + 2;
+      sheet.getRange(row, 3).setValue(&#x27;Job Done&#x27;);
+      sheet.getRange(row, 18).setValue(new Date());  // Completed At
+      return { ok: true, quoteNumber: existing.quoteNumber, status: &#x27;Job Done&#x27; };
+    }
+  }
+  return { error: &#x27;quote row not found&#x27; };
 }
 
 /**
@@ -3527,7 +3911,7 @@ function generateCrewToken_() {
       <h2>What we need from you</h2>
 
       <div class="section-progress">
-        <span class="section-progress__label">Items addressed (this section + "Deferred for next phase"): <span id="need-progress-text">0 / 13</span></span>
+        <span class="section-progress__label">Items addressed (this section + "Deferred for next phase"): <span id="need-progress-text">0 / 14</span></span>
         <div class="section-progress__bar"><div class="section-progress__fill" id="need-progress-fill"></div></div>
       </div>
 
@@ -3839,6 +4223,31 @@ function generateCrewToken_() {
         </div>
       </div>
 
+      <div class="card card--checkable" data-need-id="fu-quote-copy" data-card-status="followup">
+        <h3>10. Quote / invoice copy <span class="card-status card-status--followup">Followup Requested</span></h3>
+        <p>Now that the crew tool generates a quote PDF and emails customers, two pieces of language we built defaults for that you can swap whenever you want.</p>
+
+        <p style="margin-top:12px"><strong>1. The authorization paragraph on the quote PDF</strong> (canned, every quote)</p>
+        <p style="margin:0;font-size:0.9rem;color:var(--off-white);background:#1a1a1a;border-left:3px solid var(--green);padding:10px 12px;border-radius:4px">By signing below, the customer authorizes the work described in this proposal to be performed. Payment is due upon completion of the work.</p>
+        <p style="margin-top:8px;font-size:0.9rem;color:var(--off-white)">Want to leave it as-is, change the wording, add Venmo / payment instructions? You can edit this directly in the Google Doc template anytime — no code change needed. Tell us what you'd want it to say (or "leave as-is").</p>
+
+        <p style="margin-top:14px"><strong>2. The email body when the quote is sent</strong></p>
+        <p style="margin:0;font-size:0.9rem;color:var(--off-white);background:#1a1a1a;border-left:3px solid var(--green);padding:10px 12px;border-radius:4px">Hi [name],<br><br>Attached is the quote for the tree work we discussed. Let me know if anything looks off — otherwise sign and send back when you're ready.<br><br>— Jason, Pine Point Tree Service<br>(774) 262-2145</p>
+        <p style="margin-top:8px;font-size:0.9rem;color:var(--off-white)">Same question — keep, tweak, or replace? The crew tool also lets us add a per-customer note (like "Great to meet you today, thanks for your time") that gets dropped into the email and printed on the PDF.</p>
+
+        <div class="card-reply">
+          <label class="card-reply__label" for="reply-quote-copy">Your reply</label>
+          <textarea class="card-reply__textarea" id="reply-quote-copy" data-reply-id="fu-quote-copy" placeholder="Quote authorization paragraph + email body — keep, tweak, or replace?"></textarea>
+          <div class="card-reply__actions">
+            <button class="card-check">Mark addressed</button>
+            <span class="card-reply__hint">Saved as you type. Submit at the bottom of this section sends it.</span>
+          </div>
+          <div class="card-reply__history" data-history-empty="true"></div>
+        </div>
+      </div>
+
+      
+
       <div class="test-summary" id="need-summary">
         <div class="test-summary__counts">
           <span class="ok-count"><strong id="need-filled-count">0</strong> cards have notes (across this section + "Deferred for next phase" below)</span>
@@ -3871,15 +4280,35 @@ function generateCrewToken_() {
         </div>
       </div>
 
-      <div class="card card--checkable" data-need-id="def-on-screen-sign" data-card-status="followup">
-        <h3>D2. On-screen customer signature <span class="card-status card-status--followup">Discuss</span></h3>
-        <p><strong>What it is:</strong> instead of a paper signature line on the printed quote, the customer signs with their finger on your phone or tablet before you leave the site. Signature gets saved into the quote PDF automatically.</p>
-        <p><strong>Why it matters:</strong> no scanning, no chasing signed copies after the visit. Every authorized job has a signed PDF in your Drive instantly.</p>
-        <p><strong>What it'd take:</strong> add a "Get signature" step to the crew tool. Customer signs, signature image embeds into the PDF, you both get the signed copy by email. Keeps the existing paper option as a fallback.</p>
-        <p><strong>Question for you:</strong> would your customers actually want to sign on a phone? Or do most of them prefer paper / pen? If paper still works fine for you, this is low priority.</p>
+      <div class="card card--checkable" data-need-id="def-signature" data-card-status="followup">
+        <h3>D2. Digital signatures (two ways) <span class="card-status card-status--followup">Discuss</span></h3>
+        <p>Right now the quote PDF has a paper signature line — customer signs in person and you take the signed page. Two digital options if/when you want to upgrade:</p>
+
+        <p style="margin-top:12px"><strong>Option A — On-screen finger sign</strong></p>
+        <ul>
+          <li>Customer signs with their finger on your phone before you leave the site. Signature image gets baked into the quote PDF automatically.</li>
+          <li><strong>Cost / setup:</strong> no third-party fees. Built into the crew tool.</li>
+          <li><strong>Build effort:</strong> small (signature pad library + insert image into PDF). ~half a day.</li>
+          <li><strong>When it shines:</strong> you're standing with the customer at the end of the visit and you want a signed PDF before you leave the driveway.</li>
+          <li><strong>Catch:</strong> doesn't work if you're not face-to-face when the quote goes out. Customer can't sign remotely.</li>
+        </ul>
+
+        <p style="margin-top:12px"><strong>Option B — DocuSign style remote signing</strong></p>
+        <ul>
+          <li>You email the quote, customer clicks a link, signs in their browser. Status flips to "Signed" automatically when they're done.</li>
+          <li><strong>Cost:</strong> DocuSign starts around $15/month per sender (or there are cheaper alternatives like Dropbox Sign / SignWell). Not free.</li>
+          <li><strong>Build effort:</strong> bigger — third-party API integration, webhook for sign events, account setup. ~2-3 days.</li>
+          <li><strong>When it shines:</strong> customer wants to "think about it overnight" or you want to send a quote without a site visit. They sign whenever they want, you get notified.</li>
+          <li><strong>Catch:</strong> recurring monthly cost; another tool to manage.</li>
+        </ul>
+
+        <p style="margin-top:12px"><strong>The middle ground</strong> — keep the paper signature line on the PDF (today's setup), and add Option A only if your customers start saying they'd prefer signing on the phone. Option B usually only makes sense if you do a lot of remote / no-site-visit quotes.</p>
+
+        <p><strong>Question for you:</strong> do you mostly sign in person, or do you find yourself emailing quotes and waiting on signed copies? Answer points to A vs B (or "stick with paper for now").</p>
+
         <div class="card-reply">
-          <label class="card-reply__label" for="reply-def-on-screen-sign">Your thoughts</label>
-          <textarea class="card-reply__textarea" id="reply-def-on-screen-sign" data-reply-id="def-on-screen-sign" placeholder="Worth it, or stick with paper?"></textarea>
+          <label class="card-reply__label" for="reply-def-signature">Your thoughts</label>
+          <textarea class="card-reply__textarea" id="reply-def-signature" data-reply-id="def-signature" placeholder="Paper / on-screen / DocuSign — and a sentence on why."></textarea>
           <div class="card-reply__actions">
             <button class="card-check">Mark addressed</button>
             <span class="card-reply__hint">Saved as you type.</span>
